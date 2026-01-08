@@ -136,7 +136,151 @@ export async function getCurrentUser() {
     }
 }
 
-// ... existing update/add functions ...
+// Update user profile
+export async function updateUser(updates) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
+
+        const { data, error } = await supabase
+            .from('users')
+            .update(updates)
+            .eq('id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return { success: true, message: 'User updated', user: data };
+    } catch (error) {
+        console.error('Update user error:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Add purchase to user
+export async function addPurchase(item) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
+
+        const { data, error } = await supabase
+            .from('purchases')
+            .insert([
+                {
+                    buyer_id: user.id,
+                    item_id: item.id,
+                    item_title: item.title,
+                    price: item.price,
+                    category: item.category
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return { success: true, message: 'Purchase recorded', purchase: data };
+    } catch (error) {
+        console.error('Add purchase error:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Add listing to seller
+export async function addListing(item) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
+
+        const { data, error } = await supabase
+            .from('marketplace_items')
+            .insert([
+                {
+                    ...item,
+                    seller_id: user.id,
+                    status: 'active'
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return { success: true, message: 'Listing added', listing: data };
+    } catch (error) {
+        console.error('Add listing error:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Add download to user
+export async function addDownload(resource) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
+
+        const { data, error } = await supabase
+            .from('downloads')
+            .insert([
+                {
+                    user_id: user.id,
+                    resource_id: resource.id
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Increment download count on the resource
+        await supabase.rpc('increment_resource_downloads', { resource_id: resource.id });
+
+        return { success: true, message: 'Download recorded', download: data };
+    } catch (error) {
+        console.error('Add download error:', error.message);
+        return { success: false, message: error.message };
+    }
+}
+
+// Toggle saved item
+export async function toggleSavedItem(itemId) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
+
+        // Check if already saved
+        const { data: existing } = await supabase
+            .from('saved_items')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('item_id', itemId)
+            .single();
+
+        if (existing) {
+            // Remove it
+            const { error } = await supabase
+                .from('saved_items')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('item_id', itemId);
+
+            if (error) throw error;
+            return { success: true, message: 'Item removed from saved', saved: false };
+        } else {
+            // Add it
+            const { error } = await supabase
+                .from('saved_items')
+                .insert([{ user_id: user.id, item_id: itemId }]);
+
+            if (error) throw error;
+            return { success: true, message: 'Item saved', saved: true };
+        }
+    } catch (error) {
+        console.error('Toggle saved error:', error.message);
+        return { success: false, message: error.message };
+    }
+}
 
 // Get user statistics
 export async function getUserStats() {
