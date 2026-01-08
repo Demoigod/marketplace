@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Campus Market</title>
+    <meta name="description" content="Manage your marketplace activity, listings, and purchases">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="auth.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
+                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#368CBF" />
+                                <stop offset="100%" stop-color="#E6DBC9" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Campus Market</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link">Marketplace</a>
+                    <a href="index.html#free-resources" class="nav-link">Free Resources</a>
+                    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                </div>
+                <button class="btn-secondary" id="backToMarket" onclick="window.location.href='index.html'">
+                    Back to Market
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- Welcome Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Welcome, <span id="dashboardUserName">User</span>!</h1>
+                <p class="dashboard-subtitle">Manage your marketplace activity</p>
+            </div>
+
+            <!-- Dashboard Content (Dynamic based on role) -->
+            <div id="dashboardContent"></div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
