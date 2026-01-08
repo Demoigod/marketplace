@@ -1,269 +1,301 @@
-// ===== AUTHENTICATION SYSTEM =====
-
-// User storage key
-const USERS_KEY = 'marketplace_users';
-const SESSION_KEY = 'marketplace_session';
-
-// Initialize users array if not exists
-function initializeStorage() {
-    if (!localStorage.getItem(USERS_KEY)) {
-        localStorage.setItem(USERS_KEY, JSON.stringify([]));
-    }
-}
-
-// Get all users
-function getUsers() {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-}
-
-// Save users
-function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-// Generate unique ID
-function generateId() {
-    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
+// ===== SUPABASE AUTHENTICATION SYSTEM =====
+import { supabase } from './supabase-config.js'
 
 // Register new user
-function registerUser(email, password, name, role) {
-    initializeStorage();
-    const users = getUsers();
+export async function registerUser(email, password, name, role) {
+    try {
+        // 1. Sign up user with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+        });
 
-    // Check if user already exists
-    if (users.find(u => u.email === email)) {
-        return { success: false, message: 'Email already registered' };
+        if (authError) throw authError;
+
+        if (authData.user) {
+            // 2. Create profile in users table
+            const { error: profileError } = await supabase
+                .from('users')
+                .insert([
+                    {
+                        id: authData.user.id,
+                        email: email,
+                        name: name,
+                        role: role
+                    }
+                ]);
+
+            if (profileError) throw profileError;
+
+            return { success: true, message: 'Registration successful! Please check your email for verification.', user: authData.user };
+        }
+    } catch (error) {
+        console.error('Registration error:', error.message);
+        return { success: false, message: error.message };
     }
-
-    // Create new user
-    const newUser = {
-        id: generateId(),
-        email: email,
-        password: password, // In production, this should be hashed
-        name: name,
-        role: role, // 'buyer' or 'seller'
-        createdAt: new Date().toISOString(),
-        purchases: [],
-        listings: [],
-        downloads: [],
-        savedItems: [],
-        sales: []
-    };
-
-    users.push(newUser);
-    saveUsers(users);
-
-    return { success: true, message: 'Registration successful', user: newUser };
 }
 
 // Login user
-function loginUser(email, password) {
-    const users = getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+export async function loginUser(email, password) {
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-    if (!user) {
-        return { success: false, message: 'Invalid email or password' };
+        if (error) throw error;
+
+        return { success: true, message: 'Login successful', user: data.user };
+    } catch (error) {
+        console.error('Login error:', error.message);
+        return { success: false, message: error.message };
     }
-
-    // Create session
-    const session = {
-        userId: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        loggedIn: true,
-        loginTime: new Date().toISOString()
-    };
-
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
-    return { success: true, message: 'Login successful', user: user };
 }
 
 // Logout user
-function logoutUser() {
-    localStorage.removeItem(SESSION_KEY);
-    return { success: true, message: 'Logged out successfully' };
+export async function logoutUser() {
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+
+        // Clear any remaining local storage session items if needed
+        localStorage.removeItem('marketplace_session');
+
+        return { success: true, message: 'Logged out successfully' };
+    } catch (error) {
+        console.error('Logout error:', error.message);
+        return { success: false, message: error.message };
+    }
 }
 
 // Get current session
-function getCurrentSession() {
-    const session = localStorage.getItem(SESSION_KEY);
-    return session ? JSON.parse(session) : null;
+export async function getCurrentSession() {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+        console.error('Session error:', error.message);
+        return null;
+    }
+    return session;
 }
 
 // Check if user is logged in
-function isLoggedIn() {
-    const session = getCurrentSession();
-    return session && session.loggedIn;
+export async function isLoggedIn() {
+    const session = await getCurrentSession();
+    return !!session;
 }
 
-// Get current user data
-function getCurrentUser() {
-    const session = getCurrentSession();
-    if (!session) return null;
+// Get current user profile data
+export async function getCurrentUser() {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
 
-    const users = getUsers();
-    return users.find(u => u.id === session.userId);
-}
+        // Fetch additional profile data from users table
+        const { data: profile, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
 
-// Update user data
-function updateUser(userId, updates) {
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
+        if (error) throw error;
 
-    if (userIndex === -1) {
-        return { success: false, message: 'User not found' };
+        // Fetch activity data (purchases, listings, sales, downloads)
+        const [
+            { data: purchases },
+            { data: listings },
+            { data: sales },
+            { data: downloads }
+        ] = await Promise.all([
+            supabase.from('purchases').select('*').eq('buyer_id', user.id),
+            supabase.from('marketplace_items').select('*').eq('seller_id', user.id),
+            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM marketplace_items WHERE seller_id = $1)'), // This is complex, will simplify for demo
+            supabase.from('downloads').select('*').eq('user_id', user.id)
+        ]);
+
+        return {
+            ...profile,
+            purchases: purchases || [],
+            listings: listings || [],
+            sales: sales || [],
+            downloads: downloads || []
+        };
+    } catch (error) {
+        console.error('Get user error:', error.message);
+        return null;
     }
+}
 
-    users[userIndex] = { ...users[userIndex], ...updates };
-    saveUsers(users);
+// Update user profile
+export async function updateUser(updates) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
 
-    return { success: true, message: 'User updated', user: users[userIndex] };
+        const { data, error } = await supabase
+            .from('users')
+            .update(updates)
+            .eq('id', user.id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return { success: true, message: 'User updated', user: data };
+    } catch (error) {
+        console.error('Update user error:', error.message);
+        return { success: false, message: error.message };
+    }
 }
 
 // Add purchase to user
-function addPurchase(userId, item) {
-    const user = getCurrentUser();
-    if (!user) return { success: false, message: 'Not logged in' };
+export async function addPurchase(item) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
 
-    const purchase = {
-        id: generateId(),
-        itemId: item.id,
-        itemTitle: item.title,
-        price: item.price,
-        category: item.category,
-        purchaseDate: new Date().toISOString()
-    };
+        const { data, error } = await supabase
+            .from('purchases')
+            .insert([
+                {
+                    buyer_id: user.id,
+                    item_id: item.id,
+                    item_title: item.title,
+                    price: item.price,
+                    category: item.category
+                }
+            ])
+            .select()
+            .single();
 
-    user.purchases.push(purchase);
-    updateUser(userId, { purchases: user.purchases });
+        if (error) throw error;
 
-    return { success: true, message: 'Purchase recorded', purchase: purchase };
+        return { success: true, message: 'Purchase recorded', purchase: data };
+    } catch (error) {
+        console.error('Add purchase error:', error.message);
+        return { success: false, message: error.message };
+    }
 }
 
 // Add listing to seller
-function addListing(userId, item) {
-    const user = getCurrentUser();
-    if (!user) return { success: false, message: 'Not logged in' };
+export async function addListing(item) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
 
-    const listing = {
-        ...item,
-        sellerId: userId,
-        listedDate: new Date().toISOString(),
-        views: 0,
-        status: 'active'
-    };
+        const { data, error } = await supabase
+            .from('marketplace_items')
+            .insert([
+                {
+                    ...item,
+                    seller_id: user.id,
+                    status: 'active'
+                }
+            ])
+            .select()
+            .single();
 
-    user.listings.push(listing);
-    updateUser(userId, { listings: user.listings });
+        if (error) throw error;
 
-    return { success: true, message: 'Listing added', listing: listing };
+        return { success: true, message: 'Listing added', listing: data };
+    } catch (error) {
+        console.error('Add listing error:', error.message);
+        return { success: false, message: error.message };
+    }
 }
 
 // Add download to user
-function addDownload(userId, resource) {
-    const user = getCurrentUser();
-    if (!user) return { success: false, message: 'Not logged in' };
+export async function addDownload(resource) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
 
-    const download = {
-        id: generateId(),
-        resourceId: resource.id,
-        resourceTitle: resource.title,
-        resourceType: resource.type,
-        course: resource.course,
-        downloadDate: new Date().toISOString()
-    };
+        const { data, error } = await supabase
+            .from('downloads')
+            .insert([
+                {
+                    user_id: user.id,
+                    resource_id: resource.id
+                }
+            ])
+            .select()
+            .single();
 
-    user.downloads.push(download);
-    updateUser(userId, { downloads: user.downloads });
+        if (error) throw error;
 
-    return { success: true, message: 'Download recorded', download: download };
+        // Increment download count on the resource
+        await supabase.rpc('increment_resource_downloads', { resource_id: resource.id });
+
+        return { success: true, message: 'Download recorded', download: data };
+    } catch (error) {
+        console.error('Add download error:', error.message);
+        return { success: false, message: error.message };
+    }
 }
 
 // Toggle saved item
-function toggleSavedItem(userId, itemId) {
-    const user = getCurrentUser();
-    if (!user) return { success: false, message: 'Not logged in' };
+export async function toggleSavedItem(itemId) {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not logged in');
 
-    const index = user.savedItems.indexOf(itemId);
+        // Check if already saved
+        const { data: existing } = await supabase
+            .from('saved_items')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('item_id', itemId)
+            .single();
 
-    if (index > -1) {
-        user.savedItems.splice(index, 1);
-        updateUser(userId, { savedItems: user.savedItems });
-        return { success: true, message: 'Item removed from saved', saved: false };
-    } else {
-        user.savedItems.push(itemId);
-        updateUser(userId, { savedItems: user.savedItems });
-        return { success: true, message: 'Item saved', saved: true };
+        if (existing) {
+            // Remove it
+            const { error } = await supabase
+                .from('saved_items')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('item_id', itemId);
+
+            if (error) throw error;
+            return { success: true, message: 'Item removed from saved', saved: false };
+        } else {
+            // Add it
+            const { error } = await supabase
+                .from('saved_items')
+                .insert([{ user_id: user.id, item_id: itemId }]);
+
+            if (error) throw error;
+            return { success: true, message: 'Item saved', saved: true };
+        }
+    } catch (error) {
+        console.error('Toggle saved error:', error.message);
+        return { success: false, message: error.message };
     }
-}
-
-// Record sale
-function recordSale(sellerId, itemId, buyerId, price) {
-    const users = getUsers();
-    const seller = users.find(u => u.id === sellerId);
-
-    if (!seller) return { success: false, message: 'Seller not found' };
-
-    const sale = {
-        id: generateId(),
-        itemId: itemId,
-        buyerId: buyerId,
-        price: price,
-        saleDate: new Date().toISOString()
-    };
-
-    if (!seller.sales) seller.sales = [];
-    seller.sales.push(sale);
-
-    // Update listing status
-    const listing = seller.listings.find(l => l.id === itemId);
-    if (listing) {
-        listing.status = 'sold';
-    }
-
-    updateUser(sellerId, { sales: seller.sales, listings: seller.listings });
-
-    return { success: true, message: 'Sale recorded', sale: sale };
 }
 
 // Get user statistics
-function getUserStats(userId) {
-    const user = getCurrentUser();
-    if (!user) return null;
+export async function getUserStats() {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
 
-    const stats = {
-        totalPurchases: user.purchases?.length || 0,
-        totalSpent: user.purchases?.reduce((sum, p) => sum + (p.price || 0), 0) || 0,
-        totalDownloads: user.downloads?.length || 0,
-        savedItemsCount: user.savedItems?.length || 0,
-        totalListings: user.listings?.length || 0,
-        activeListings: user.listings?.filter(l => l.status === 'active').length || 0,
-        soldListings: user.listings?.filter(l => l.status === 'sold').length || 0,
-        totalSales: user.sales?.length || 0,
-        totalRevenue: user.sales?.reduce((sum, s) => sum + (s.price || 0), 0) || 0
-    };
+        const profile = await getCurrentUser();
+        if (!profile) return null;
 
-    return stats;
+        const stats = {
+            totalPurchases: profile.purchases.length,
+            totalSpent: profile.purchases.reduce((sum, p) => sum + (p.price || 0), 0),
+            totalDownloads: profile.downloads.length,
+            savedItemsCount: 0, // Need to fetch separately or join
+            totalListings: profile.listings.length,
+            activeListings: profile.listings.filter(l => l.status === 'active').length,
+            soldListings: profile.listings.filter(l => l.status === 'sold').length,
+            totalSales: profile.sales.length,
+            totalRevenue: profile.sales.reduce((sum, s) => sum + (s.price || 0), 0)
+        };
+
+        return stats;
+    } catch (error) {
+        console.error('Get stats error:', error.message);
+        return null;
+    }
 }
 
-// Export functions for use in other scripts
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        registerUser,
-        loginUser,
-        logoutUser,
-        getCurrentSession,
-        isLoggedIn,
-        getCurrentUser,
-        updateUser,
-        addPurchase,
-        addListing,
-        addDownload,
-        toggleSavedItem,
-        recordSale,
-        getUserStats
-    };
-}

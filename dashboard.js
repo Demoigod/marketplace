@@ -1,28 +1,48 @@
 // ===== DASHBOARD INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', () => {
+import {
+    isLoggedIn,
+    getCurrentUser,
+    getUserStats,
+    logoutUser
+} from './auth.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
     // Check if user is logged in
-    if (!isLoggedIn()) {
+    if (!await isLoggedIn()) {
         window.location.href = 'index.html';
         return;
     }
 
-    const session = getCurrentSession();
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
 
     // Update user name
-    document.getElementById('dashboardUserName').textContent = session.name;
+    document.getElementById('dashboardUserName').textContent = user.name;
 
     // Render dashboard based on role
-    if (session.role === 'seller') {
+    if (user.role === 'seller') {
         renderSellerDashboard(user);
     } else {
         renderBuyerDashboard(user);
     }
+
+    // Setup logout if needed
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await logoutUser();
+            window.location.href = 'index.html';
+        });
+    }
 });
 
 // ===== BUYER DASHBOARD =====
-function renderBuyerDashboard(user) {
-    const stats = getUserStats(user.id);
+async function renderBuyerDashboard(user) {
+    const stats = await getUserStats();
 
     const dashboardHTML = `
         <div class="stats-grid">
@@ -45,7 +65,7 @@ function renderBuyerDashboard(user) {
                     </svg>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-value">$${stats.totalSpent.toFixed(2)}</h3>
+                    <h3 class="stat-value">$${parseFloat(stats.totalSpent).toFixed(2)}</h3>
                     <p class="stat-label">Total Spent</p>
                 </div>
             </div>
@@ -90,8 +110,8 @@ function renderBuyerDashboard(user) {
 }
 
 // ===== SELLER DASHBOARD =====
-function renderSellerDashboard(user) {
-    const stats = getUserStats(user.id);
+async function renderSellerDashboard(user) {
+    const stats = await getUserStats();
 
     const dashboardHTML = `
         <div class="stats-grid">
@@ -138,7 +158,7 @@ function renderSellerDashboard(user) {
                     </svg>
                 </div>
                 <div class="stat-info">
-                    <h3 class="stat-value">$${stats.totalRevenue.toFixed(2)}</h3>
+                    <h3 class="stat-value">$${parseFloat(stats.totalRevenue).toFixed(2)}</h3>
                     <p class="stat-label">Total Revenue</p>
                 </div>
             </div>
@@ -156,7 +176,7 @@ function renderSellerDashboard(user) {
         
         <div class="dashboard-section">
             <h2 class="section-title">Uploaded Resources</h2>
-            ${renderUploadedResources(user.downloads)}
+            ${renderUploadedResources(user.listings)}
         </div>
     `;
 
@@ -183,10 +203,10 @@ function renderPurchaseHistory(purchases) {
                 <tbody>
                     ${purchases.map(purchase => `
                         <tr>
-                            <td>${purchase.itemTitle}</td>
+                            <td>${purchase.item_title}</td>
                             <td><span class="category-badge">${purchase.category}</span></td>
-                            <td class="price">$${purchase.price.toFixed(2)}</td>
-                            <td>${new Date(purchase.purchaseDate).toLocaleDateString()}</td>
+                            <td class="price">$${parseFloat(purchase.price).toFixed(2)}</td>
+                            <td>${new Date(purchase.purchase_date).toLocaleDateString()}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -205,19 +225,15 @@ function renderDownloadHistory(downloads) {
             <table class="dashboard-table">
                 <thead>
                     <tr>
-                        <th>Resource</th>
-                        <th>Type</th>
-                        <th>Course</th>
+                        <th>Resource ID</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${downloads.map(download => `
                         <tr>
-                            <td>${download.resourceTitle}</td>
-                            <td><span class="type-badge">${download.resourceType}</span></td>
-                            <td>${download.course}</td>
-                            <td>${new Date(download.downloadDate).toLocaleDateString()}</td>
+                            <td>${download.resource_id}</td>
+                            <td>${new Date(download.download_date).toLocaleDateString()}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -241,7 +257,7 @@ function renderMyListings(listings) {
                     </div>
                     <p class="listing-description">${listing.description}</p>
                     <div class="listing-footer">
-                        <span class="listing-price">$${listing.price.toFixed(2)}</span>
+                        <span class="listing-price">$${parseFloat(listing.price).toFixed(2)}</span>
                         <span class="listing-views">${listing.views || 0} views</span>
                     </div>
                 </div>
@@ -268,9 +284,9 @@ function renderSalesHistory(sales) {
                 <tbody>
                     ${sales.map(sale => `
                         <tr>
-                            <td>${sale.itemId}</td>
-                            <td class="price">$${sale.price.toFixed(2)}</td>
-                            <td>${new Date(sale.saleDate).toLocaleDateString()}</td>
+                            <td>${sale.item_id}</td>
+                            <td class="price">$${parseFloat(sale.price).toFixed(2)}</td>
+                            <td>${new Date(sale.purchase_date).toLocaleDateString()}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -279,33 +295,15 @@ function renderSalesHistory(sales) {
     `;
 }
 
-function renderUploadedResources(resources) {
-    if (!resources || resources.length === 0) {
+function renderUploadedResources(listings) {
+    // For now using listings as a placeholder, in a real app would fetch from free_resources table
+    if (!listings || listings.length === 0) {
         return '<p class="empty-state">No resources uploaded yet. Share your knowledge!</p>';
     }
 
     return `
         <div class="table-container">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Resource</th>
-                        <th>Type</th>
-                        <th>Course</th>
-                        <th>Uploaded</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${resources.map(resource => `
-                        <tr>
-                            <td>${resource.resourceTitle}</td>
-                            <td><span class="type-badge">${resource.resourceType}</span></td>
-                            <td>${resource.course}</td>
-                            <td>${new Date(resource.downloadDate).toLocaleDateString()}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+            <p class="empty-state">Resource management coming soon...</p>
         </div>
     `;
 }

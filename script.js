@@ -1,151 +1,21 @@
-// ===== SAMPLE DATA =====
-const sampleMarketplaceItems = [
-    {
-        id: 1,
-        title: "MacBook Pro 13\" 2020",
-        category: "electronics",
-        price: 899.99,
-        description: "Excellent condition, barely used. Comes with charger and original box.",
-        condition: "like-new",
-        image: "laptop"
-    },
-    {
-        id: 2,
-        title: "Calculus Textbook",
-        category: "books",
-        price: 45.00,
-        description: "Stewart's Calculus 8th Edition. Minimal highlighting, great condition.",
-        condition: "good",
-        image: "book"
-    },
-    {
-        id: 3,
-        title: "Study Desk",
-        category: "furniture",
-        price: 75.00,
-        description: "Solid wood desk, perfect for dorm room. Easy to assemble.",
-        condition: "good",
-        image: "desk"
-    },
-    {
-        id: 4,
-        title: "Tutoring Services - Math",
-        category: "services",
-        price: 25.00,
-        description: "Experienced tutor offering help with calculus, algebra, and statistics. $25/hour.",
-        condition: "new",
-        image: "service"
-    },
-    {
-        id: 5,
-        title: "iPhone 12 Pro",
-        category: "electronics",
-        price: 599.99,
-        description: "128GB, Pacific Blue. Excellent condition with screen protector.",
-        condition: "like-new",
-        image: "phone"
-    },
-    {
-        id: 6,
-        title: "Winter Jacket",
-        category: "clothing",
-        price: 60.00,
-        description: "North Face jacket, size M. Warm and waterproof.",
-        condition: "good",
-        image: "jacket"
-    },
-    {
-        id: 7,
-        title: "Gaming Mouse",
-        category: "electronics",
-        price: 35.00,
-        description: "Logitech G502, RGB lighting, programmable buttons.",
-        condition: "like-new",
-        image: "mouse"
-    },
-    {
-        id: 8,
-        title: "Chemistry Lab Manual",
-        category: "books",
-        price: 20.00,
-        description: "Chem 101 lab manual, all experiments included.",
-        condition: "fair",
-        image: "book"
-    }
-];
-
-const sampleResources = [
-    {
-        id: 1,
-        title: "CS101 Final Exam 2023",
-        type: "exam",
-        course: "Introduction to Computer Science",
-        year: 2023,
-        description: "Complete final exam with solutions"
-    },
-    {
-        id: 2,
-        title: "Organic Chemistry Textbook",
-        type: "textbook",
-        course: "Organic Chemistry I",
-        year: 2022,
-        description: "Full PDF textbook with all chapters"
-    },
-    {
-        id: 3,
-        title: "Calculus II Midterm 2024",
-        type: "exam",
-        course: "Calculus II",
-        year: 2024,
-        description: "Practice problems and solutions"
-    },
-    {
-        id: 4,
-        title: "Physics Study Notes",
-        type: "notes",
-        course: "Physics 201",
-        year: 2023,
-        description: "Comprehensive study notes for all chapters"
-    },
-    {
-        id: 5,
-        title: "Biology Final Exam 2023",
-        type: "exam",
-        course: "General Biology",
-        year: 2023,
-        description: "Past exam paper with answer key"
-    },
-    {
-        id: 6,
-        title: "Linear Algebra Textbook",
-        type: "textbook",
-        course: "Linear Algebra",
-        year: 2024,
-        description: "Complete textbook PDF"
-    },
-    {
-        id: 7,
-        title: "Economics 101 Notes",
-        type: "notes",
-        course: "Microeconomics",
-        year: 2024,
-        description: "Detailed lecture notes and summaries"
-    },
-    {
-        id: 8,
-        title: "Statistics Midterm 2023",
-        type: "exam",
-        course: "Statistics 301",
-        year: 2023,
-        description: "Midterm exam with solutions"
-    }
-];
+// ===== SUPABASE INTEGRATION =====
+import { supabase } from './supabase-config.js';
+import {
+    registerUser,
+    loginUser,
+    logoutUser,
+    getCurrentSession,
+    isLoggedIn,
+    getCurrentUser,
+    addListing,
+    addDownload
+} from './auth.js';
 
 // ===== STATE MANAGEMENT =====
 let currentCategory = 'all';
 let currentResourceType = 'all';
-let marketplaceItems = [...sampleMarketplaceItems];
-let resources = [...sampleResources];
+let marketplaceItems = [];
+let resources = [];
 
 // ===== DOM ELEMENTS =====
 const uploadModal = document.getElementById('uploadModal');
@@ -169,12 +39,51 @@ const userMenu = document.getElementById('userMenu');
 const dashboardLink = document.getElementById('dashboardLink');
 
 // ===== INITIALIZATION =====
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuthStatus();
-    renderMarketplaceItems();
-    renderResources();
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkAuthStatus();
+    await fetchMarketplaceItems();
+    await fetchResources();
     setupEventListeners();
 });
+
+// ===== DATA FETCHING =====
+async function fetchMarketplaceItems() {
+    try {
+        let query = supabase.from('marketplace_items').select('*').eq('status', 'active');
+
+        if (currentCategory !== 'all') {
+            query = query.eq('category', currentCategory);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+        marketplaceItems = data || [];
+        renderMarketplaceItems();
+    } catch (error) {
+        console.error('Error fetching items:', error.message);
+        showNotification('Failed to load marketplace items');
+    }
+}
+
+async function fetchResources() {
+    try {
+        let query = supabase.from('free_resources').select('*');
+
+        if (currentResourceType !== 'all') {
+            query = query.eq('type', currentResourceType);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+        resources = data || [];
+        renderResources();
+    } catch (error) {
+        console.error('Error fetching resources:', error.message);
+        showNotification('Failed to load resources');
+    }
+}
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
@@ -249,7 +158,7 @@ function setupEventListeners() {
             document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
             e.target.classList.add('active');
             currentCategory = e.target.dataset.category;
-            renderMarketplaceItems();
+            fetchMarketplaceItems();
         });
     });
 
@@ -259,7 +168,7 @@ function setupEventListeners() {
             document.querySelectorAll('.resource-chip').forEach(c => c.classList.remove('active'));
             e.target.classList.add('active');
             currentResourceType = e.target.dataset.type;
-            renderResources();
+            fetchResources();
         });
     });
 
@@ -294,32 +203,33 @@ function closeModal(modal) {
 }
 
 // ===== FORM HANDLERS =====
-function handleItemUpload(e) {
+async function handleItemUpload(e) {
     e.preventDefault();
 
     const newItem = {
-        id: marketplaceItems.length + 1,
         title: document.getElementById('itemTitle').value,
         category: document.getElementById('itemCategory').value,
         price: parseFloat(document.getElementById('itemPrice').value),
         description: document.getElementById('itemDescription').value,
-        condition: document.getElementById('itemCondition').value,
-        image: document.getElementById('itemCategory').value
+        condition: document.getElementById('itemCondition').value
     };
 
-    marketplaceItems.unshift(newItem);
-    renderMarketplaceItems();
-    closeModal(uploadModal);
-    uploadForm.reset();
+    const result = await addListing(newItem);
 
-    showNotification('Item posted successfully!');
+    if (result.success) {
+        fetchMarketplaceItems();
+        closeModal(uploadModal);
+        uploadForm.reset();
+        showNotification('Item posted successfully!');
+    } else {
+        showNotification(result.message);
+    }
 }
 
-function handleResourceUpload(e) {
+async function handleResourceUpload(e) {
     e.preventDefault();
 
     const newResource = {
-        id: resources.length + 1,
         title: document.getElementById('resourceTitle').value,
         type: document.getElementById('resourceType').value,
         course: document.getElementById('resourceCourse').value,
@@ -327,12 +237,21 @@ function handleResourceUpload(e) {
         description: document.getElementById('resourceDescription').value
     };
 
-    resources.unshift(newResource);
-    renderResources();
-    closeModal(resourceModal);
-    resourceForm.reset();
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error } = await supabase
+            .from('free_resources')
+            .insert([{ ...newResource, uploader_id: user.id }]);
 
-    showNotification('Resource uploaded successfully!');
+        if (error) throw error;
+
+        fetchResources();
+        closeModal(resourceModal);
+        resourceForm.reset();
+        showNotification('Resource uploaded successfully!');
+    } catch (error) {
+        showNotification(error.message);
+    }
 }
 
 // ===== RENDER FUNCTIONS =====
@@ -346,27 +265,17 @@ function renderMarketplaceItems() {
 }
 
 function createMarketplaceCard(item) {
-    const imageGradients = {
-        laptop: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        book: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        desk: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        service: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        phone: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        jacket: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-        mouse: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
-    };
-
-    const gradient = imageGradients[item.image] || 'linear-gradient(135deg, #368CBF 0%, #E6DBC9 100%)';
+    const placeholderGradient = 'linear-gradient(135deg, #368CBF 0%, #E6DBC9 100%)';
 
     return `
         <div class="marketplace-item" data-id="${item.id}">
-            <div class="item-image" style="background: ${gradient}"></div>
+            <div class="item-image" style="background: ${placeholderGradient}"></div>
             <div class="item-content">
                 <span class="item-category">${item.category}</span>
                 <h3 class="item-title">${item.title}</h3>
                 <p class="item-description">${item.description}</p>
                 <div class="item-footer">
-                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                    <span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>
                     <span class="item-condition">${formatCondition(item.condition)}</span>
                 </div>
             </div>
@@ -413,7 +322,7 @@ function createResourceCard(resource) {
             </div>
             <div class="resource-meta">
                 <span class="resource-year">${resource.year}</span>
-                <button class="download-btn" onclick="downloadResource(${resource.id})">
+                <button class="download-btn" onclick="downloadResourceAction('${resource.id}')">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path d="M8 11V3M8 11L5 8M8 11L11 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M2 13H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -436,28 +345,33 @@ function formatCondition(condition) {
     return conditionMap[condition] || condition;
 }
 
-function handleSearch(e) {
+async function handleSearch(e) {
     const query = e.target.value.toLowerCase();
 
-    // Filter marketplace items
-    const filteredItems = sampleMarketplaceItems.filter(item => {
-        return item.title.toLowerCase().includes(query) ||
-            item.description.toLowerCase().includes(query) ||
-            item.category.toLowerCase().includes(query);
-    });
+    try {
+        // Filter marketplace items from database
+        let { data: filteredItems, error: itemsError } = await supabase
+            .from('marketplace_items')
+            .select('*')
+            .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
+            .eq('status', 'active');
 
-    marketplaceItems = filteredItems;
-    renderMarketplaceItems();
+        if (itemsError) throw itemsError;
+        marketplaceItems = filteredItems || [];
+        renderMarketplaceItems();
 
-    // Filter resources
-    const filteredResources = sampleResources.filter(resource => {
-        return resource.title.toLowerCase().includes(query) ||
-            resource.course.toLowerCase().includes(query) ||
-            resource.type.toLowerCase().includes(query);
-    });
+        // Filter resources from database
+        let { data: filteredResources, error: resourcesError } = await supabase
+            .from('free_resources')
+            .select('*')
+            .or(`title.ilike.%${query}%,course.ilike.%${query}%,type.ilike.%${query}%`);
 
-    resources = filteredResources;
-    renderResources();
+        if (resourcesError) throw resourcesError;
+        resources = filteredResources || [];
+        renderResources();
+    } catch (error) {
+        console.error('Search error:', error.message);
+    }
 }
 
 function debounce(func, wait) {
@@ -472,14 +386,22 @@ function debounce(func, wait) {
     };
 }
 
-function downloadResource(id) {
+async function downloadResourceAction(id) {
+    if (!await isLoggedIn()) {
+        openModal(authModal);
+        showNotification('Please login to download resources');
+        return;
+    }
+
     const resource = resources.find(r => r.id === id);
     if (resource) {
+        await addDownload(resource);
         showNotification(`Downloading: ${resource.title}`);
         // In a real application, this would trigger an actual download
         console.log('Downloading resource:', resource);
     }
 }
+window.downloadResourceAction = downloadResourceAction;
 
 function showNotification(message) {
     // Create notification element
@@ -536,21 +458,23 @@ style.textContent = `
 document.head.appendChild(style);
 
 // ===== AUTHENTICATION FUNCTIONS =====
-function checkAuthStatus() {
-    if (isLoggedIn()) {
-        const session = getCurrentSession();
-        updateUIForLoggedInUser(session);
+async function checkAuthStatus() {
+    const loggedIn = await isLoggedIn();
+    if (loggedIn) {
+        const user = await getCurrentUser();
+        updateUIForLoggedInUser(user);
     } else {
         updateUIForLoggedOutUser();
     }
 }
 
-function updateUIForLoggedInUser(session) {
+function updateUIForLoggedInUser(user) {
+    if (!user) return;
     if (loginBtn) loginBtn.style.display = 'none';
     if (userMenu) userMenu.style.display = 'block';
     if (dashboardLink) dashboardLink.style.display = 'block';
     if (document.getElementById('userName')) {
-        document.getElementById('userName').textContent = session.name.split(' ')[0];
+        document.getElementById('userName').textContent = user.name ? user.name.split(' ')[0] : 'User';
     }
 }
 
@@ -560,25 +484,27 @@ function updateUIForLoggedOutUser() {
     if (dashboardLink) dashboardLink.style.display = 'none';
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
 
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
-    const result = loginUser(email, password);
+    const result = await loginUser(email, password);
 
     if (result.success) {
         showNotification('Login successful!');
         closeModal(authModal);
         loginForm.reset();
-        checkAuthStatus();
+        await checkAuthStatus();
+        fetchMarketplaceItems();
+        fetchResources();
     } else {
         showNotification(result.message);
     }
 }
 
-function handleRegister(e) {
+async function handleRegister(e) {
     e.preventDefault();
 
     const name = document.getElementById('registerName').value;
@@ -586,10 +512,10 @@ function handleRegister(e) {
     const password = document.getElementById('registerPassword').value;
     const role = document.getElementById('registerRole').value;
 
-    const result = registerUser(email, password, name, role);
+    const result = await registerUser(email, password, name, role);
 
     if (result.success) {
-        showNotification('Registration successful! Please login.');
+        showNotification(result.message);
         // Switch to login tab
         document.querySelector('[data-tab="login"]').click();
         registerForm.reset();
@@ -598,11 +524,11 @@ function handleRegister(e) {
     }
 }
 
-function handleLogout(e) {
+async function handleLogout(e) {
     e.preventDefault();
-    logoutUser();
+    await logoutUser();
     showNotification('Logged out successfully');
-    checkAuthStatus();
+    await checkAuthStatus();
     // Redirect to home if on dashboard
     if (window.location.pathname.includes('dashboard.html')) {
         window.location.href = 'index.html';
