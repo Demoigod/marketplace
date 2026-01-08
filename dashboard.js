@@ -178,13 +178,14 @@ async function renderSellerDashboard(user) {
         
         <div class="dashboard-section">
             <h2 class="section-title">Uploaded Resources</h2>
-            ${renderUploadedResources(user.listings)}
+            ${renderUploadedResources(user.uploadedResources)}
         </div>
     `;
 
     document.getElementById('dashboardContent').innerHTML = dashboardHTML;
 }
 
+// ===== RENDER FUNCTIONS =====
 // ===== RENDER FUNCTIONS =====
 function renderPurchaseHistory(purchases) {
     if (!purchases || purchases.length === 0) {
@@ -227,14 +228,18 @@ function renderDownloadHistory(downloads) {
             <table class="dashboard-table">
                 <thead>
                     <tr>
-                        <th>Resource ID</th>
+                        <th>Resource Title</th>
+                        <th>Course</th>
+                        <th>Type</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${downloads.map(download => `
                         <tr>
-                            <td>${download.resource_id}</td>
+                            <td>${download.resource ? download.resource.title : 'Unknown Resource'}</td>
+                            <td>${download.resource ? download.resource.course : '-'}</td>
+                            <td><span class="category-badge">${download.resource ? download.resource.type : 'N/A'}</span></td>
                             <td>${new Date(download.download_date).toLocaleDateString()}</td>
                         </tr>
                     `).join('')}
@@ -260,7 +265,11 @@ function renderMyListings(listings) {
                     <p class="listing-description">${listing.description}</p>
                     <div class="listing-footer">
                         <span class="listing-price">$${parseFloat(listing.price).toFixed(2)}</span>
-                        <span class="listing-views">${listing.views || 0} views</span>
+                        <div style="text-align: right;">
+                            <span class="listing-views">${listing.views || 0} views</span>
+                            <br>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">${new Date(listing.created_at).toLocaleDateString()}</span>
+                        </div>
                     </div>
                 </div>
             `).join('')}
@@ -278,15 +287,17 @@ function renderSalesHistory(sales) {
             <table class="dashboard-table">
                 <thead>
                     <tr>
-                        <th>Item ID</th>
+                        <th>Item</th>
+                        <th>Category</th>
                         <th>Price</th>
-                        <th>Sale Date</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${sales.map(sale => `
                         <tr>
-                            <td>${sale.item_id}</td>
+                            <td>${sale.item_title}</td>
+                            <td><span class="category-badge">${sale.category}</span></td>
                             <td class="price">$${parseFloat(sale.price).toFixed(2)}</td>
                             <td>${new Date(sale.purchase_date).toLocaleDateString()}</td>
                         </tr>
@@ -297,15 +308,35 @@ function renderSalesHistory(sales) {
     `;
 }
 
-function renderUploadedResources(listings) {
-    // For now using listings as a placeholder, in a real app would fetch from free_resources table
-    if (!listings || listings.length === 0) {
+function renderUploadedResources(resources) {
+    if (!resources || resources.length === 0) {
         return '<p class="empty-state">No resources uploaded yet. Share your knowledge!</p>';
     }
 
     return `
         <div class="table-container">
-            <p class="empty-state">Resource management coming soon...</p>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Course</th>
+                        <th>Type</th>
+                        <th>Downloads</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${resources.map(resource => `
+                        <tr>
+                            <td>${resource.title}</td>
+                            <td>${resource.course}</td>
+                            <td><span class="category-badge">${resource.type}</span></td>
+                            <td>${resource.downloads || 0}</td>
+                            <td>${new Date(resource.created_at).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
     `;
 }
