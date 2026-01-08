@@ -20,7 +20,12 @@ export async function registerUser(email, password, name, role) {
 
         if (authError) throw authError;
 
-        // Return success immediately
+        // If email confirmation is disabled, we get a session immediately
+        if (authData.session) {
+            return { success: true, message: 'Registration successful!', user: authData.user };
+        }
+
+        // Return success for email verification flow
         return { success: true, message: 'Registration successful! Please check your email for verification.', user: authData.user };
 
     } catch (error) {
