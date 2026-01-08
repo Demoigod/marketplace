@@ -188,6 +188,43 @@ body {
 }
 
 /* ===== BUTTONS ===== */
+.user-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    background: rgba(54, 140, 191, 0.1);
+    transition: all var(--transition-base);
+}
+
+.user-profile-link:hover {
+    background: rgba(54, 140, 191, 0.2);
+    color: var(--color-primary);
+}
+
+.logout-btn-nav {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-btn-nav:hover {
+    color: #e63946;
+    background: rgba(230, 57, 70, 0.1);
+}
+
 .btn-primary {
     background: var(--bg-secondary);
     color: var(--text-light);

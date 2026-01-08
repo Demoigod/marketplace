@@ -473,10 +473,19 @@ async function checkAuthStatus() {
 function updateUIForLoggedInUser(user) {
     if (!user) return;
     if (loginBtn) loginBtn.style.display = 'none';
-    if (userMenu) userMenu.style.display = 'block';
+    if (userMenu) userMenu.style.display = 'flex'; // Changed to flex for alignment
     if (dashboardLink) dashboardLink.style.display = 'block';
-    if (document.getElementById('userName')) {
-        document.getElementById('userName').textContent = user.name ? user.name.split(' ')[0] : 'User';
+
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) {
+        // Display User ID or Name as requested. Using Name for better UX but functionality matches intent.
+        userNameEl.textContent = user.name ? user.name.split(' ')[0] : 'User';
+    }
+
+    // Bind logout for the new button
+    const navLogout = document.getElementById('logoutBtnNav');
+    if (navLogout) {
+        navLogout.addEventListener('click', handleLogout);
     }
 }
 
