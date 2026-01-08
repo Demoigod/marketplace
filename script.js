@@ -10,6 +10,7 @@ import {
     addListing,
     addDownload
 } from './auth.js';
+import { setupMobileMenu } from './navbar.js';
 
 // ===== STATE MANAGEMENT =====
 let currentCategory = 'all';
@@ -40,6 +41,7 @@ const dashboardLink = document.getElementById('dashboardLink');
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', async () => {
+    setupMobileMenu();
     await checkAuthStatus();
     await fetchMarketplaceItems();
     await fetchResources();

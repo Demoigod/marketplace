@@ -2,33 +2,27 @@
 import { supabase } from './supabase-config.js'
 
 // Register new user
+// Register new user
 export async function registerUser(email, password, name, role) {
     try {
-        // 1. Sign up user with Supabase Auth
+        // 1. Sign up user with Supabase Auth including metadata
+        // The database trigger will handle creating the public.users record
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                data: {
+                    name: name,
+                    role: role
+                }
+            }
         });
 
         if (authError) throw authError;
 
-        if (authData.user) {
-            // 2. Create profile in users table
-            const { error: profileError } = await supabase
-                .from('users')
-                .insert([
-                    {
-                        id: authData.user.id,
-                        email: email,
-                        name: name,
-                        role: role
-                    }
-                ]);
+        // Return success immediately
+        return { success: true, message: 'Registration successful! Please check your email for verification.', user: authData.user };
 
-            if (profileError) throw profileError;
-
-            return { success: true, message: 'Registration successful! Please check your email for verification.', user: authData.user };
-        }
     } catch (error) {
         console.error('Registration error:', error.message);
         return { success: false, message: error.message };
