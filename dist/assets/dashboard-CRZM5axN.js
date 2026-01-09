@@ -1,4 +1,4 @@
-import{s as i,i as d,g as l,c as o,e as a}from"./navbar-BZmORDzx.js";/* empty css               */document.addEventListener("DOMContentLoaded",async()=>{if(i(),!await d()){window.location.href="index.html";return}const s=await l();if(!s){window.location.href="index.html";return}document.getElementById("dashboardUserName").textContent=s.name,s.role==="seller"?r(s):c(s);const t=document.getElementById("logoutBtn");t&&t.addEventListener("click",async e=>{e.preventDefault(),await o(),window.location.href="index.html"})});async function c(s){const t=await a(),e=`
+import{i,a as d,g as l,c as o,e}from"./navbar-w6MMH3FO.js";/* empty css               */document.addEventListener("DOMContentLoaded",async()=>{if(await i(),!await d()){window.location.href="index.html";return}const s=await l();if(!s){window.location.href="index.html";return}document.getElementById("dashboardUserName").textContent=s.name,s.role==="seller"?r(s):c(s);const t=document.getElementById("logoutBtn");t&&t.addEventListener("click",async a=>{a.preventDefault(),await o(),window.location.href="index.html"})});async function c(s){const t=await e(),a=`
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon buyer">
@@ -58,7 +58,7 @@ import{s as i,i as d,g as l,c as o,e as a}from"./navbar-BZmORDzx.js";/* empty cs
             <h2 class="section-title">Downloaded Resources</h2>
             ${h(s.downloads)}
         </div>
-    `;document.getElementById("dashboardContent").innerHTML=e}async function r(s){const t=await a(),e=`
+    `;document.getElementById("dashboardContent").innerHTML=a}async function r(s){const t=await e(),a=`
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon seller">
@@ -123,7 +123,7 @@ import{s as i,i as d,g as l,c as o,e as a}from"./navbar-BZmORDzx.js";/* empty cs
             <h2 class="section-title">Uploaded Resources</h2>
             ${u(s.uploadedResources)}
         </div>
-    `;document.getElementById("dashboardContent").innerHTML=e}function n(s){return!s||s.length===0?'<p class="empty-state">No purchases yet. Start shopping!</p>':`
+    `;document.getElementById("dashboardContent").innerHTML=a}function n(s){return!s||s.length===0?'<p class="empty-state">No purchases yet. Start shopping!</p>':`
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>

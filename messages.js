@@ -1,6 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { getCurrentUser, isLoggedIn } from './auth.js';
-import { setupMobileMenu } from './navbar.js';
+import { initNavigation } from './navbar.js';
 
 let currentUser = null;
 let currentConversationId = null;
@@ -8,7 +8,7 @@ let conversationsSubscription = null;
 let messagesSubscription = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    setupMobileMenu();
+    await initNavigation();
 
     // Check auth
     if (!await isLoggedIn()) {

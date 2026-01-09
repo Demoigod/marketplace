@@ -1,0 +1,25 @@
+import{i as u,a as g,g as v,s as r}from"./navbar-w6MMH3FO.js";/* empty css               */let a=null,i=null,l=null;document.addEventListener("DOMContentLoaded",async()=>{if(await u(),!await g()){window.location.href="index.html";return}if(a=await v(),!a)return;const e=new URLSearchParams(window.location.search),t=e.get("seller_id"),n=e.get("item_id");t&&n&&await y(t,n),await p(),document.getElementById("backToConversations").addEventListener("click",E),document.getElementById("messageForm").addEventListener("submit",_)});async function y(e,t){if(e===a.id){alert("You cannot message yourself!"),window.history.replaceState({},document.title,window.location.pathname);return}try{const{data:n,error:s}=await r.from("conversations").select("*").eq("item_id",t).eq("seller_id",e).eq("buyer_id",a.id).single();if(n)i=n.id;else{const{data:o,error:c}=await r.from("conversations").insert([{item_id:t,seller_id:e,buyer_id:a.id}]).select().single();if(c)throw c;i=o.id}window.history.replaceState({},document.title,window.location.pathname),await loadChat(i)}catch(n){console.error("Error starting conversation:",n),alert("Could not start conversation.")}}async function p(){try{const{data:e,error:t}=await r.from("conversations").select(`
+                *,
+                marketplace_items (title),
+                buyer:users!buyer_id (id, name),
+                seller:users!seller_id (id, name)
+            `).or(`buyer_id.eq.${a.id},seller_id.eq.${a.id}`).order("updated_at",{ascending:!1});if(t)throw t;f(e)}catch(e){console.error("Error loading conversations:",e),document.getElementById("conversationsContainer").innerHTML='<p class="p-4 text-red-500">Failed to load messages.</p>'}}function f(e){const t=document.getElementById("conversationsContainer");if(e.length===0){t.innerHTML='<p class="p-6 text-center text-gray-500">No conversations yet.</p>';return}t.innerHTML=e.map(n=>{const o=n.buyer_id===a.id?n.seller:n.buyer,c=n.id===i?"active":"",m=new Date(n.updated_at).toLocaleDateString();return`
+            <div class="conversation-item ${c}" onclick="loadChat('${n.id}')">
+                <div class="conversation-header">
+                    <span class="conversation-partner">${o?o.name:"Unknown User"}</span>
+                    <span class="conversation-time">${m}</span>
+                </div>
+                <div class="conversation-item-title">${n.marketplace_items?n.marketplace_items.title:"Unknown Item"}</div>
+                <div class="conversation-preview">Click to view messages...</div>
+            </div>
+        `}).join("")}window.loadChat=async function(e){i=e,document.querySelector(".message-page-container").classList.add("mobile-chat-active"),document.getElementById("emptyChatState").style.display="none",document.getElementById("activeChatContainer").style.display="flex",document.querySelectorAll(".conversation-item").forEach(t=>t.classList.remove("active")),d(e),h(e)};async function h(e){const{data:t}=await r.from("conversations").select(`
+            *,
+            marketplace_items (title),
+            buyer:users!buyer_id (name),
+            seller:users!seller_id (name)
+        `).eq("id",e).single();if(t){const s=t.buyer_id===a.id?t.seller.name:t.buyer.name;document.getElementById("chatPartnerName").textContent=s,document.getElementById("chatItemTitle").textContent=t.marketplace_items?t.marketplace_items.title:"Item"}}async function d(e){const t=document.getElementById("messagesList");t.innerHTML='<div class="text-center p-4 text-gray-400">Loading history...</div>';const{data:n,error:s}=await r.from("messages").select("*").eq("conversation_id",e).order("created_at",{ascending:!0});if(s){console.error("Error loading messages:",s);return}w(n),C(),b(e)}function w(e){const t=document.getElementById("messagesList");if(e.length===0){t.innerHTML='<div class="text-center p-4 text-gray-400">No messages yet. Say hello!</div>';return}t.innerHTML=e.map(n=>{const s=n.sender_id===a.id,o=new Date(n.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});return`
+            <div class="message ${s?"sent":"received"}">
+                <div class="message-content">${L(n.content)}</div>
+                <span class="message-time">${o}</span>
+            </div>
+        `}).join("")}async function _(e){e.preventDefault();const t=document.getElementById("messageInput"),n=t.value.trim();if(!(!n||!i))try{t.value="";const{error:s}=await r.from("messages").insert([{conversation_id:i,sender_id:a.id,content:n}]);if(s)throw s;d(i)}catch(s){console.error("Error sending message:",s),alert("Failed to send message")}}function C(){const e=document.getElementById("messagesList");e.scrollTop=e.scrollHeight}function E(){document.querySelector(".message-page-container").classList.remove("mobile-chat-active"),i=null}function L(e){const t=document.createElement("div");return t.textContent=e,t.innerHTML}function b(e){l&&r.removeChannel(l),l=r.channel(`public:messages:conversation_id=eq.${e}`).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:`conversation_id=eq.${e}`},t=>{d(e)}).subscribe()}

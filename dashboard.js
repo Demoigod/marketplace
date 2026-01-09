@@ -5,10 +5,10 @@ import {
     getUserStats,
     logoutUser
 } from './auth.js';
-import { setupMobileMenu } from './navbar.js';
+import { initNavigation } from './navbar.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    setupMobileMenu();
+    await initNavigation();
     // Check if user is logged in
     if (!await isLoggedIn()) {
         window.location.href = 'index.html';
