@@ -121,6 +121,11 @@ function setupEventListeners() {
         if (e.target === authModal) closeModal(authModal);
     });
 
+    // Custom event to open auth modal from other components
+    document.addEventListener('open-auth-modal', () => {
+        openModal(authModal);
+    });
+
     // Auth modal tabs
     document.querySelectorAll('.auth-tab').forEach(tab => {
         tab.addEventListener('click', (e) => {

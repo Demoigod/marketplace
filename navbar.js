@@ -188,9 +188,7 @@ function attachEventListeners() {
     const loginBtn = document.getElementById('navLoginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            const mainLogin = document.getElementById('loginBtn');
-            if (mainLogin) mainLogin.click();
-            else window.location.href = 'index.html#login';
+            document.dispatchEvent(new CustomEvent('open-auth-modal'));
         });
     }
 }
