@@ -36,7 +36,7 @@ async function renderDesktopNav() {
             <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="Browse Categories">
                 ${gridIcon}
             </button>
-            <div class="dropdown-menu-modern" role="menu">
+            <div class="dropdown-menu-modern" role="menu" style="display: none;">
                 <div class="dropdown-header">Marketplace</div>
                 <a href="index.html?category=all" class="menu-item" role="menuitem">
                     All Listings
@@ -62,7 +62,7 @@ async function renderDesktopNav() {
                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
                     ${userIcon}
                 </button>
-                <div class="dropdown-menu-modern" role="menu">
+                <div class="dropdown-menu-modern" role="menu" style="display: none;">
                     <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
                     <div class="dropdown-divider"></div>
                     <a href="dashboard.html" class="menu-item" role="menuitem">Dashboard</a>
