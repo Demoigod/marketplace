@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marketplace - Buy, Sell & Share</title>
+    <meta name="description"
+        content="A vibrant marketplace for students to buy, sell goods and services, and access free exam papers and textbooks.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+  <script type="module" crossorigin src="/assets/main-4GDtksns.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/navbar-BZmORDzx.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles-DGqEUcso.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">
+                    <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
+                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#368CBF" />
+                                <stop offset="100%" stop-color="#E6DBC9" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Campus Market</span>
+                </a>
+
+                <button class="menu-toggle">☰</button>
+
+                <div class="nav-links">
+                    <a href="index.html" class="nav-link active">Marketplace</a>
+                    <a href="#free-resources" class="nav-link">Free Resources</a>
+                    <a href="dashboard.html" class="nav-link" id="dashboardLink" style="display: none;">Dashboard</a>
+                </div>
+                <div class="nav-actions">
+                    <button class="btn-secondary" id="loginBtn" style="display: inline-flex;">Login</button>
+                    <div class="user-menu" id="userMenu" style="display: none; align-items: center; gap: 1rem;">
+                        <a href="dashboard.html" class="user-profile-link" id="userProfileLink" title="Go to Dashboard">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="2" />
+                                <path d="M4 18C4 14.6863 6.68629 12 10 12C13.3137 12 16 14.6863 16 18"
+                                    stroke="currentColor" stroke-width="2" />
+                            </svg>
+                            <span id="userName">User</span>
+                        </a>
+                        <button class="logout-btn-nav" id="logoutBtnNav" title="Logout">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="btn-primary" id="postItemBtn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M10 4V16M4 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        Post Item
+                    </button>
+                </div>
+            </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Your Campus Marketplace</h1>
+                <p class="hero-subtitle">Buy, sell, and discover amazing deals from fellow students</p>
+
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
+                        <path d="M14 14L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input"
+                        placeholder="Search for items, services, or resources...">
+                    <button class="search-btn">Search</button>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="category-filters">
+                    <button class="category-chip active" data-category="all">All Items</button>
+                    <button class="category-chip" data-category="electronics">Electronics</button>
+                    <button class="category-chip" data-category="books">Books</button>
+                    <button class="category-chip" data-category="furniture">Furniture</button>
+                    <button class="category-chip" data-category="services">Services</button>
+                    <button class="category-chip" data-category="clothing">Clothing</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marketplace Section -->
+    <section id="marketplace" class="marketplace-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Marketplace Listings</h2>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="grid">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
+                            <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
+                        </svg>
+                    </button>
+                    <button class="toggle-btn" data-view="list">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <rect x="2" y="4" width="16" height="2" rx="1" fill="currentColor" />
+                            <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" />
+                            <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="marketplaceGrid" class="marketplace-grid">
+                <!-- Items will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Free Resources Section -->
+    <section id="free-resources" class="free-resources-section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Free Resources</h2>
+                    <p class="section-subtitle">Past exam papers and textbooks shared by students</p>
+                </div>
+                <button class="btn-secondary" id="uploadResourceBtn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M10 14V6M10 6L7 9M10 6L13 9" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M4 16H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    Upload Resource
+                </button>
+            </div>
+
+            <!-- Resource Filters -->
+            <div class="resource-filters">
+                <button class="resource-chip active" data-type="all">All Resources</button>
+                <button class="resource-chip" data-type="exam">Exam Papers</button>
+                <button class="resource-chip" data-type="textbook">Textbooks</button>
+                <button class="resource-chip" data-type="notes">Study Notes</button>
+            </div>
+
+            <div id="resourcesGrid" class="resources-grid">
+                <!-- Resources will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Post New Item</h3>
+                <button class="modal-close" id="closeModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <form id="uploadForm" class="upload-form">
+                <div class="form-group">
+                    <label for="itemTitle">Item Title</label>
+                    <input type="text" id="itemTitle" required placeholder="e.g., iPhone 12 Pro">
+                </div>
+                <div class="form-group">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory" required>
+                        <option value="">Select category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="books">Books</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="services">Services</option>
+                        <option value="clothing">Clothing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemPrice">Price ($)</label>
+                    <input type="number" id="itemPrice" required placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="itemDescription">Description</label>
+                    <textarea id="itemDescription" required placeholder="Describe your item..." rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="itemCondition">Condition</label>
+                    <select id="itemCondition" required>
+                        <option value="">Select condition</option>
+                        <option value="new">New</option>
+                        <option value="like-new">Like New</option>
+                        <option value="good">Good</option>
+                        <option value="fair">Fair</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Post Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Resource Upload Modal -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload Free Resource</h3>
+                <button class="modal-close" id="closeResourceModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <form id="resourceForm" class="upload-form">
+                <div class="form-group">
+                    <label for="resourceTitle">Resource Title</label>
+                    <input type="text" id="resourceTitle" required placeholder="e.g., CS101 Final Exam 2023">
+                </div>
+                <div class="form-group">
+                    <label for="resourceType">Resource Type</label>
+                    <select id="resourceType" required>
+                        <option value="">Select type</option>
+                        <option value="exam">Exam Paper</option>
+                        <option value="textbook">Textbook</option>
+                        <option value="notes">Study Notes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resourceCourse">Course/Subject</label>
+                    <input type="text" id="resourceCourse" required placeholder="e.g., Computer Science 101">
+                </div>
+                <div class="form-group">
+                    <label for="resourceYear">Year</label>
+                    <input type="number" id="resourceYear" placeholder="e.g., 2023" min="2000" max="2030">
+                </div>
+                <div class="form-group">
+                    <label for="resourceDescription">Description</label>
+                    <textarea id="resourceDescription" placeholder="Additional details..." rows="3"></textarea>
+                </div>
+                <div class="file-upload-area">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M24 32V16M24 16L18 22M24 16L30 22" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 36H36" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <p>Click to upload or drag and drop</p>
+                    <p class="file-hint">PDF files only (max 50MB)</p>
+                    <input type="file" id="resourceFile" accept=".pdf" style="display: none;">
+                </div>
+                <button type="submit" class="btn-primary btn-full">Upload Resource</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">Campus Market</h3>
+                    <p class="footer-description">Your trusted student marketplace for buying, selling, and sharing
+                        educational resources.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                    d="M10 0C7.284 0 6.944.012 5.877.06 4.813.11 4.086.278 3.45.525a4.902 4.902 0 00-1.772 1.153A4.902 4.902 0 00.525 3.45C.278 4.086.109 4.813.06 5.877.012 6.944 0 7.284 0 10s.012 3.056.06 4.123c.05 1.064.218 1.791.465 2.427a4.902 4.902 0 001.153 1.772 4.902 4.902 0 001.772 1.153c.636.247 1.363.416 2.427.465C6.944 19.988 7.284 20 10 20s3.056-.012 4.123-.06c1.064-.05 1.791-.218 2.427-.465a4.902 4.902 0 001.772-1.153 4.902 4.902 0 001.153-1.772c.247-.636.416-1.363.465-2.427.048-1.067.06-1.407.06-4.123s-.012-3.056-.06-4.123c-.05-1.064-.218-1.791-.465-2.427a4.902 4.902 0 00-1.153-1.772A4.902 4.902 0 0016.55.525C15.914.278 15.187.109 14.123.06 13.056.012 12.716 0 10 0zm0 1.802c2.67 0 2.986.01 4.04.058.975.045 1.504.207 1.857.344.466.182.8.398 1.15.748.35.35.566.684.748 1.15.137.353.3.882.344 1.857.048 1.054.058 1.37.058 4.04 0 2.67-.01 2.986-.058 4.04-.045.975-.207 1.504-.344 1.857-.182.466-.398.8-.748 1.15-.35.35-.684.566-1.15.748-.353.137-.882.3-1.857.344-1.054.048-1.37.058-4.04.058-2.67 0-2.986-.01-4.04-.058-.975-.045-1.504-.207-1.857-.344a3.097 3.097 0 01-1.15-.748 3.097 3.097 0 01-.748-1.15c-.137-.353-.3-.882-.344-1.857-.048-1.054-.058-1.37-.058-4.04 0-2.67.01-2.986.058-4.04.045-.975.207-1.504.344-1.857.182-.466.398-.8.748-1.15.35-.35.684-.566 1.15-.748.353-.137.882-.3 1.857-.344 1.054-.048 1.37-.058 4.04-.058z" />
+                                <path
+                                    d="M10 13.333a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm0-8.468a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm6.538-.203a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-heading">Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#marketplace">Marketplace</a></li>
+                        <li><a href="#free-resources">Free Resources</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 class="footer-heading">Contact</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:support@campusmarket.com">support@campusmarket.com</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Report an Issue</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Campus Market. All rights reserved.</p>
+                <p class="footer-disclaimer">Built with ❤️ for students, by students</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authModalTitle">Login</h3>
+                <button class="modal-close" id="closeAuthModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="upload-form" style="display: block;">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary btn-full">Login</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="upload-form" style="display: none;">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="registerRole">I want to</label>
+                    <select id="registerRole" required>
+                        <option value="">Select your primary role</option>
+                        <option value="buyer">Buy items</option>
+                        <option value="seller">Sell items</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Register</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

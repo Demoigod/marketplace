@@ -278,7 +278,13 @@ function createMarketplaceCard(item) {
                 <p class="item-description">${item.description}</p>
                 <div class="item-footer">
                     <span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>
-                    <span class="item-condition">${formatCondition(item.condition)}</span>
+                    <div style="display: flex; gap: 0.5rem;">
+                         <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" 
+                            onclick="window.location.href='messages.html?item_id=${item.id}&seller_id=${item.seller_id}'">
+                            Message
+                        </button>
+                        <span class="item-condition">${formatCondition(item.condition)}</span>
+                    </div>
                 </div>
             </div>
         </div>

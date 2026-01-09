@@ -7,6 +7,7 @@ export default defineConfig({
             input: {
                 main: resolve(__dirname, 'index.html'),
                 dashboard: resolve(__dirname, 'dashboard.html'),
+                messages: resolve(__dirname, 'messages.html'),
                 privacy: resolve(__dirname, 'privacy.html'),
             },
         },
