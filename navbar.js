@@ -1,14 +1,21 @@
 import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
 
 export async function initNavigation() {
-    setupMobileMenu(); // Keep mobile logic
+    setupMobileMenu();
     await renderDesktopNav();
 }
 
 export function setupMobileMenu() {
     const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links'); // Legacy support
-    // We might need to render a mobile equivalent of the new menu
+    const navLinks = document.querySelector('.nav-links'); // Keeping legacy mobile class for now
+
+    if (menuToggle && navLinks) {
+        // Simple override to ensure it toggles
+        menuToggle.onclick = () => {
+            navLinks.classList.toggle('active');
+            menuToggle.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+        };
+    }
 }
 
 async function renderDesktopNav() {
@@ -18,13 +25,61 @@ async function renderDesktopNav() {
     const user = await getCurrentUser();
     const isAuth = !!user;
 
-    // Preserve the Mobile Toggle button if it exists (it's usually hidden on desktop)
-    const mobileToggle = navContent.querySelector('.menu-toggle');
+    // SVG Icons
+    const gridIcon = `<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
+    const userIcon = `<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+    const chevronDown = `<svg class="menu-icon" style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
-    // Clear existing content but keep mobile toggle if needed, or rebuild it
-    // Easiest is to rebuild the entire innerHTML strictly
+    // Browse Dropdown HTML
+    const browseHtml = `
+        <div class="dropdown-container" id="browseDropdown">
+            <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="Browse Categories">
+                ${gridIcon}
+            </button>
+            <div class="dropdown-menu-modern" role="menu">
+                <div class="dropdown-header">Marketplace</div>
+                <a href="index.html?category=all" class="menu-item" role="menuitem">
+                    All Listings
+                </a>
+                <a href="index.html?type=free" class="menu-item" role="menuitem">
+                    Free Resources
+                </a>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-header">Categories</div>
+                <a href="index.html?category=electronics" class="menu-item" role="menuitem">Electronics</a>
+                <a href="index.html?category=books" class="menu-item" role="menuitem">Books</a>
+                <a href="index.html?category=furniture" class="menu-item" role="menuitem">Furniture</a>
+                <a href="index.html?category=services" class="menu-item" role="menuitem">Services</a>
+            </div>
+        </div>
+    `;
 
-    // SVG Logo
+    // Profile Dropdown HTML
+    let profileHtml = '';
+    if (isAuth) {
+        profileHtml = `
+            <div class="dropdown-container" id="profileDropdown">
+                <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
+                    ${userIcon}
+                </button>
+                <div class="dropdown-menu-modern" role="menu">
+                    <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
+                    <div class="dropdown-divider"></div>
+                    <a href="dashboard.html" class="menu-item" role="menuitem">Dashboard</a>
+                    <a href="messages.html" class="menu-item" role="menuitem">Messages</a>
+                    <a href="#" id="menuPostItem" class="menu-item" role="menuitem">Post Item</a>
+                    <div class="dropdown-divider"></div>
+                    <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
+                </div>
+            </div>
+        `;
+    } else {
+        profileHtml = `
+             <button class="btn-primary" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
+        `;
+    }
+
+    // Logo HTML
     const logoHtml = `
         <a href="index.html" class="logo">
             <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
@@ -41,120 +96,95 @@ async function renderDesktopNav() {
         </a>
     `;
 
-    // Dropdowns HTML
-    const browseMenu = `
-        <div class="nav-dropdown" id="browseDropdown">
-            <button class="nav-dropdown-trigger">
-                Browse
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6 6-6"/>
-                </svg>
-            </button>
-            <div class="nav-dropdown-menu">
-                <a href="index.html?category=all" class="nav-dropdown-item">All Listings</a>
-                <div class="nav-dropdown-item nested-dropdown">
-                    Categories
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                    <div class="nested-dropdown-menu">
-                        <a href="index.html?category=electronics" class="nav-dropdown-item">Electronics</a>
-                        <a href="index.html?category=books" class="nav-dropdown-item">Books</a>
-                        <a href="index.html?category=furniture" class="nav-dropdown-item">Furniture</a>
-                        <a href="index.html?category=services" class="nav-dropdown-item">Services</a>
-                        <a href="index.html?category=clothing" class="nav-dropdown-item">Clothing</a>
-                    </div>
-                </div>
-                <a href="index.html?type=free" class="nav-dropdown-item">Free Items</a>
-                <a href="#" id="navPostItem" class="nav-dropdown-item">Post item</a>
-            </div>
-        </div>
-    `;
+    // Layout Assembly
+    // Left: Dropdowns
+    // Center/Left-align: Logo (as per user request: "on the left side of the logo provide a dropdown")
+    // Actually, if I place dropdowns FIRST in DOM, they are to the left of the Logo.
 
-    let profileMenu = '';
-    if (isAuth) {
-        profileMenu = `
-            <div class="nav-dropdown" id="profileDropdown">
-                <button class="nav-dropdown-trigger">
-                    Profile
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                </button>
-                <div class="nav-dropdown-menu">
-                    <a href="dashboard.html" class="nav-dropdown-item">My Profile</a>
-                    <a href="dashboard.html" class="nav-dropdown-item">My Listings</a>
-                    <a href="messages.html" class="nav-dropdown-item">Messages</a>
-                    <a href="#" class="nav-dropdown-item">Settings</a>
-                    <div class="nav-dropdown-divider"></div>
-                    <a href="#" id="navLogout" class="nav-dropdown-item" style="color: #e63946;">Log out</a>
-                </div>
-            </div>
-        `;
-    } else {
-        // Option 1: Show "Login" button instead of Profile
-        // Option 2: Show Profile dropdown with "Login" option
-        // I will stick to the button for Guest, or a simple Login text
-        profileMenu = `
-             <button class="btn-primary" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
-        `;
-    }
-
-    // Construct Layout
-    // "On the left side of the logo" -> [Browse] [Profile] [Logo]
     const leftNav = `
-        <div class="nav-left">
-            ${browseMenu}
-            ${profileMenu}
+        <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
+            ${browseHtml}
+            ${profileHtml}
         </div>
     `;
 
-    // Rebuild DOM
-    // Standard: [Left Nav] [Logo] [Mobile Toggle]
-    // Add spacer to push logo? The CSS 'nav-content' has justify-start.
-    // Logic: 
-    // .nav-left { order: -1 } -> First
-    // .logo { margin-right: auto } -> Pushes everything else (if any) to right
-
-    // We need to be careful not to destroy the Mobile Toggle button which is usually hidden in CSS but needed for mobile.
-    // I will recreate it.
-
+    // Note: We need to preserve the mobile toggle
     const mobileToggleHtml = `<button class="menu-toggle">☰</button>`;
 
     navContent.innerHTML = `
-        ${leftNav}
-        ${logoHtml}
+        <div style="display:flex; align-items:center;">
+             ${leftNav}
+             ${logoHtml}
+        </div>
         ${mobileToggleHtml}
-        <div class="nav-links mobile-only-links"> <!-- Hidden on desktop, logic for mobile menu -->
+        <div class="nav-links mobile-only-links">
              <a href="index.html" class="nav-link">Home</a>
              <a href="dashboard.html" class="nav-link">Dashboard</a>
-             <!-- ... simplified mobile menu ... -->
         </div>
     `;
 
-    // Re-attach Event Listeners
-    attachDropdownListeners();
+    attachEventListeners();
+}
 
-    // Attach Post Item listener
-    const postItem = document.getElementById('navPostItem');
-    if (postItem) {
-        postItem.addEventListener('click', (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('postItemBtn'); // The hidden button or main button
-            if (btn) btn.click(); // Trigger existing logic
-            else {
-                // Fallback if on page without that button
-                if (isAuth) {
-                    // Redirect or open modal (requires modal logic)
-                    window.location.href = 'index.html#post';
-                } else {
-                    alert('Please login');
-                }
+function attachEventListeners() {
+    // Dropdown Toggles
+    const dropdowns = document.querySelectorAll('.dropdown-container');
+
+    dropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.icon-btn');
+        const menu = dropdown.querySelector('.dropdown-menu-modern');
+
+        if (!trigger || !menu) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains('open');
+
+            // Close all others
+            closeAllDropdowns();
+
+            if (!isOpen) {
+                dropdown.classList.add('open');
+                trigger.setAttribute('aria-expanded', 'true');
+                trigger.classList.add('active');
             }
+        });
+
+        // Keyboard support
+        trigger.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+                trigger.focus();
+            }
+        });
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown-container')) {
+            closeAllDropdowns();
+        }
+    });
+
+    // Handle Actions
+    const logoutBtn = document.getElementById('menuLogout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await logoutUser();
+            window.location.reload();
         });
     }
 
-    // Attach Login
+    const postItemBtn = document.getElementById('menuPostItem');
+    if (postItemBtn) {
+        postItemBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const mainBtn = document.getElementById('postItemBtn');
+            if (mainBtn) mainBtn.click();
+            else window.location.href = 'index.html';
+        });
+    }
+
     const loginBtn = document.getElementById('navLoginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
@@ -163,38 +193,15 @@ async function renderDesktopNav() {
             else window.location.href = 'index.html#login';
         });
     }
-
-    // Attach Logout
-    const logoutBtn = document.getElementById('navLogout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await logoutUser();
-            window.location.href = 'index.html';
-        });
-    }
 }
 
-function attachDropdownListeners() {
-    // Dropdown Toggles
-    document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
-        trigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const parent = trigger.parentElement;
-
-            // Close others
-            document.querySelectorAll('.nav-dropdown').forEach(d => {
-                if (d !== parent) d.classList.remove('active');
-            });
-
-            parent.classList.toggle('active');
-        });
-    });
-
-    // Close on click outside
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.nav-dropdown').forEach(d => {
-            d.classList.remove('active');
-        });
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-container').forEach(d => {
+        d.classList.remove('open');
+        const trigger = d.querySelector('.icon-btn');
+        if (trigger) {
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.classList.remove('active');
+        }
     });
 }
