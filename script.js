@@ -11,6 +11,9 @@ import {
     addDownload
 } from './auth.js';
 import { initNavigation } from './navbar.js';
+import { handleItemPost } from './post-item.js';
+import { fetchAllItems, createItemCard } from './items.js';
+import { initSaveListeners } from './save-item.js';
 
 // ===== STATE MANAGEMENT =====
 let currentCategory = 'all';
@@ -43,11 +46,13 @@ const dashboardLink = document.getElementById('dashboardLink');
 document.addEventListener('DOMContentLoaded', async () => {
     await initNavigation();
     await checkAuthStatus();
-    // 4. Initial content load
-    fetchMarketplaceItems();
-    fetchResources();
 
-    // 5. Check URL parameters for actions
+    // Initial content load
+    refreshMarketplace();
+    fetchResources();
+    initSaveListeners();
+
+    // Check URL parameters for actions
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'post') {
         setTimeout(() => {
@@ -56,6 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     setupEventListeners();
 });
+
+async function refreshMarketplace() {
+    const isAuth = await isLoggedIn();
+    const items = await fetchAllItems();
+    marketplaceGrid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
+}
+
+document.addEventListener('item-posted', refreshMarketplace);
 
 // ===== DATA FETCHING =====
 async function fetchMarketplaceItems() {
@@ -181,7 +194,7 @@ function setupEventListeners() {
     });
 
     // Form submissions
-    if (uploadForm) uploadForm.addEventListener('submit', handleItemUpload);
+    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
     if (resourceForm) resourceForm.addEventListener('submit', handleResourceUpload);
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
     if (registerForm) registerForm.addEventListener('submit', handleRegister);

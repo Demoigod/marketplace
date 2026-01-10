@@ -515,9 +515,6 @@ body {
 }
 
 .item-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding-top: var(--spacing-sm);
     border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -526,15 +523,86 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-primary);
+    display: block;
+    margin-bottom: 0.25rem;
 }
 
-.item-condition {
-    background: rgba(230, 219, 201, 0.5);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-sm);
+.item-date {
     font-size: 0.8rem;
-    font-weight: 500;
     color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.item-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.item-actions-grid button {
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-buy {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+}
+
+.btn-buy:hover:not(:disabled) {
+    background: #2a6d9a;
+}
+
+.btn-contact {
+    background: white;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+}
+
+.btn-contact:hover:not(:disabled) {
+    background: rgba(54, 140, 191, 0.05);
+}
+
+.btn-view {
+    background: #f3f4f6;
+    color: var(--text-primary);
+    border: none;
+}
+
+.btn-view:hover {
+    background: #e5e7eb;
+}
+
+.btn-save {
+    background: white;
+    color: var(--text-secondary);
+    border: 1px solid #e0e0e0;
+}
+
+.btn-save:hover:not(:disabled) {
+    background: #f9fafb;
+}
+
+.btn-save.active {
+    background: #FEF2F2;
+    color: #EF4444;
+    border-color: #FECACA;
+}
+
+.item-actions-grid button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
 }
 
 /* ===== RESOURCES GRID ===== */
