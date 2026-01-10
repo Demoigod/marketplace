@@ -43,8 +43,17 @@ const dashboardLink = document.getElementById('dashboardLink');
 document.addEventListener('DOMContentLoaded', async () => {
     await initNavigation();
     await checkAuthStatus();
-    await fetchMarketplaceItems();
-    await fetchResources();
+    // 4. Initial content load
+    fetchMarketplaceItems();
+    fetchResources();
+
+    // 5. Check URL parameters for actions
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'post') {
+        setTimeout(() => {
+            document.dispatchEvent(new CustomEvent('open-post-modal'));
+        }, 800);
+    }
     setupEventListeners();
 });
 
@@ -136,6 +145,18 @@ function setupEventListeners() {
     // Custom event to open auth modal from other components
     document.addEventListener('open-auth-modal', () => {
         if (authModal) openModal(authModal);
+    });
+
+    // Custom event to open post item modal
+    document.addEventListener('open-post-modal', () => {
+        if (uploadModal) {
+            if (!isLoggedIn()) {
+                openModal(authModal);
+                showNotification('Please login to post items');
+                return;
+            }
+            openModal(uploadModal);
+        }
     });
 
     // Auth modal tabs

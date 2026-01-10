@@ -179,9 +179,13 @@ function attachEventListeners() {
 
     const postItemHandler = (e) => {
         e.preventDefault();
-        const mainBtn = document.getElementById('postItemBtn');
-        if (mainBtn) mainBtn.click();
-        else window.location.href = 'index.html#post';
+        const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/');
+
+        if (isHomePage) {
+            document.dispatchEvent(new CustomEvent('open-post-modal'));
+        } else {
+            window.location.href = 'index.html?action=post';
+        }
     };
 
     const postItemBtnMenu = document.getElementById('menuPostItem');

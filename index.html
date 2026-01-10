@@ -74,22 +74,35 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Marketplace Listings</h2>
-                <div class="view-toggle">
-                    <button class="toggle-btn active" data-view="grid">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
-                            <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
-                            <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
-                            <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5" />
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button class="btn-primary" id="postItemBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
+                        Post New Item
                     </button>
-                    <button class="toggle-btn" data-view="list">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <rect x="2" y="4" width="16" height="2" rx="1" fill="currentColor" />
-                            <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" />
-                            <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor" />
-                        </svg>
-                    </button>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="grid">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor"
+                                    stroke-width="1.5" />
+                                <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor"
+                                    stroke-width="1.5" />
+                                <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor"
+                                    stroke-width="1.5" />
+                                <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor"
+                                    stroke-width="1.5" />
+                            </svg>
+                        </button>
+                        <button class="toggle-btn" data-view="list">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <rect x="2" y="4" width="16" height="2" rx="1" fill="currentColor" />
+                                <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor" />
+                                <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
