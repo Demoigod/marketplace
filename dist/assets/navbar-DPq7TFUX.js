@@ -64,7 +64,10 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
     `;let a="";t?a=`
             <div class="nav-links">
                  <a href="index.html" class="nav-link">Home</a>
-                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+                 <a href="dashboard.html" class="nav-link">${e.role==="seller"?"My Listings":"My Purchases"}</a>
+                 <a href="messages.html" class="nav-link">Messages</a>
+                 <a href="#" id="navPostItem" class="nav-link">Post Item</a>
+                 <button id="navLogout" class="nav-link" style="border:none; background:none; cursor:pointer;">Logout</button>
             </div>
             <div class="dropdown-container" id="profileDropdown" style="margin-left: 16px;">
                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
@@ -73,10 +76,7 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
                 <div class="dropdown-menu-modern" role="menu" style="display: none;">
                     <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${e.name||"User"}</span></div>
                     <div class="dropdown-divider"></div>
-                    <a href="dashboard.html" class="menu-item" role="menuitem">Dashboard</a>
-                    <a href="messages.html" class="menu-item" role="menuitem">Messages</a>
-                    <a href="#" id="menuPostItem" class="menu-item" role="menuitem">Post Item</a>
-                    <div class="dropdown-divider"></div>
+                    <a href="dashboard.html" class="menu-item" role="menuitem">Account Settings</a>
                     <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
                 </div>
             </div>
@@ -108,4 +108,4 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
              ${a}
              ${l}
         </div>
-    `,Rn()}function Rn(){document.querySelectorAll(".dropdown-container").forEach(n=>{const i=n.querySelector(".icon-btn"),a=n.querySelector(".dropdown-menu-modern");!i||!a||(i.addEventListener("click",o=>{o.stopPropagation();const l=n.classList.contains("open");Be(),l||(n.classList.add("open"),i.setAttribute("aria-expanded","true"),i.classList.add("active"))}),i.addEventListener("keydown",o=>{o.key==="Escape"&&(Be(),i.focus())}))}),document.addEventListener("click",n=>{n.target.closest(".dropdown-container")||Be()});const e=document.getElementById("menuLogout");e&&e.addEventListener("click",async()=>{await Sn(),window.location.reload()});const t=document.getElementById("menuPostItem");t&&t.addEventListener("click",n=>{n.preventDefault();const i=document.getElementById("postItemBtn");i?i.click():window.location.href="index.html"});const s=document.getElementById("navLoginBtn");s&&s.addEventListener("click",n=>{n.preventDefault(),document.dispatchEvent(new CustomEvent("open-auth-modal"))})}function Be(){document.querySelectorAll(".dropdown-container").forEach(r=>{r.classList.remove("open");const e=r.querySelector(".icon-btn");e&&(e.setAttribute("aria-expanded","false"),e.classList.remove("active"))})}export{Pn as a,$n as b,Sn as c,jn as d,xn as e,Wt as g,Un as i,Cn as l,In as r,x as s};
+    `,Rn()}function Rn(){document.querySelectorAll(".dropdown-container").forEach(l=>{const c=l.querySelector(".icon-btn"),u=l.querySelector(".dropdown-menu-modern");!c||!u||(c.addEventListener("click",f=>{f.stopPropagation();const h=l.classList.contains("open");Be(),h||(l.classList.add("open"),c.setAttribute("aria-expanded","true"),c.classList.add("active"))}),c.addEventListener("keydown",f=>{f.key==="Escape"&&(Be(),c.focus())}))}),document.addEventListener("click",l=>{l.target.closest(".dropdown-container")||Be()});const e=async()=>{await Sn(),window.location.href="index.html"},t=document.getElementById("menuLogout");t&&t.addEventListener("click",e);const s=document.getElementById("navLogout");s&&s.addEventListener("click",e);const n=l=>{l.preventDefault();const c=document.getElementById("postItemBtn");c?c.click():window.location.href="index.html#post"},i=document.getElementById("menuPostItem");i&&i.addEventListener("click",n);const a=document.getElementById("navPostItem");a&&a.addEventListener("click",n);const o=document.getElementById("navLoginBtn");o&&o.addEventListener("click",l=>{l.preventDefault(),document.dispatchEvent(new CustomEvent("open-auth-modal"))})}function Be(){document.querySelectorAll(".dropdown-container").forEach(r=>{r.classList.remove("open");const e=r.querySelector(".icon-btn");e&&(e.setAttribute("aria-expanded","false"),e.classList.remove("active"))})}export{Pn as a,$n as b,Sn as c,jn as d,xn as e,Wt as g,Un as i,Cn as l,In as r,x as s};

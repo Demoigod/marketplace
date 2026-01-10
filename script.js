@@ -532,9 +532,11 @@ async function handleLogin(e) {
         showNotification('Login successful!');
         closeModal(authModal);
         loginForm.reset();
-        await checkAuthStatus();
-        fetchMarketplaceItems();
-        fetchResources();
+
+        // Wait a small bit for session to sync then redirect
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 500);
     } else {
         showNotification(result.message);
     }

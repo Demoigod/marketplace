@@ -57,11 +57,15 @@ async function renderDesktopNav() {
     // Right-side Navigation HTML (Conditional)
     let rightNavHtml = '';
     if (isAuth) {
-        // Logged in: Show Home, Dashboard, and Profile Dropdown
+        const isSeller = user.role === 'seller';
+        // Logged in: Show requested links
         rightNavHtml = `
             <div class="nav-links">
                  <a href="index.html" class="nav-link">Home</a>
-                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+                 <a href="dashboard.html" class="nav-link">${isSeller ? 'My Listings' : 'My Purchases'}</a>
+                 <a href="messages.html" class="nav-link">Messages</a>
+                 <a href="#" id="navPostItem" class="nav-link">Post Item</a>
+                 <button id="navLogout" class="nav-link" style="border:none; background:none; cursor:pointer;">Logout</button>
             </div>
             <div class="dropdown-container" id="profileDropdown" style="margin-left: 16px;">
                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
@@ -70,10 +74,7 @@ async function renderDesktopNav() {
                 <div class="dropdown-menu-modern" role="menu" style="display: none;">
                     <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
                     <div class="dropdown-divider"></div>
-                    <a href="dashboard.html" class="menu-item" role="menuitem">Dashboard</a>
-                    <a href="messages.html" class="menu-item" role="menuitem">Messages</a>
-                    <a href="#" id="menuPostItem" class="menu-item" role="menuitem">Post Item</a>
-                    <div class="dropdown-divider"></div>
+                    <a href="dashboard.html" class="menu-item" role="menuitem">Account Settings</a>
                     <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
                 </div>
             </div>
@@ -164,23 +165,30 @@ function attachEventListeners() {
     });
 
     // Handle Actions
-    const logoutBtn = document.getElementById('menuLogout');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await logoutUser();
-            window.location.reload();
-        });
-    }
+    const logoutHandler = async () => {
+        await logoutUser();
+        window.location.href = 'index.html';
+    };
 
-    const postItemBtn = document.getElementById('menuPostItem');
-    if (postItemBtn) {
-        postItemBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const mainBtn = document.getElementById('postItemBtn');
-            if (mainBtn) mainBtn.click();
-            else window.location.href = 'index.html';
-        });
-    }
+    const logoutBtnMenu = document.getElementById('menuLogout');
+    if (logoutBtnMenu) logoutBtnMenu.addEventListener('click', logoutHandler);
+
+    const logoutBtnNav = document.getElementById('navLogout');
+    if (logoutBtnNav) logoutBtnNav.addEventListener('click', logoutHandler);
+
+
+    const postItemHandler = (e) => {
+        e.preventDefault();
+        const mainBtn = document.getElementById('postItemBtn');
+        if (mainBtn) mainBtn.click();
+        else window.location.href = 'index.html#post';
+    };
+
+    const postItemBtnMenu = document.getElementById('menuPostItem');
+    if (postItemBtnMenu) postItemBtnMenu.addEventListener('click', postItemHandler);
+
+    const postItemBtnNav = document.getElementById('navPostItem');
+    if (postItemBtnNav) postItemBtnNav.addEventListener('click', postItemHandler);
 
     const loginBtn = document.getElementById('navLoginBtn');
     if (loginBtn) {
