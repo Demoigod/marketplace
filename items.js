@@ -1,5 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { isLoggedIn } from './auth.js';
+import { handleContactSeller } from './contact-seller.js';
 
 /**
  * Fetches all active items from the marketplace.
@@ -31,7 +32,7 @@ export function createItemCard(item, isAuth = false) {
     const loginPrompt = isAuth ? '' : 'title="Please login to use this feature"';
 
     return `
-        <div class="marketplace-item" data-id="${item.id}" data-owner-id="${item.user_id}">
+        <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.user_id}">
             <div class="item-image" style="background-image: url('${mainImage}'); background-size: cover; background-position: center;"></div>
             <div class="item-content">
                 <div class="item-header">

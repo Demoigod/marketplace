@@ -110,9 +110,9 @@ export async function getCurrentUser() {
             // Purchases
             supabase.from('purchases').select('*').eq('buyer_id', user.id).order('purchase_date', { ascending: false }),
             // Listings (Seller)
-            supabase.from('marketplace_items').select('*').eq('seller_id', user.id).order('created_at', { ascending: false }),
-            // Sales (Seller) - This complex query might need refinement in a real app, relying on item_id match for now
-            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM marketplace_items WHERE seller_id = $1)'), // Simplified logic
+            supabase.from('items').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+            // Sales (Seller)
+            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM items WHERE user_id = $1)'),
             // Downloads with resource details
             supabase.from('downloads').select('*, resource:free_resources(*)').eq('user_id', user.id).order('download_date', { ascending: false }),
             // Saved Items
@@ -194,11 +194,11 @@ export async function addListing(item) {
         if (!user) throw new Error('Not logged in');
 
         const { data, error } = await supabase
-            .from('marketplace_items')
+            .from('items')
             .insert([
                 {
                     ...item,
-                    seller_id: user.id,
+                    user_id: user.id,
                     status: 'active'
                 }
             ])

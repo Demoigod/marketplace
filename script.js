@@ -412,7 +412,7 @@ async function handleSearch(e) {
     try {
         // Filter marketplace items from database
         let { data: filteredItems, error: itemsError } = await supabase
-            .from('marketplace_items')
+            .from('items')
             .select('*')
             .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
             .eq('status', 'active');
