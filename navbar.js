@@ -184,7 +184,8 @@ function attachEventListeners() {
 
     const loginBtn = document.getElementById('navLoginBtn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             document.dispatchEvent(new CustomEvent('open-auth-modal'));
         });
     }

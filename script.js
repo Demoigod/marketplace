@@ -90,40 +90,52 @@ async function fetchResources() {
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
     // Modal controls
-    postItemBtn.addEventListener('click', () => {
-        if (!isLoggedIn()) {
-            openModal(authModal);
-            showNotification('Please login to post items');
-            return;
-        }
-        openModal(uploadModal);
-    });
-    uploadResourceBtn.addEventListener('click', () => {
-        if (!isLoggedIn()) {
-            openModal(authModal);
-            showNotification('Please login to upload resources');
-            return;
-        }
-        openModal(resourceModal);
-    });
-    closeModalBtn.addEventListener('click', () => closeModal(uploadModal));
-    closeResourceModalBtn.addEventListener('click', () => closeModal(resourceModal));
-    closeAuthModalBtn.addEventListener('click', () => closeModal(authModal));
+    if (postItemBtn) {
+        postItemBtn.addEventListener('click', () => {
+            if (!isLoggedIn()) {
+                openModal(authModal);
+                showNotification('Please login to post items');
+                return;
+            }
+            openModal(uploadModal);
+        });
+    }
+
+    if (uploadResourceBtn) {
+        uploadResourceBtn.addEventListener('click', () => {
+            if (!isLoggedIn()) {
+                openModal(authModal);
+                showNotification('Please login to upload resources');
+                return;
+            }
+            openModal(resourceModal);
+        });
+    }
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', () => closeModal(uploadModal));
+    if (closeResourceModalBtn) closeResourceModalBtn.addEventListener('click', () => closeModal(resourceModal));
+    if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => closeModal(authModal));
 
     // Close modal on outside click
-    uploadModal.addEventListener('click', (e) => {
-        if (e.target === uploadModal) closeModal(uploadModal);
-    });
-    resourceModal.addEventListener('click', (e) => {
-        if (e.target === resourceModal) closeModal(resourceModal);
-    });
-    authModal.addEventListener('click', (e) => {
-        if (e.target === authModal) closeModal(authModal);
-    });
+    if (uploadModal) {
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) closeModal(uploadModal);
+        });
+    }
+    if (resourceModal) {
+        resourceModal.addEventListener('click', (e) => {
+            if (e.target === resourceModal) closeModal(resourceModal);
+        });
+    }
+    if (authModal) {
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) closeModal(authModal);
+        });
+    }
 
     // Custom event to open auth modal from other components
     document.addEventListener('open-auth-modal', () => {
-        openModal(authModal);
+        if (authModal) openModal(authModal);
     });
 
     // Auth modal tabs
@@ -134,22 +146,24 @@ function setupEventListeners() {
             e.target.classList.add('active');
 
             if (tabType === 'login') {
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                document.getElementById('authModalTitle').textContent = 'Login';
+                if (loginForm) loginForm.style.display = 'block';
+                if (registerForm) registerForm.style.display = 'none';
+                const title = document.getElementById('authModalTitle');
+                if (title) title.textContent = 'Login';
             } else {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                document.getElementById('authModalTitle').textContent = 'Register';
+                if (loginForm) loginForm.style.display = 'none';
+                if (registerForm) registerForm.style.display = 'block';
+                const title = document.getElementById('authModalTitle');
+                if (title) title.textContent = 'Register';
             }
         });
     });
 
     // Form submissions
-    uploadForm.addEventListener('submit', handleItemUpload);
-    resourceForm.addEventListener('submit', handleResourceUpload);
-    loginForm.addEventListener('submit', handleLogin);
-    registerForm.addEventListener('submit', handleRegister);
+    if (uploadForm) uploadForm.addEventListener('submit', handleItemUpload);
+    if (resourceForm) resourceForm.addEventListener('submit', handleResourceUpload);
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
     // Auth buttons
     if (loginBtn) {
