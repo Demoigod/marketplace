@@ -55,25 +55,46 @@ BEGIN
     END IF;
 END $$;
 
--- 4. SIMPLIFIED RLS (Security Definer Fallback)
--- This version is MUCH more likely to work with Realtime broadcasts
+-- 4. SIMPLIFIED RLS (Idempotent)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public profiles are viewable" ON public.users;
 CREATE POLICY "Public profiles are viewable" ON public.users FOR SELECT USING (true);
 
 -- Conversations
 DROP POLICY IF EXISTS "Users can view their own convos" ON public.conversations;
+DROP POLICY IF EXISTS "Users can only view their own conversations" ON public.conversations;
 CREATE POLICY "Users can view their own convos"
 ON public.conversations FOR SELECT
 USING (auth.uid() = user1_id OR auth.uid() = user2_id);
 
+DROP POLICY IF EXISTS "Users can start convos" ON public.conversations;
+DROP POLICY IF EXISTS "Users can only create conversations involving themselves" ON public.conversations;
+CREATE POLICY "Users can start convos"
+ON public.conversations FOR INSERT
+WITH CHECK (auth.uid() = user1_id OR auth.uid() = user2_id);
+
 -- Messages (Optimized for Realtime)
+DROP POLICY IF EXISTS "Users can read messages in their conversations" ON public.messages;
 DROP POLICY IF EXISTS "Users can read convos messages" ON public.messages;
+DROP POLICY IF EXISTS "Users can view messages in their conversations" ON public.messages;
 CREATE POLICY "Users can read messages in their conversations"
 ON public.messages FOR SELECT
 USING (
     sender_id = auth.uid() OR 
     EXISTS (
+        SELECT 1 FROM public.conversations 
+        WHERE id = messages.conversation_id 
+        AND (user1_id = auth.uid() OR user2_id = auth.uid())
+    )
+);
+
+DROP POLICY IF EXISTS "Users can send messages" ON public.messages;
+DROP POLICY IF EXISTS "Users can only send messages as themselves in their conversations" ON public.messages;
+CREATE POLICY "Users can send messages"
+ON public.messages FOR INSERT
+WITH CHECK (
+    auth.uid() = sender_id 
+    AND EXISTS (
         SELECT 1 FROM public.conversations 
         WHERE id = messages.conversation_id 
         AND (user1_id = auth.uid() OR user2_id = auth.uid())
