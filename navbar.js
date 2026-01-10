@@ -1,8 +1,8 @@
 import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
 
 export async function initNavigation() {
-    setupMobileMenu();
     await renderDesktopNav();
+    setupMobileMenu();
 }
 
 export function setupMobileMenu() {

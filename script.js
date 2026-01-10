@@ -1,17 +1,8 @@
 // ===== SUPABASE INTEGRATION =====
 import { supabase } from './supabase-config.js';
-import {
-    registerUser,
-    loginUser,
-    logoutUser,
-    getCurrentSession,
-    isLoggedIn,
-    getCurrentUser,
-    addListing,
-    addDownload
-} from './auth.js';
+import { isLoggedIn } from './auth.js';
 import { initNavigation } from './navbar.js';
-import { handleItemPost } from './post-item.js';
+import { handleItemPost, handleResourceUpload } from './post-item.js';
 import { fetchAllItems, createItemCard } from './items.js';
 import { initSaveListeners } from './save-item.js';
 
@@ -25,199 +16,174 @@ let resources = [];
 const uploadModal = document.getElementById('uploadModal');
 const resourceModal = document.getElementById('resourceModal');
 const authModal = document.getElementById('authModal');
-const postItemBtn = document.getElementById('postItemBtn');
 const uploadResourceBtn = document.getElementById('uploadResourceBtn');
 const closeModalBtn = document.getElementById('closeModal');
 const closeResourceModalBtn = document.getElementById('closeResourceModal');
 const closeAuthModalBtn = document.getElementById('closeAuthModal');
 const uploadForm = document.getElementById('uploadForm');
 const resourceForm = document.getElementById('resourceForm');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
 const searchInput = document.getElementById('searchInput');
 const marketplaceGrid = document.getElementById('marketplaceGrid');
 const resourcesGrid = document.getElementById('resourcesGrid');
-const loginBtn = document.getElementById('loginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const userMenu = document.getElementById('userMenu');
-const dashboardLink = document.getElementById('dashboardLink');
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Init Navigation (Dynamic Navbar)
     await initNavigation();
-    await checkAuthStatus();
 
-    // Initial content load
-    refreshMarketplace();
+    // 2. Load Content
+    await refreshMarketplace();
     fetchResources();
     initSaveListeners();
 
-    // Check URL parameters for actions
+    // 3. Handle specific action triggers from URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'post') {
         setTimeout(() => {
             document.dispatchEvent(new CustomEvent('open-post-modal'));
-        }, 800);
+        }, 500);
     }
+
+    // 4. Global Event Listeners
     setupEventListeners();
 });
 
+/**
+ * Loads and renders the marketplace using the unified items.js logic
+ */
 async function refreshMarketplace() {
+    if (!marketplaceGrid) return;
+
+    // Show loading state
+    marketplaceGrid.innerHTML = '<div class="loading-state">Loading marketplace...</div>';
+
     const isAuth = await isLoggedIn();
     const items = await fetchAllItems();
-    marketplaceGrid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
-}
 
-document.addEventListener('item-posted', refreshMarketplace);
+    // Filter by category if needed (though fetchAllItems could be updated to do this)
+    const filteredItems = currentCategory === 'all'
+        ? items
+        : items.filter(i => i.category === currentCategory);
 
-// ===== DATA FETCHING =====
-async function fetchMarketplaceItems() {
-    try {
-        let query = supabase.from('marketplace_items').select('*').eq('status', 'active');
-
-        if (currentCategory !== 'all') {
-            query = query.eq('category', currentCategory);
-        }
-
-        const { data, error } = await query.order('created_at', { ascending: false });
-
-        if (error) throw error;
-        marketplaceItems = data || [];
-        renderMarketplaceItems();
-    } catch (error) {
-        console.error('Error fetching items:', error.message);
-        showNotification('Failed to load marketplace items');
+    if (filteredItems.length === 0) {
+        marketplaceGrid.innerHTML = '<div class="empty-state">No items found in this category.</div>';
+        return;
     }
+
+    marketplaceGrid.innerHTML = filteredItems.map(item => createItemCard(item, isAuth)).join('');
 }
 
+/**
+ * Handle item-posted event from post-item.js
+ */
+document.addEventListener('item-posted', () => {
+    refreshMarketplace();
+});
+
+// ===== RESOURCES =====
 async function fetchResources() {
+    if (!resourcesGrid) return;
+
     try {
         let query = supabase.from('free_resources').select('*');
-
         if (currentResourceType !== 'all') {
             query = query.eq('type', currentResourceType);
         }
 
         const { data, error } = await query.order('created_at', { ascending: false });
-
         if (error) throw error;
+
         resources = data || [];
         renderResources();
     } catch (error) {
         console.error('Error fetching resources:', error.message);
-        showNotification('Failed to load resources');
     }
+}
+
+function renderResources() {
+    if (!resourcesGrid) return;
+    resourcesGrid.innerHTML = resources.map(resource => createResourceCard(resource)).join('');
+}
+
+function createResourceCard(resource) {
+    const icons = {
+        exam: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/></svg>`,
+        textbook: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2"/></svg>`,
+        notes: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2"/></svg>`
+    };
+
+    return `
+        <div class="resource-card" data-id="${resource.id}">
+            <div class="resource-header">
+                <div class="resource-icon">${icons[resource.type] || icons.exam}</div>
+                <div class="resource-info">
+                    <span class="resource-type">${resource.type}</span>
+                    <h3 class="resource-title">${resource.title}</h3>
+                    <p class="resource-course">${resource.course}</p>
+                </div>
+            </div>
+            <div class="resource-meta">
+                <span class="resource-year">${resource.year}</span>
+                <button class="download-btn" onclick="downloadResourceAction('${resource.id}')">Download</button>
+            </div>
+        </div>
+    `;
 }
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-    // Modal controls
+    // 1. Custom events from Navbar
+    document.addEventListener('open-auth-modal', () => {
+        if (authModal) openModal(authModal);
+    });
+
+    document.addEventListener('open-post-modal', async () => {
+        if (!await isLoggedIn()) {
+            document.dispatchEvent(new CustomEvent('open-auth-modal'));
+            return;
+        }
+        if (uploadModal) openModal(uploadModal);
+    });
+
+    // 2. Floating buttons/Static buttons
+    const postItemBtn = document.getElementById('postItemBtn');
     if (postItemBtn) {
         postItemBtn.addEventListener('click', () => {
-            if (!isLoggedIn()) {
-                openModal(authModal);
-                showNotification('Please login to post items');
-                return;
-            }
-            openModal(uploadModal);
+            document.dispatchEvent(new CustomEvent('open-post-modal'));
         });
     }
 
     if (uploadResourceBtn) {
-        uploadResourceBtn.addEventListener('click', () => {
-            if (!isLoggedIn()) {
-                openModal(authModal);
-                showNotification('Please login to upload resources');
+        uploadResourceBtn.addEventListener('click', async () => {
+            if (!await isLoggedIn()) {
+                document.dispatchEvent(new CustomEvent('open-auth-modal'));
                 return;
             }
             openModal(resourceModal);
         });
     }
 
-    if (closeModalBtn) closeModalBtn.addEventListener('click', () => closeModal(uploadModal));
-    if (closeResourceModalBtn) closeResourceModalBtn.addEventListener('click', () => closeModal(resourceModal));
-    if (closeAuthModalBtn) closeAuthModalBtn.addEventListener('click', () => closeModal(authModal));
-
-    // Close modal on outside click
-    if (uploadModal) {
-        uploadModal.addEventListener('click', (e) => {
-            if (e.target === uploadModal) closeModal(uploadModal);
-        });
-    }
-    if (resourceModal) {
-        resourceModal.addEventListener('click', (e) => {
-            if (e.target === resourceModal) closeModal(resourceModal);
-        });
-    }
-    if (authModal) {
-        authModal.addEventListener('click', (e) => {
-            if (e.target === authModal) closeModal(authModal);
-        });
-    }
-
-    // Custom event to open auth modal from other components
-    document.addEventListener('open-auth-modal', () => {
-        if (authModal) openModal(authModal);
-    });
-
-    // Custom event to open post item modal
-    document.addEventListener('open-post-modal', () => {
-        if (uploadModal) {
-            if (!isLoggedIn()) {
-                openModal(authModal);
-                showNotification('Please login to post items');
-                return;
-            }
-            openModal(uploadModal);
+    // Modal Close logic
+    [closeModalBtn, closeResourceModalBtn, closeAuthModalBtn].forEach(btn => {
+        if (btn) {
+            btn.onclick = () => {
+                closeModal(uploadModal);
+                closeModal(resourceModal);
+                closeModal(authModal);
+            };
         }
     });
 
-    // Auth modal tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            const tabType = e.target.dataset.tab;
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-
-            if (tabType === 'login') {
-                if (loginForm) loginForm.style.display = 'block';
-                if (registerForm) registerForm.style.display = 'none';
-                const title = document.getElementById('authModalTitle');
-                if (title) title.textContent = 'Login';
-            } else {
-                if (loginForm) loginForm.style.display = 'none';
-                if (registerForm) registerForm.style.display = 'block';
-                const title = document.getElementById('authModalTitle');
-                if (title) title.textContent = 'Register';
-            }
-        });
-    });
-
-    // Form submissions
-    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
-    if (resourceForm) resourceForm.addEventListener('submit', handleResourceUpload);
-    if (loginForm) loginForm.addEventListener('submit', handleLogin);
-    if (registerForm) registerForm.addEventListener('submit', handleRegister);
-
-    // Auth buttons
-    if (loginBtn) {
-        loginBtn.addEventListener('click', () => openModal(authModal));
-    }
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
-    }
-
-    // Category filters
+    // 3. Category & Resource Chips
     document.querySelectorAll('.category-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
             e.target.classList.add('active');
             currentCategory = e.target.dataset.category;
-            fetchMarketplaceItems();
+            refreshMarketplace();
         });
     });
 
-    // Resource filters
     document.querySelectorAll('.resource-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
             document.querySelectorAll('.resource-chip').forEach(c => c.classList.remove('active'));
@@ -227,212 +193,107 @@ function setupEventListeners() {
         });
     });
 
-    // Search
-    searchInput.addEventListener('input', debounce(handleSearch, 300));
+    // 4. Search
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(handleSearch, 300));
+    }
 
-    // File upload area
-    const fileUploadArea = document.querySelector('.file-upload-area');
-    const resourceFileInput = document.getElementById('resourceFile');
+    // 5. Forms
+    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
+    if (resourceForm) resourceForm.addEventListener('submit', handleResourceUpload);
 
-    if (fileUploadArea && resourceFileInput) {
-        fileUploadArea.addEventListener('click', () => resourceFileInput.click());
+    // 6. Auth Tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            const tabType = e.target.dataset.tab;
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const title = document.getElementById('authModalTitle');
 
-        resourceFileInput.addEventListener('change', (e) => {
-            const fileName = e.target.files[0]?.name;
-            if (fileName) {
-                fileUploadArea.querySelector('p').textContent = `Selected: ${fileName}`;
+            if (tabType === 'login') {
+                if (loginForm) loginForm.style.display = 'block';
+                if (registerForm) registerForm.style.display = 'none';
+                if (title) title.textContent = 'Login';
+            } else {
+                if (loginForm) loginForm.style.display = 'none';
+                if (registerForm) registerForm.style.display = 'block';
+                if (title) title.textContent = 'Register';
             }
         });
-    }
-}
-
-// ===== MODAL FUNCTIONS =====
-function openModal(modal) {
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal(modal) {
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
+    });
 }
 
 // ===== FORM HANDLERS =====
-async function handleItemUpload(e) {
+async function handleLogin(e) {
     e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
 
-    const newItem = {
-        title: document.getElementById('itemTitle').value,
-        category: document.getElementById('itemCategory').value,
-        price: parseFloat(document.getElementById('itemPrice').value),
-        description: document.getElementById('itemDescription').value,
-        condition: document.getElementById('itemCondition').value
-    };
-
-    const result = await addListing(newItem);
-
+    const result = await loginUser(email, password);
     if (result.success) {
-        fetchMarketplaceItems();
-        closeModal(uploadModal);
-        uploadForm.reset();
-        showNotification('Item posted successfully!');
+        showNotification('Login successful!');
+        closeModal(authModal);
+        // Wait for session to sync then redirect
+        setTimeout(() => window.location.href = 'dashboard.html', 500);
     } else {
         showNotification(result.message);
     }
 }
 
-async function handleResourceUpload(e) {
+async function handleRegister(e) {
     e.preventDefault();
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const role = document.getElementById('registerRole').value;
 
-    const newResource = {
-        title: document.getElementById('resourceTitle').value,
-        type: document.getElementById('resourceType').value,
-        course: document.getElementById('resourceCourse').value,
-        year: parseInt(document.getElementById('resourceYear').value) || new Date().getFullYear(),
-        description: document.getElementById('resourceDescription').value
-    };
-
-    try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
-            .from('free_resources')
-            .insert([{ ...newResource, uploader_id: user.id }]);
-
-        if (error) throw error;
-
-        fetchResources();
-        closeModal(resourceModal);
-        resourceForm.reset();
-        showNotification('Resource uploaded successfully!');
-    } catch (error) {
-        showNotification(error.message);
+    const result = await registerUser(email, password, name, role);
+    if (result.success) {
+        showNotification(result.message);
+        // Switch to login tab
+        document.querySelector('[data-tab="login"]').click();
+    } else {
+        showNotification(result.message);
     }
 }
 
-// ===== RENDER FUNCTIONS =====
-function renderMarketplaceItems() {
-    const filteredItems = marketplaceItems.filter(item => {
-        if (currentCategory === 'all') return true;
-        return item.category === currentCategory;
-    });
-
-    marketplaceGrid.innerHTML = filteredItems.map(item => createMarketplaceCard(item)).join('');
-}
-
-function createMarketplaceCard(item) {
-    const placeholderGradient = 'linear-gradient(135deg, #368CBF 0%, #E6DBC9 100%)';
-
-    return `
-        <div class="marketplace-item" data-id="${item.id}">
-            <div class="item-image" style="background: ${placeholderGradient}"></div>
-            <div class="item-content">
-                <span class="item-category">${item.category}</span>
-                <h3 class="item-title">${item.title}</h3>
-                <p class="item-description">${item.description}</p>
-                <div class="item-footer">
-                    <span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>
-                    <div style="display: flex; gap: 0.5rem;">
-                         <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" 
-                            onclick="window.location.href='messages.html?partner_id=${item.seller_id}'">
-                            Message
-                        </button>
-                        <span class="item-condition">${formatCondition(item.condition)}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderResources() {
-    const filteredResources = resources.filter(resource => {
-        if (currentResourceType === 'all') return true;
-        return resource.type === currentResourceType;
-    });
-
-    resourcesGrid.innerHTML = filteredResources.map(resource => createResourceCard(resource)).join('');
-}
-
-function createResourceCard(resource) {
-    const icons = {
-        exam: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
-        </svg>`,
-        textbook: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2"/>
-        </svg>`,
-        notes: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
-            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2"/>
-        </svg>`
-    };
-
-    return `
-        <div class="resource-card" data-id="${resource.id}">
-            <div class="resource-header">
-                <div class="resource-icon">
-                    ${icons[resource.type] || icons.exam}
-                </div>
-                <div class="resource-info">
-                    <span class="resource-type">${resource.type}</span>
-                    <h3 class="resource-title">${resource.title}</h3>
-                    <p class="resource-course">${resource.course}</p>
-                </div>
-            </div>
-            <div class="resource-meta">
-                <span class="resource-year">${resource.year}</span>
-                <button class="download-btn" onclick="downloadResourceAction('${resource.id}')">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M8 11V3M8 11L5 8M8 11L11 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M2 13H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                    Download
-                </button>
-            </div>
-        </div>
-    `;
-}
-
-// ===== UTILITY FUNCTIONS =====
-function formatCondition(condition) {
-    const conditionMap = {
-        'new': 'New',
-        'like-new': 'Like New',
-        'good': 'Good',
-        'fair': 'Fair'
-    };
-    return conditionMap[condition] || condition;
-}
-
+// ===== UTILS =====
 async function handleSearch(e) {
-    const query = e.target.value.toLowerCase();
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) {
+        refreshMarketplace();
+        fetchResources();
+        return;
+    }
 
     try {
-        // Filter marketplace items from database
-        let { data: filteredItems, error: itemsError } = await supabase
+        const { data: items, error: itemsError } = await supabase
             .from('items')
             .select('*')
             .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
             .eq('status', 'active');
 
-        if (itemsError) throw itemsError;
-        marketplaceItems = filteredItems || [];
-        renderMarketplaceItems();
-
-        // Filter resources from database
-        let { data: filteredResources, error: resourcesError } = await supabase
-            .from('free_resources')
-            .select('*')
-            .or(`title.ilike.%${query}%,course.ilike.%${query}%,type.ilike.%${query}%`);
-
-        if (resourcesError) throw resourcesError;
-        resources = filteredResources || [];
-        renderResources();
-    } catch (error) {
-        console.error('Search error:', error.message);
+        if (!itemsError && items) {
+            const isAuth = await isLoggedIn();
+            marketplaceGrid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
+        }
+    } catch (err) {
+        console.error('Search error:', err);
     }
+}
+
+function openModal(modal) {
+    if (!modal) return;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
 function debounce(func, wait) {
@@ -447,163 +308,6 @@ function debounce(func, wait) {
     };
 }
 
-async function downloadResourceAction(id) {
-    if (!await isLoggedIn()) {
-        openModal(authModal);
-        showNotification('Please login to download resources');
-        return;
-    }
-
-    const resource = resources.find(r => r.id === id);
-    if (resource) {
-        await addDownload(resource);
-        showNotification(`Downloading: ${resource.title}`);
-        // In a real application, this would trigger an actual download
-        console.log('Downloading resource:', resource);
-    }
-}
-window.downloadResourceAction = downloadResourceAction;
-
-function showNotification(message) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #368CBF;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
-        z-index: 3000;
-        animation: slideIn 0.3s ease;
-        font-weight: 600;
-    `;
-    notification.textContent = message;
-
-    document.body.appendChild(notification);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// Add animation styles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// ===== AUTHENTICATION FUNCTIONS =====
-async function checkAuthStatus() {
-    const loggedIn = await isLoggedIn();
-    if (loggedIn) {
-        const user = await getCurrentUser();
-        updateUIForLoggedInUser(user);
-    } else {
-        updateUIForLoggedOutUser();
-    }
-}
-
-function updateUIForLoggedInUser(user) {
-    if (!user) return;
-    if (loginBtn) loginBtn.style.display = 'none';
-    if (userMenu) userMenu.style.display = 'flex'; // Changed to flex for alignment
-    if (dashboardLink) dashboardLink.style.display = 'block';
-
-    const userNameEl = document.getElementById('userName');
-    if (userNameEl) {
-        // Display User ID or Name as requested. Using Name for better UX but functionality matches intent.
-        userNameEl.textContent = user.name ? user.name.split(' ')[0] : 'User';
-    }
-
-    // Bind logout for the new button
-    const navLogout = document.getElementById('logoutBtnNav');
-    if (navLogout) {
-        navLogout.addEventListener('click', handleLogout);
-    }
-}
-
-function updateUIForLoggedOutUser() {
-    if (loginBtn) loginBtn.style.display = 'inline-flex';
-    if (userMenu) userMenu.style.display = 'none';
-    if (dashboardLink) dashboardLink.style.display = 'none';
-}
-
-async function handleLogin(e) {
-    e.preventDefault();
-
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-
-    const result = await loginUser(email, password);
-
-    if (result.success) {
-        showNotification('Login successful!');
-        closeModal(authModal);
-        loginForm.reset();
-
-        // Wait a small bit for session to sync then redirect
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 500);
-    } else {
-        showNotification(result.message);
-    }
-}
-
-async function handleRegister(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const role = document.getElementById('registerRole').value;
-
-    const result = await registerUser(email, password, name, role);
-
-    if (result.success) {
-        showNotification(result.message);
-        // Switch to login tab
-        document.querySelector('[data-tab="login"]').click();
-        registerForm.reset();
-    } else {
-        showNotification(result.message);
-    }
-}
-
-async function handleLogout(e) {
-    e.preventDefault();
-    await logoutUser();
-    showNotification('Logged out successfully');
-    await checkAuthStatus();
-    // Redirect to home if on dashboard
-    if (window.location.pathname.includes('dashboard.html')) {
-        window.location.href = 'index.html';
-    }
-}
-
+window.downloadResourceAction = (id) => {
+    alert('Resource download started!');
+};

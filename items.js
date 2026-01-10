@@ -60,8 +60,8 @@ window.handleBuyAction = (id) => {
 };
 
 window.handleContactAction = (sellerId) => {
-    // Redirect to messaging system logic
-    window.location.href = `messages.html?partner_id=${sellerId}`;
+    // Use the standardized handler instead of a simple redirect
+    handleContactSeller(sellerId);
 };
 
 function escapeHtml(text) {
