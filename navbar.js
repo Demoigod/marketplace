@@ -54,11 +54,16 @@ async function renderDesktopNav() {
         </div>
     `;
 
-    // Profile Dropdown HTML
-    let profileHtml = '';
+    // Right-side Navigation HTML (Conditional)
+    let rightNavHtml = '';
     if (isAuth) {
-        profileHtml = `
-            <div class="dropdown-container" id="profileDropdown">
+        // Logged in: Show Home, Dashboard, and Profile Dropdown
+        rightNavHtml = `
+            <div class="nav-links">
+                 <a href="index.html" class="nav-link">Home</a>
+                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+            <div class="dropdown-container" id="profileDropdown" style="margin-left: 16px;">
                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
                     ${userIcon}
                 </button>
@@ -74,8 +79,9 @@ async function renderDesktopNav() {
             </div>
         `;
     } else {
-        profileHtml = `
-             <button class="btn-primary" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
+        // Logged out: Show ONLY Login button
+        rightNavHtml = `
+             <button class="btn-primary btn-nav" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
         `;
     }
 
@@ -97,29 +103,20 @@ async function renderDesktopNav() {
     `;
 
     // Layout Assembly
-    // Left: Dropdowns
-    // Center/Left-align: Logo (as per user request: "on the left side of the logo provide a dropdown")
-    // Actually, if I place dropdowns FIRST in DOM, they are to the left of the Logo.
-
-    const leftNav = `
-        <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
-            ${browseHtml}
-            ${profileHtml}
-        </div>
-    `;
-
-    // Note: We need to preserve the mobile toggle
-    const mobileToggleHtml = `<button class="menu-toggle">☰</button>`;
+    // Only show mobile toggle if we have links to toggle (i.e. if logged in)
+    const mobileToggleHtml = isAuth ? `<button class="menu-toggle">☰</button>` : '';
 
     navContent.innerHTML = `
-        <div style="display:flex; align-items:center;">
-             ${leftNav}
+        <div style="display:flex; align-items:center; flex:1;">
+             <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
+                 ${browseHtml}
+             </div>
              ${logoHtml}
         </div>
-        ${mobileToggleHtml}
-        <div class="nav-links mobile-only-links">
-             <a href="index.html" class="nav-link">Home</a>
-             <a href="dashboard.html" class="nav-link">Dashboard</a>
+        
+        <div class="nav-right" style="display: flex; align-items: center; gap: 16px;">
+             ${rightNavHtml}
+             ${mobileToggleHtml}
         </div>
     `;
 

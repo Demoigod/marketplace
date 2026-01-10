@@ -62,7 +62,11 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
             </div>
         </div>
     `;let a="";t?a=`
-            <div class="dropdown-container" id="profileDropdown">
+            <div class="nav-links">
+                 <a href="index.html" class="nav-link">Home</a>
+                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+            <div class="dropdown-container" id="profileDropdown" style="margin-left: 16px;">
                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
                     ${n}
                 </button>
@@ -77,7 +81,7 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
                 </div>
             </div>
         `:a=`
-             <button class="btn-primary" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
+             <button class="btn-primary btn-nav" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
         `;const o=`
         <a href="index.html" class="logo">
             <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
@@ -92,19 +96,16 @@ ${m}`}class R extends Error{constructor({message:e,code:t,cause:s,name:n}){var i
             </svg>
             <span class="logo-text">Campus Market</span>
         </a>
-    `,l=`
-        <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
-            ${i}
-            ${a}
-        </div>
-    `,c='<button class="menu-toggle">☰</button>';r.innerHTML=`
-        <div style="display:flex; align-items:center;">
-             ${l}
+    `,l=t?'<button class="menu-toggle">☰</button>':"";r.innerHTML=`
+        <div style="display:flex; align-items:center; flex:1;">
+             <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
+                 ${i}
+             </div>
              ${o}
         </div>
-        ${c}
-        <div class="nav-links mobile-only-links">
-             <a href="index.html" class="nav-link">Home</a>
-             <a href="dashboard.html" class="nav-link">Dashboard</a>
+        
+        <div class="nav-right" style="display: flex; align-items: center; gap: 16px;">
+             ${a}
+             ${l}
         </div>
     `,Rn()}function Rn(){document.querySelectorAll(".dropdown-container").forEach(n=>{const i=n.querySelector(".icon-btn"),a=n.querySelector(".dropdown-menu-modern");!i||!a||(i.addEventListener("click",o=>{o.stopPropagation();const l=n.classList.contains("open");Be(),l||(n.classList.add("open"),i.setAttribute("aria-expanded","true"),i.classList.add("active"))}),i.addEventListener("keydown",o=>{o.key==="Escape"&&(Be(),i.focus())}))}),document.addEventListener("click",n=>{n.target.closest(".dropdown-container")||Be()});const e=document.getElementById("menuLogout");e&&e.addEventListener("click",async()=>{await Sn(),window.location.reload()});const t=document.getElementById("menuPostItem");t&&t.addEventListener("click",n=>{n.preventDefault();const i=document.getElementById("postItemBtn");i?i.click():window.location.href="index.html"});const s=document.getElementById("navLoginBtn");s&&s.addEventListener("click",()=>{document.dispatchEvent(new CustomEvent("open-auth-modal"))})}function Be(){document.querySelectorAll(".dropdown-container").forEach(r=>{r.classList.remove("open");const e=r.querySelector(".icon-btn");e&&(e.setAttribute("aria-expanded","false"),e.classList.remove("active"))})}export{Pn as a,$n as b,Sn as c,jn as d,xn as e,Wt as g,Un as i,Cn as l,In as r,x as s};
