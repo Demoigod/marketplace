@@ -110,7 +110,9 @@ async function loadMessages() {
  * Subscribes to Supabase Realtime for new messages
  */
 function subscribeToMessages() {
-    supabase
+    console.log(`Subscribing to messages for conversation: ${currentConversationId}`);
+
+    const channel = supabase
         .channel(`chat:${currentConversationId}`)
         .on('postgres_changes', {
             event: 'INSERT',
@@ -118,10 +120,20 @@ function subscribeToMessages() {
             table: 'messages',
             filter: `conversation_id=eq.${currentConversationId}`
         }, (payload) => {
+            console.log('New message received via Realtime:', payload.new.body);
             appendMessageToUI(payload.new);
             scrollToBottom();
         })
-        .subscribe();
+        .subscribe((status) => {
+            console.log(`Realtime subscription status: ${status}`);
+            if (status === 'SUBSCRIBED') {
+                console.log('Successfully connected to real-time messaging channel.');
+            }
+            if (status === 'CHANNEL_ERROR') {
+                console.error('Failed to connect to real-time channel. Retrying in 3 seconds...');
+                setTimeout(subscribeToMessages, 3000);
+            }
+        });
 }
 
 /**
