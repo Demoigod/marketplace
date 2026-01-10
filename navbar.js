@@ -104,9 +104,6 @@ async function renderDesktopNav() {
     `;
 
     // Layout Assembly
-    // Only show mobile toggle if we have links to toggle (i.e. if logged in)
-    const mobileToggleHtml = isAuth ? `<button class="menu-toggle">☰</button>` : '';
-
     navContent.innerHTML = `
         <div style="display:flex; align-items:center; flex:1;">
              <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
@@ -117,11 +114,47 @@ async function renderDesktopNav() {
         
         <div class="nav-right" style="display: flex; align-items: center; gap: 16px;">
              ${rightNavHtml}
-             ${mobileToggleHtml}
+             ${isAuth ? `<button class="menu-toggle">☰</button>` : ''}
         </div>
     `;
 
+    if (isAuth) {
+        setupGlobalMessageListener(user.id);
+    }
+
     attachEventListeners();
+}
+
+/**
+ * Global listener for new messages to show a notification dot
+ */
+function setupGlobalMessageListener(userId) {
+    // We listen to the messages table. 
+    // RLS will ensure we only receive events for conversations we participate in.
+    supabase
+        .channel('global-messages')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+        }, (payload) => {
+            // If the sender is NOT the current user, show a dot
+            if (payload.new.sender_id !== userId) {
+                console.log('Global message received!');
+                showNotificationDot();
+            }
+        })
+        .subscribe();
+}
+
+function showNotificationDot() {
+    const messagesLink = document.querySelector('a[href="messages.html"]');
+    if (messagesLink && !messagesLink.querySelector('.nav-notification-dot')) {
+        const dot = document.createElement('span');
+        dot.className = 'nav-notification-dot';
+        messagesLink.style.position = 'relative';
+        messagesLink.appendChild(dot);
+    }
 }
 
 function attachEventListeners() {

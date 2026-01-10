@@ -6,78 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages - Campus Market</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-  <script type="module" crossorigin src="/assets/messages-DVecNI70.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/navbar-BksK6sTH.js">
-  <link rel="stylesheet" crossorigin href="/assets/styles-CkK_teMe.css">
+        rel="stylesheet">
+  <script type="module" crossorigin src="/assets/messages-VGNdHrfB.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/navbar-CpVXx8h8.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles-Dk4U5J6r.css">
 </head>
 
 <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-content">
-                <!-- Navigation rendered by navbar.js -->
-            </div>
+        <div class="container nav-content">
+            <!-- Navigation rendered by navbar.js -->
         </div>
     </nav>
 
-    <div class="container message-page-container">
-        <div class="messages-layout">
-            <!-- Sidebar: Conversation List -->
-            <aside class="conversations-sidebar" id="conversationsList">
-                <div class="sidebar-header">
-                    <h2>Messages</h2>
-                </div>
-                <div id="conversationsContainer" class="conversations-list">
-                    <!-- Dynamic conversations will load here -->
-                    <div class="loading-state">Loading conversations...</div>
-                </div>
-            </aside>
+    <div class="container" style="padding-top: 2rem; max-width: 800px;">
+        <div class="inbox-header">
+            <h1>Messaging Inbox</h1>
+            <p>Select a conversation to continue chatting.</p>
+        </div>
 
-            <!-- Main: Chat Area -->
-            <main class="chat-area" id="chatArea">
-                <!-- Empty State -->
-                <div id="emptyChatState" class="empty-chat-state">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="text-gray-300">
-                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
-                            stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-                    </svg>
-                    <h3>Select a conversation</h3>
-                    <p>Choose a conversation from the left to start chatting</p>
-                </div>
-
-                <!-- Active Chat -->
-                <div id="activeChatContainer" class="chat-container" style="display: none;">
-                    <div class="chat-header">
-                        <button class="back-btn mobile-only" id="backToConversations">
-                            ←
-                        </button>
-                        <div class="chat-header-info">
-                            <h3 id="chatPartnerName">Partner Name</h3>
-                            <span id="chatItemTitle" class="item-context">Item Title</span>
-                        </div>
-                    </div>
-
-                    <div id="messagesList" class="messages-list">
-                        <!-- Messages load here -->
-                    </div>
-
-                    <div class="message-input-area">
-                        <form id="messageForm">
-                            <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
-                            <button type="submit" class="send-btn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </main>
+        <div id="conversationsContainer" class="inbox-list">
+            <div class="loading-state">Loading your messages...</div>
         </div>
     </div>
+
 </body>
 
 </html>

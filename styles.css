@@ -1570,7 +1570,82 @@ body {
     display: flex;
 }
 
-.btn-icon:hover {
-    background: #f5f5f5;
+/* ===== INBOX & CONVERSATION LIST ===== */
+.inbox-header {
+    margin-bottom: 2rem;
+}
+
+.inbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.conversation-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #efefef;
+    position: relative;
+}
+
+.conversation-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--color-primary);
+}
+
+.conv-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.conv-details {
+    flex: 1;
+}
+
+.conv-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.conv-name {
+    font-weight: 700;
     color: var(--text-primary);
+}
+
+.conv-time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.conv-preview {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.nav-notification-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 8px;
+    height: 8px;
+    background: #ff4d4f;
+    border-radius: 50%;
+    border: 2px solid white;
 }
