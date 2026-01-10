@@ -53,21 +53,27 @@ async function loadConversationDetails() {
 
         if (error) throw error;
 
-        // Determine partner ID (the one who is NOT the current user)
+        // Determine partner ID
         const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
 
-        // Fetch partner name from users table
+        // Fetch partner name
         const { data: partner, error: pError } = await supabase
             .from('users')
             .select('name')
             .eq('id', partnerId)
             .single();
 
-        if (pError) throw pError;
-        document.getElementById('chatPartnerName').textContent = partner.name;
+        if (pError) {
+            console.warn('Could not load partner name, using fallback');
+            document.getElementById('chatPartnerName').textContent = 'Chat Partner';
+        } else {
+            document.getElementById('chatPartnerName').textContent = partner.name || 'Chat Partner';
+        }
 
     } catch (err) {
         console.error('Error loading conversation details:', err.message);
+        document.getElementById('messagesList').innerHTML = `<div class="error-state">Conversation not found or access denied.</div>`;
+        throw err; // Stop further loading
     }
 }
 
