@@ -1220,10 +1220,15 @@ body {
     border-bottom-left-radius: 4px;
 }
 
+.message-body {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
 .message-time {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     margin-top: 4px;
-    opacity: 0.8;
+    opacity: 0.7;
     text-align: right;
     display: block;
 }
