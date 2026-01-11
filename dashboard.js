@@ -31,11 +31,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderBuyerDashboard(user);
     }
 
-    // Render dashboard based on role
-    if (user.role === 'seller') {
-        renderSellerDashboard(user);
-    } else {
-        renderBuyerDashboard(user);
+    // Setup logout if needed
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await logoutUser();
+            window.location.href = 'index.html';
+        });
     }
 });
 

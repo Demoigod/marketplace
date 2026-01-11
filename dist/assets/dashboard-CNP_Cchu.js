@@ -1,4 +1,4 @@
-import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css               */document.addEventListener("DOMContentLoaded",async()=>{if(await l(),!await o()){window.location.href="index.html";return}const s=await c();if(!s){window.location.href="index.html";return}document.getElementById("dashboardUserName").textContent=s.name,s.role==="seller"?i(s):e(s),s.role==="seller"?i(s):e(s)});async function e(s){const t=await d(),a=`
+import{a as i,i as d,g as l,c as o,d as e}from"./navbar-DAxEynKi.js";/* empty css               */document.addEventListener("DOMContentLoaded",async()=>{if(await i(),!await d()){window.location.href="index.html";return}const s=await l();if(!s){window.location.href="index.html";return}document.getElementById("dashboardUserName").textContent=s.name,s.role==="seller"?r(s):c(s);const t=document.getElementById("logoutBtn");t&&t.addEventListener("click",async a=>{a.preventDefault(),await o(),window.location.href="index.html"})});async function c(s){const t=await e(),a=`
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon buyer">
@@ -51,14 +51,14 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
         
         <div class="dashboard-section">
             <h2 class="section-title">Purchase History</h2>
-            ${r(s.purchases)}
+            ${n(s.purchases)}
         </div>
         
         <div class="dashboard-section">
             <h2 class="section-title">Downloaded Resources</h2>
-            ${n(s.downloads)}
+            ${h(s.downloads)}
         </div>
-    `;document.getElementById("dashboardContent").innerHTML=a}async function i(s){const t=await d(),a=`
+    `;document.getElementById("dashboardContent").innerHTML=a}async function r(s){const t=await e(),a=`
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon seller">
@@ -111,19 +111,19 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
         
         <div class="dashboard-section">
             <h2 class="section-title">My Listings</h2>
-            ${h(s.listings)}
+            ${v(s.listings)}
         </div>
         
         <div class="dashboard-section">
             <h2 class="section-title">Sales History</h2>
-            ${v(s.sales)}
+            ${p(s.sales)}
         </div>
         
         <div class="dashboard-section">
             <h2 class="section-title">Uploaded Resources</h2>
-            ${p(s.uploadedResources)}
+            ${u(s.uploadedResources)}
         </div>
-    `;document.getElementById("dashboardContent").innerHTML=a}function r(s){return!s||s.length===0?'<p class="empty-state">No purchases yet. Start shopping!</p>':`
+    `;document.getElementById("dashboardContent").innerHTML=a}function n(s){return!s||s.length===0?'<p class="empty-state">No purchases yet. Start shopping!</p>':`
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>
@@ -146,7 +146,7 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
                 </tbody>
             </table>
         </div>
-    `}function n(s){return!s||s.length===0?'<p class="empty-state">No downloads yet. Check out free resources!</p>':`
+    `}function h(s){return!s||s.length===0?'<p class="empty-state">No downloads yet. Check out free resources!</p>':`
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>
@@ -169,7 +169,7 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
                 </tbody>
             </table>
         </div>
-    `}function h(s){return!s||s.length===0?'<p class="empty-state">No listings yet. Post your first item!</p>':`
+    `}function v(s){return!s||s.length===0?'<p class="empty-state">No listings yet. Post your first item!</p>':`
         <div class="listings-grid">
             ${s.map(t=>`
                 <div class="listing-card ${t.status}">
@@ -189,7 +189,7 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
                 </div>
             `).join("")}
         </div>
-    `}function v(s){return!s||s.length===0?'<p class="empty-state">No sales yet. Keep promoting your listings!</p>':`
+    `}function p(s){return!s||s.length===0?'<p class="empty-state">No sales yet. Keep promoting your listings!</p>':`
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>
@@ -212,7 +212,7 @@ import{a as l,i as o,g as c,b as d}from"./navbar-CJGh-4aH.js";/* empty css      
                 </tbody>
             </table>
         </div>
-    `}function p(s){return!s||s.length===0?'<p class="empty-state">No resources uploaded yet. Share your knowledge!</p>':`
+    `}function u(s){return!s||s.length===0?'<p class="empty-state">No resources uploaded yet. Share your knowledge!</p>':`
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>

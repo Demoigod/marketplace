@@ -1,6 +1,5 @@
 import { supabase } from './supabase-config.js';
 import { isLoggedIn } from './auth.js';
-import { handleContactSeller } from './contact-seller.js';
 
 /**
  * Fetches all active items from the marketplace.
@@ -42,28 +41,19 @@ export function createItemCard(item, isAuth = false) {
                 <p class="item-date">Posted on ${postedDate}</p>
                 <p class="item-description">${escapeHtml(item.description)}</p>
                 
+                
                 <div class="item-actions-grid">
-                    <button class="btn-buy" ${disabledAttr} ${loginPrompt} onclick="handleBuyAction('${item.id}')">Buy</button>
-                    <button class="btn-contact" ${disabledAttr} ${loginPrompt} onclick="handleContactAction('${item.user_id}')">Contact Seller</button>
-                    <button class="btn-view" onclick="window.location.href='item.html?id=${item.id}'">View</button>
-                    <button class="btn-save" data-item-id="${item.id}">Save</button>
+                    <button class="btn-buy" ${disabledAttr} ${loginPrompt} data-action="buy" data-id="${item.id}">Buy</button>
+                    <button class="btn-contact" ${disabledAttr} ${loginPrompt} data-action="contact" data-seller-id="${item.user_id}">Contact Seller</button>
+                    <button class="btn-view" data-action="view" data-id="${item.id}">View</button>
+                    <button class="btn-save" data-action="save" data-item-id="${item.id}">Save</button>
                 </div>
             </div>
         </div>
     `;
 }
 
-// Action Handlers
-window.handleBuyAction = (id) => {
-    // Placeholder redirect as requested
-    window.location.href = `payment.html?item_id=${id}`;
-};
-
-window.handleContactAction = (sellerId) => {
-    // Use the standardized handler instead of a simple redirect
-    handleContactSeller(sellerId);
-};
-
+// Helper to escape HTML to prevent XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;

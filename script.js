@@ -1,8 +1,18 @@
 // ===== SUPABASE INTEGRATION =====
 import { supabase } from './supabase-config.js';
-import { isLoggedIn } from './auth.js';
+import {
+    registerUser,
+    loginUser,
+    logoutUser,
+    getCurrentSession,
+    isLoggedIn,
+    getCurrentUser,
+    addListing,
+    addDownload,
+    checkAuthStatus
+} from './auth.js';
 import { initNavigation } from './navbar.js';
-import { handleItemPost, handleResourceUpload } from './post-item.js';
+import { handleItemPost } from './post-item.js';
 import { fetchAllItems, createItemCard } from './items.js';
 import { initSaveListeners } from './save-item.js';
 
@@ -16,93 +26,107 @@ let resources = [];
 const uploadModal = document.getElementById('uploadModal');
 const resourceModal = document.getElementById('resourceModal');
 const authModal = document.getElementById('authModal');
+const postItemBtn = document.getElementById('postItemBtn');
 const uploadResourceBtn = document.getElementById('uploadResourceBtn');
-const closeModalBtn = document.getElementById('closeModal');
-const closeResourceModalBtn = document.getElementById('closeResourceModal');
-const closeAuthModalBtn = document.getElementById('closeAuthModal');
+// const closeModalBtn = document.getElementById('closeModal'); // Handled by navbar/generic logic if present
+// const closeResourceModalBtn = document.getElementById('closeResourceModal');
+// const closeAuthModalBtn = document.getElementById('closeAuthModal');
 const uploadForm = document.getElementById('uploadForm');
 const resourceForm = document.getElementById('resourceForm');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
 const searchInput = document.getElementById('searchInput');
 const marketplaceGrid = document.getElementById('marketplaceGrid');
 const resourcesGrid = document.getElementById('resourcesGrid');
+const loginBtn = document.getElementById('loginBtn');
+// const logoutBtn = document.getElementById('logoutBtn');
+// const userMenu = document.getElementById('userMenu');
+const dashboardLink = document.getElementById('dashboardLink');
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Init Navigation (Dynamic Navbar)
     await initNavigation();
 
-    // 2. Load Content
-    await refreshMarketplace();
+    // Check auth status to update UI (this handles the "dead" login buttons state potentially)
+    // Note: checkAuthStatus is imported from auth.js if available, or we might need to implement a simple check here
+    // checking if checkAuthStatus is exported from auth.js, I will assume it's helpful to call simple auth check
+    await updateAuthUI();
+
+    // Initial content load
+    refreshMarketplace();
     fetchResources();
     initSaveListeners();
 
-    // 3. Handle specific action triggers from URL
+    // Check URL parameters for actions (e.g., immediate post triggering)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('action') === 'post') {
         setTimeout(() => {
             document.dispatchEvent(new CustomEvent('open-post-modal'));
-        }, 500);
+        }, 800);
     }
 
-    // 4. Global Event Listeners
     setupEventListeners();
 });
 
-/**
- * Loads and renders the marketplace using the unified items.js logic
- */
-async function refreshMarketplace() {
-    if (!marketplaceGrid) return;
-
-    // Show loading state
-    marketplaceGrid.innerHTML = '<div class="loading-state">Loading marketplace...</div>';
-
+async function updateAuthUI() {
     const isAuth = await isLoggedIn();
-    const items = await fetchAllItems();
-
-    // Filter by category if needed (though fetchAllItems could be updated to do this)
-    const filteredItems = currentCategory === 'all'
-        ? items
-        : items.filter(i => i.category === currentCategory);
-
-    if (filteredItems.length === 0) {
-        marketplaceGrid.innerHTML = '<div class="empty-state">No items found in this category.</div>';
-        return;
+    const user = await getCurrentUser();
+    // navbar.js handles most of this, but if we have specific page elements:
+    if (isAuth && user) {
+        if (dashboardLink) dashboardLink.style.display = 'block';
+    } else {
+        if (dashboardLink) dashboardLink.style.display = 'none';
     }
-
-    marketplaceGrid.innerHTML = filteredItems.map(item => createItemCard(item, isAuth)).join('');
 }
 
-/**
- * Handle item-posted event from post-item.js
- */
-document.addEventListener('item-posted', () => {
-    refreshMarketplace();
-});
+async function refreshMarketplace() {
+    const isAuth = await isLoggedIn();
+    const items = await fetchAllItems();
+    if (marketplaceGrid) {
+        if (items && items.length > 0) {
+            marketplaceGrid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
+        } else {
+            marketplaceGrid.innerHTML = '<p class="empty-state">No items found. Be the first to post!</p>';
+        }
+    }
+}
 
-// ===== RESOURCES =====
+// Global listener for re-rendering when an item is posted
+document.addEventListener('item-posted', refreshMarketplace);
+
+// ===== DATA FETCHING (Resources) =====
 async function fetchResources() {
-    if (!resourcesGrid) return;
+    if (!resourcesGrid) return; // Guard clause
 
     try {
-        let query = supabase.from('free_resources').select('*');
-        if (currentResourceType !== 'all') {
-            query = query.eq('type', currentResourceType);
-        }
+        const { data, error } = await supabase
+            .from('free_resources')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-        const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
-
         resources = data || [];
         renderResources();
     } catch (error) {
         console.error('Error fetching resources:', error.message);
+        resourcesGrid.innerHTML = '<p class="error-state">Failed to load resources.</p>';
     }
 }
 
 function renderResources() {
     if (!resourcesGrid) return;
-    resourcesGrid.innerHTML = resources.map(resource => createResourceCard(resource)).join('');
+
+    const filteredResources = resources.filter(resource => {
+        if (currentResourceType === 'all') return true;
+        return resource.type === currentResourceType;
+    });
+
+    if (filteredResources.length === 0) {
+        resourcesGrid.innerHTML = '<p class="empty-state">No resources found.</p>';
+        return;
+    }
+
+    resourcesGrid.innerHTML = filteredResources.map(resource => createResourceCard(resource)).join('');
 }
 
 function createResourceCard(resource) {
@@ -115,7 +139,9 @@ function createResourceCard(resource) {
     return `
         <div class="resource-card" data-id="${resource.id}">
             <div class="resource-header">
-                <div class="resource-icon">${icons[resource.type] || icons.exam}</div>
+                <div class="resource-icon">
+                    ${icons[resource.type] || icons.exam}
+                </div>
                 <div class="resource-info">
                     <span class="resource-type">${resource.type}</span>
                     <h3 class="resource-title">${resource.title}</h3>
@@ -124,7 +150,13 @@ function createResourceCard(resource) {
             </div>
             <div class="resource-meta">
                 <span class="resource-year">${resource.year}</span>
-                <button class="download-btn" onclick="downloadResourceAction('${resource.id}')">Download</button>
+                <button class="download-btn">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 11V3M8 11L5 8M8 11L11 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 13H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Download
+                </button>
             </div>
         </div>
     `;
@@ -132,182 +164,196 @@ function createResourceCard(resource) {
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-    // 1. Custom events from Navbar
-    document.addEventListener('open-auth-modal', () => {
-        if (authModal) openModal(authModal);
-    });
-
-    document.addEventListener('open-post-modal', async () => {
-        if (!await isLoggedIn()) {
-            document.dispatchEvent(new CustomEvent('open-auth-modal'));
-            return;
-        }
-        if (uploadModal) openModal(uploadModal);
-    });
-
-    // 2. Floating buttons/Static buttons
-    const postItemBtn = document.getElementById('postItemBtn');
-    if (postItemBtn) {
-        postItemBtn.addEventListener('click', () => {
-            document.dispatchEvent(new CustomEvent('open-post-modal'));
-        });
-    }
-
-    if (uploadResourceBtn) {
-        uploadResourceBtn.addEventListener('click', async () => {
-            if (!await isLoggedIn()) {
-                document.dispatchEvent(new CustomEvent('open-auth-modal'));
-                return;
-            }
-            openModal(resourceModal);
-        });
-    }
-
-    // Modal Close logic
-    [closeModalBtn, closeResourceModalBtn, closeAuthModalBtn].forEach(btn => {
-        if (btn) {
-            btn.onclick = () => {
-                closeModal(uploadModal);
-                closeModal(resourceModal);
-                closeModal(authModal);
-            };
-        }
-    });
-
-    // 3. Category & Resource Chips
-    document.querySelectorAll('.category-chip').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            currentCategory = e.target.dataset.category;
-            refreshMarketplace();
-        });
-    });
-
-    document.querySelectorAll('.resource-chip').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-            document.querySelectorAll('.resource-chip').forEach(c => c.classList.remove('active'));
-            e.target.classList.add('active');
-            currentResourceType = e.target.dataset.type;
-            fetchResources();
-        });
-    });
-
-    // 4. Search
+    // Search functionality
     if (searchInput) {
         searchInput.addEventListener('input', debounce(handleSearch, 300));
     }
 
-    // 5. Forms
-    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
-    if (resourceForm) resourceForm.addEventListener('submit', handleResourceUpload);
-
-    // 6. Auth Tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            const tabType = e.target.dataset.tab;
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            e.target.classList.add('active');
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const title = document.getElementById('authModalTitle');
-
-            if (tabType === 'login') {
-                if (loginForm) loginForm.style.display = 'block';
-                if (registerForm) registerForm.style.display = 'none';
-                if (title) title.textContent = 'Login';
-            } else {
-                if (loginForm) loginForm.style.display = 'none';
-                if (registerForm) registerForm.style.display = 'block';
-                if (title) title.textContent = 'Register';
-            }
+    // Category filters
+    document.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            // We would need to implement client-side filtering or re-fetch with query
+            // For now, simpler re-fetch approach:
+            // This assumes fetchAllItems handles strict filtering or we filter the local 'marketplaceItems' if we cached perfectly.
+            // But since fetchAllItems returns everything, let's just filter locally:
+            // This requires we keep marketplaceItems in state or refetch. 
+            // Simplified: Just log for now or implement if 'items.js' supports it.
+            // Actually, best to just filter the DOM or re-fetch with filter.
+            // Let's implement client-side filter of the fetched list.
+            const cat = chip.dataset.category;
+            filterMarketplace(cat);
         });
     });
-}
 
-// ===== FORM HANDLERS =====
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    // Resource filters
+    document.querySelectorAll('.resource-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.resource-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentResourceType = chip.dataset.type;
+            renderResources();
+        });
+    });
 
-    const result = await loginUser(email, password);
-    if (result.success) {
-        showNotification('Login successful!');
-        closeModal(authModal);
-        // Wait for session to sync then redirect
-        setTimeout(() => window.location.href = 'dashboard.html', 500);
-    } else {
-        showNotification(result.message);
+    // Forms
+    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
+
+    // Auth Forms
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const result = await loginUser(email, password);
+            if (result.success) {
+                alert("Login successful!");
+                window.location.reload();
+            } else {
+                alert(result.message);
+            }
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // simple registration handling
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const role = document.getElementById('registerRole').value;
+
+            const result = await registerUser(email, password, name, role);
+            if (result.success) {
+                alert(result.message);
+                window.location.reload();
+            } else {
+                alert(result.message);
+            }
+        });
+    }
+
+    if (resourceForm) {
+        resourceForm.addEventListener('submit', handleResourceUpload);
+    }
+
+    // DELEGATED EVENT LISTENERS (Fix for 'Dead Buttons')
+    // Marketplace Grid Actions
+    if (marketplaceGrid) {
+        marketplaceGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const id = btn.dataset.id;
+
+            if (action === 'buy') {
+                window.location.href = `payment.html?item_id=${id}`;
+            } else if (action === 'contact') {
+                const sellerId = btn.dataset.sellerId;
+                window.location.href = `messages.html?partner_id=${sellerId}`;
+            } else if (action === 'view') {
+                window.location.href = `item.html?id=${id}`;
+            }
+        });
+    }
+
+    // Resource Grid Actions
+    if (resourcesGrid) {
+        resourcesGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('.download-btn');
+            if (btn) {
+                // For resources, we might need to rely on explicit data-id if not using window.
+                // Note: script.js createResourceCard needs update to remove onclick="" and add data-id?
+                // The current createResourceCard has `onclick="window.downloadResourceAction('${resource.id}')"`
+                // We should update that too. BUT, we can just grab data-id from the parent card if the button doesn't have it.
+                // The resource card has data-id.
+                const card = btn.closest('.resource-card');
+                if (card) {
+                    handleDownloadAction(card.dataset.id);
+                }
+            }
+        });
     }
 }
 
-async function handleRegister(e) {
+// Helper: Resource Upload
+async function handleResourceUpload(e) {
     e.preventDefault();
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const role = document.getElementById('registerRole').value;
-
-    const result = await registerUser(email, password, name, role);
-    if (result.success) {
-        showNotification(result.message);
-        // Switch to login tab
-        document.querySelector('[data-tab="login"]').click();
-    } else {
-        showNotification(result.message);
-    }
-}
-
-// ===== UTILS =====
-async function handleSearch(e) {
-    const query = e.target.value.toLowerCase().trim();
-    if (!query) {
-        refreshMarketplace();
-        fetchResources();
+    if (!await isLoggedIn()) {
+        alert("Please login to upload resources.");
         return;
     }
+    const user = await getCurrentUser();
 
-    try {
-        const { data: items, error: itemsError } = await supabase
-            .from('items')
-            .select('*')
-            .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
-            .eq('status', 'active');
+    const newResource = {
+        title: document.getElementById('resourceTitle').value,
+        type: document.getElementById('resourceType').value,
+        course: document.getElementById('resourceCourse').value,
+        year: parseInt(document.getElementById('resourceYear').value) || new Date().getFullYear(),
+        description: document.getElementById('resourceDescription').value,
+        uploader_id: user.id
+    };
 
-        if (!itemsError && items) {
-            const isAuth = await isLoggedIn();
-            marketplaceGrid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
-        }
-    } catch (err) {
-        console.error('Search error:', err);
+    const { error } = await supabase.from('free_resources').insert([newResource]);
+    if (error) {
+        alert("Error uploading resource: " + error.message);
+    } else {
+        alert("Resource uploaded!");
+        document.getElementById('resourceModal').classList.remove('active'); // simplistic close
+        fetchResources();
     }
 }
 
-function openModal(modal) {
-    if (!modal) return;
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+async function handleDownloadAction(id) {
+    if (!await isLoggedIn()) {
+        document.dispatchEvent(new CustomEvent('open-auth-modal'));
+        return;
+    }
+    await addDownload({ id });
+    alert("Download started!");
 }
 
-function closeModal(modal) {
-    if (!modal) return;
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-}
-
+// Helper: Debounce
 function debounce(func, wait) {
     let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
+    return function (...args) {
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func.apply(this, args), wait);
     };
 }
 
-window.downloadResourceAction = (id) => {
-    alert('Resource download started!');
-};
+// Helper: Search
+async function handleSearch(e) {
+    const query = e.target.value.toLowerCase();
+    // Use items table
+    const { data: items } = await supabase
+        .from('items')
+        .select('*')
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+        .eq('status', 'active');
+
+    const isAuth = await isLoggedIn();
+    if (marketplaceGrid) {
+        marketplaceGrid.innerHTML = (items || []).map(item => createItemCard(item, isAuth)).join('');
+    }
+}
+
+// Helper: Client-side Filter
+async function filterMarketplace(category) {
+    const isAuth = await isLoggedIn();
+    const { data: items } = await supabase
+        .from('items')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    const filtered = category === 'all'
+        ? items
+        : items.filter(i => i.category === category);
+
+    if (marketplaceGrid) {
+        marketplaceGrid.innerHTML = (filtered || []).map(item => createItemCard(item, isAuth)).join('');
+    }
+}

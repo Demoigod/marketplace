@@ -27,9 +27,6 @@
         import { supabase } from './supabase-config.js';
         import { initNavigation } from './navbar.js';
         import { isLoggedIn } from './auth.js';
-        import { handleContactSeller } from './contact-seller.js';
-
-        window.handleContactAction = handleContactSeller;
 
         document.addEventListener('DOMContentLoaded', async () => {
             await initNavigation();

@@ -6,28 +6,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages - Campus Market</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Embedded specific styles for messaging layout */
+        .messages-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            height: calc(100vh - 80px);
+            /* Adjust based on navbar height */
+            margin-top: 0;
+            background: white;
+            overflow: hidden;
+        }
+
+        .conversations-sidebar {
+            border-right: 1px solid var(--border-color, #e5e7eb);
+            display: flex;
+            flex-direction: column;
+            background: #f9fafb;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color, #e5e7eb);
+            background: white;
+        }
+
+        .search-conversations {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .conversation-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .conversation-item:hover,
+        .conversation-item.active {
+            background: white;
+            /* or a highlight color */
+        }
+
+        .conversation-item.active {
+            border-left: 4px solid var(--color-primary);
+            background: #f0f9ff;
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .messages-list {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #f9fafb;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message-sent {
+            align-self: flex-end;
+            background: var(--color-primary, #368CBF);
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message-received {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-bottom-left-radius: 0.25rem;
+            color: var(--text-primary, #1f2937);
+        }
+
+        .chat-input-area {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .send-btn {
+            padding: 0 1.5rem;
+            background: var(--color-primary, #368CBF);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .empty-chat-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #6b7280;
+        }
+
+        @media (max-width: 768px) {
+            .messages-container {
+                grid-template-columns: 1fr;
+            }
+
+            .conversations-sidebar.hidden {
+                display: none;
+            }
+
+            .chat-area.hidden {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-gray-50">
-    <!-- Navigation -->
+<body>
+    <!-- Navigation rendered by navbar.js -->
     <nav class="navbar">
-        <div class="container nav-content">
-            <!-- Navigation rendered by navbar.js -->
+        <div class="container">
+            <div class="nav-content"></div>
         </div>
     </nav>
 
-    <div class="container" style="padding-top: 2rem; max-width: 800px;">
-        <div class="inbox-header">
-            <h1>Messaging Inbox</h1>
-            <p>Select a conversation to continue chatting.</p>
-        </div>
+    <main style="padding-top: 0;"> <!-- Padding handled by container usually, but here full width -->
+        <div class="messages-container">
+            <!-- Sidebar -->
+            <div id="conversationsSidebar" class="conversations-sidebar">
+                <div class="sidebar-header">
+                    <h2 class="text-xl font-bold">Messages</h2>
+                    <!-- <input type="text" placeholder="Search messages..." class="search-conversations"> -->
+                </div>
+                <div id="conversationsList" class="conversations-list">
+                    <!-- Dynamic Conversations -->
+                    <div class="p-4 text-center text-gray-500">Loading conversations...</div>
+                </div>
+            </div>
 
-        <div id="conversationsContainer" class="inbox-list">
-            <div class="loading-state">Loading your messages...</div>
+            <!-- Chat Area -->
+            <div id="chatArea" class="chat-area">
+                <div class="empty-chat-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="mb-4 text-gray-300">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor"
+                            stroke-width="2" />
+                    </svg>
+                    <p class="text-lg font-medium">Select a conversation to start chatting</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script type="module" src="messages.js"></script>
 </body>

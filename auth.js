@@ -82,6 +82,7 @@ export async function isLoggedIn() {
     const session = await getCurrentSession();
     return !!session;
 }
+export const checkAuthStatus = isLoggedIn;
 
 // Get current user profile data
 export async function getCurrentUser() {
