@@ -265,11 +265,6 @@ function setupEventListeners() {
         resourcesGrid.addEventListener('click', (e) => {
             const btn = e.target.closest('.download-btn');
             if (btn) {
-                // For resources, we might need to rely on explicit data-id if not using window.
-                // Note: script.js createResourceCard needs update to remove onclick="" and add data-id?
-                // The current createResourceCard has `onclick="window.downloadResourceAction('${resource.id}')"`
-                // We should update that too. BUT, we can just grab data-id from the parent card if the button doesn't have it.
-                // The resource card has data-id.
                 const card = btn.closest('.resource-card');
                 if (card) {
                     handleDownloadAction(card.dataset.id);
@@ -277,6 +272,48 @@ function setupEventListeners() {
             }
         });
     }
+
+    // Modal Handling (Auth & Post)
+    document.addEventListener('open-auth-modal', () => {
+        if (authModal) authModal.classList.add('active');
+    });
+
+    document.addEventListener('open-post-modal', () => {
+        if (uploadModal) uploadModal.classList.add('active');
+    });
+
+    // Close Modals
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        });
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.classList.remove('active');
+        }
+    });
+
+    // Auth Tabs
+    const authTabs = document.querySelectorAll('.auth-tab');
+    authTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            authTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const mode = tab.dataset.tab;
+            if (mode === 'login') {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('authModalTitle').textContent = 'Login';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+                document.getElementById('authModalTitle').textContent = 'Register';
+            }
+        });
+    });
 }
 
 // Helper: Resource Upload
