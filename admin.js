@@ -1,7 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Auth Guard: Redirect to homepage if not logged in
+    const session = await isLoggedIn();
+    if (!session) {
+        window.location.href = 'index.html';
+        return;
+    }
+
     initCharts();
     initNavigation();
+    updateAdminProfile();
+
+    // Global Auth Logic: Handle Logout
+    supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.href = 'index.html';
+        }
+    });
 });
+
+async function updateAdminProfile() {
+    const user = await getCurrentUser();
+    if (user) {
+        const adminNameElements = document.querySelectorAll('.admin-name');
+        adminNameElements.forEach(el => el.textContent = user.name || 'User');
+
+        const avatarImages = document.querySelectorAll('.avatar, .avatar-sm');
+        avatarImages.forEach(img => {
+            if (img.classList.contains('avatar')) {
+                img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=368CBF&color=fff`;
+            }
+        });
+    }
+}
 
 function initCharts() {
     // 1. Weekly Sales Chart (Vertical Bar)
@@ -80,8 +112,9 @@ function initNavigation() {
     // Logout button interaction
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+        logoutBtn.addEventListener('click', async () => {
             if (confirm('Are you sure you want to logout?')) {
+                await logoutUser();
                 window.location.href = 'index.html';
             }
         });

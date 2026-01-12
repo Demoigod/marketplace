@@ -62,7 +62,7 @@ async function renderDesktopNav() {
         rightNavHtml = `
             <div class="nav-links">
                  <a href="#" id="navPostItem" class="nav-link">Post Item</a>
-                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+                 <a href="admin.html" class="nav-link">Dashboard</a>
                  <a href="messages.html" class="nav-link">Messages</a>
             </div>
             <div class="dropdown-container" id="profileDropdown" style="margin-left: 8px;">
@@ -72,8 +72,7 @@ async function renderDesktopNav() {
                 <div class="dropdown-menu-modern" role="menu" style="display: none;">
                     <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
                     <div class="dropdown-divider"></div>
-                    <a href="dashboard.html" class="menu-item" role="menuitem">Account Settings</a>
-                    <a href="admin.html" class="menu-item" role="menuitem">Admin Dashboard</a>
+                    <a href="admin.html" class="menu-item" role="menuitem">Control Center</a>
                     <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
                 </div>
             </div>

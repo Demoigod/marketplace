@@ -6,7 +6,6 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
-                dashboard: resolve(__dirname, 'dashboard.html'),
                 messages: resolve(__dirname, 'messages.html'),
                 item: resolve(__dirname, 'item.html'),
                 privacy: resolve(__dirname, 'privacy.html'),

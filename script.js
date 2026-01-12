@@ -47,10 +47,15 @@ const dashboardLink = document.getElementById('dashboardLink');
 document.addEventListener('DOMContentLoaded', async () => {
     await initNavigation();
 
-    // Check auth status to update UI (this handles the "dead" login buttons state potentially)
-    // Note: checkAuthStatus is imported from auth.js if available, or we might need to implement a simple check here
-    // checking if checkAuthStatus is exported from auth.js, I will assume it's helpful to call simple auth check
+    // Check auth status to update UI
     await updateAuthUI();
+
+    // Homepage Guard: Redirect authenticated users to Dashboard
+    const session = await isLoggedIn();
+    if (session) {
+        window.location.href = 'admin.html';
+        return; // Stop initialization if redirecting
+    }
 
     // Initial content load
     refreshMarketplace();
@@ -66,6 +71,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupEventListeners();
+
+    // Global Auth Logic: Handle redirects on state change (Logout)
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.href = 'index.html';
+        } else if (event === 'SIGNED_IN' && window.location.pathname.endsWith('index.html')) {
+            window.location.href = 'admin.html';
+        }
+    });
 });
 
 async function updateAuthUI() {
@@ -234,8 +248,7 @@ function setupEventListeners() {
             const password = document.getElementById('loginPassword').value;
             const result = await loginUser(email, password);
             if (result.success) {
-                alert("Login successful!");
-                window.location.reload();
+                window.location.href = 'admin.html';
             } else {
                 alert(result.message);
             }
@@ -253,8 +266,7 @@ function setupEventListeners() {
 
             const result = await registerUser(email, password, name, role);
             if (result.success) {
-                alert(result.message);
-                window.location.reload();
+                window.location.href = 'admin.html';
             } else {
                 alert(result.message);
             }
