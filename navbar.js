@@ -75,6 +75,7 @@ async function renderDesktopNav() {
                     <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
                     <div class="dropdown-divider"></div>
                     <a href="dashboard.html" class="menu-item" role="menuitem">Account Settings</a>
+                    <a href="admin.html" class="menu-item" role="menuitem">Admin Dashboard</a>
                     <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
                 </div>
             </div>
