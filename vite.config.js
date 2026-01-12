@@ -10,6 +10,7 @@ export default defineConfig({
                 messages: resolve(__dirname, 'messages.html'),
                 item: resolve(__dirname, 'item.html'),
                 privacy: resolve(__dirname, 'privacy.html'),
+                admin: resolve(__dirname, 'admin.html'),
             },
         },
     },

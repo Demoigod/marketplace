@@ -41,28 +41,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadConversations() {
+    if (!currentUser) return;
+
     try {
         // Fetch conversations where current user is user1 or user2
-        // We join with profiles to get names (assuming we have a users view or similar, or just fetch blindly for MVP)
-        // Since we don't have a direct relation setup in JS purely easily without views on the backend for 'partner_name',
-        // we might do a second fetch or use a function.
-        // Let's assume standard 'conversations' table trigger/view or just fetch IDs and resolve names.
-
         const { data: conversations, error } = await supabase
             .from('conversations')
             .select(`
                 *,
-                messages:messages(content, created_at, read, sender_id)
+                messages (
+                    content,
+                    created_at,
+                    read,
+                    sender_id
+                )
             `)
             .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
             .order('updated_at', { ascending: false });
 
         if (error) throw error;
 
-        renderConversationsList(conversations);
+        // Note: In a larger app, we would only fetch the last message via a view or RPC
+        // For MVP, we'll process the returned messages locally
+        renderConversationsList(conversations || []);
     } catch (err) {
         console.error('Error loading conversations:', err);
-        conversationsList.innerHTML = '<div class="p-4 text-red-500">Failed to load conversations</div>';
+        if (conversationsList) {
+            conversationsList.innerHTML = '<div class="p-4 text-red-500">Error loading inbox. Please refresh.</div>';
+        }
     }
 }
 
@@ -78,28 +84,23 @@ async function renderConversationsList(conversations) {
 
     const processed = await Promise.all(conversations.map(async (conv) => {
         const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
+
         // Fetch partner name
-        // Ideally cache this
         const { data: partner } = await supabase.from('users').select('name').eq('id', partnerId).single();
         const partnerName = partner ? partner.name : 'Unknown User';
 
-        // Get last message
-        // Supabase select above might return all messages, which is heavy.
-        // Optimized: .limit(1) on nested? Not supported deeply easily.
-        // Just picking the last from the array if strictly ordered or sorting.
-        // Better: `order` applied to children.
-        // select('*, messages(*)') order is tricky.
-        // Re-sorting locally:
+        // Get last message - standardized on .content, falling back to .body for legacy support
         const msgs = conv.messages || [];
         msgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         const lastMsg = msgs[0];
+        const lastMessageText = lastMsg ? (lastMsg.content || lastMsg.body || 'New message') : 'No messages';
 
         return {
             ...conv,
             partnerName,
-            lastMessage: lastMsg ? lastMsg.content : 'No messages',
+            lastMessage: lastMessageText,
             lastTime: lastMsg ? new Date(lastMsg.created_at).toLocaleDateString() : '',
-            unread: lastMsg && !lastMsg.read && lastMsg.sender_id !== currentUser.id // rudimentary unread check
+            unread: lastMsg && !lastMsg.read && lastMsg.sender_id !== currentUser.id
         };
     }));
 
@@ -212,9 +213,10 @@ function renderChatArea(messages, partnerName, partnerId) {
 
 function renderMessageBubble(msg) {
     const isMe = msg.sender_id === currentUser.id;
+    const content = msg.content || msg.body || ''; // Support both for safety
     return `
         <div class="message-bubble ${isMe ? 'message-sent' : 'message-received'}">
-            ${msg.content}
+            ${content}
         </div>
     `;
 }
@@ -247,10 +249,28 @@ function subscribeToConversation(conversationId) {
 }
 
 function setupGlobalSubscription() {
-    // Listen for new conversations or messages in other threads to update the sidebar list
-    // This is more complex, MVP can skip or just poll.
-    // Ideally subscribe to 'messages' where receiver is current User, but RLS prevents filtering effectively on 'receiver' unless strictly modeled.
-    // For now, simpler: just periodic refresh or relying on user interaction.
+    // Listen for new messages in ANY conversation to update the sidebar list
+    supabase
+        .channel('public:messages:global')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+        }, async (payload) => {
+            // Check if we are involved in this conversation
+            const { data: conv } = await supabase
+                .from('conversations')
+                .select('id')
+                .eq('id', payload.new.conversation_id)
+                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+                .single();
+
+            if (conv) {
+                // Refresh sidebar list
+                loadConversations();
+            }
+        })
+        .subscribe();
 }
 
 async function markMessagesRead(conversationId) {
