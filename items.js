@@ -26,9 +26,27 @@ export function createItemCard(item, isAuth = false) {
     const postedDate = new Date(item.created_at).toLocaleDateString();
     const mainImage = item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/300x200';
 
-    // Disable certain actions for unauthenticated users
-    const disabledAttr = isAuth ? '' : 'disabled';
-    const loginPrompt = isAuth ? '' : 'title="Please login to use this feature"';
+    // Unified actions logic for guest vs member
+    let actionsHtml = '';
+
+    if (isAuth) {
+        // Authenticated user: Show full interaction buttons
+        actionsHtml = `
+            <div class="item-actions-grid">
+                <button class="btn-buy" data-action="buy" data-id="${item.id}">Buy</button>
+                <button class="btn-contact" data-action="contact" data-seller-id="${item.user_id}">Contact Seller</button>
+                <button class="btn-save" data-action="save" data-item-id="${item.id}">Save</button>
+                <button class="btn-view" data-action="view" data-id="${item.id}">View Details</button>
+            </div>
+        `;
+    } else {
+        // Guest user: Show simplified preview with a clear 'View' CTA
+        actionsHtml = `
+            <div class="item-actions-preview">
+                <button class="btn-primary btn-full" data-action="view" data-id="${item.id}">View Item</button>
+            </div>
+        `;
+    }
 
     return `
         <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.user_id}">
@@ -41,13 +59,7 @@ export function createItemCard(item, isAuth = false) {
                 <p class="item-date">Posted on ${postedDate}</p>
                 <p class="item-description">${escapeHtml(item.description)}</p>
                 
-                
-                <div class="item-actions-grid">
-                    <button class="btn-buy" ${disabledAttr} ${loginPrompt} data-action="buy" data-id="${item.id}">Buy</button>
-                    <button class="btn-contact" ${disabledAttr} ${loginPrompt} data-action="contact" data-seller-id="${item.user_id}">Contact Seller</button>
-                    <button class="btn-view" data-action="view" data-id="${item.id}">View</button>
-                    <button class="btn-save" data-action="save" data-item-id="${item.id}">Save</button>
-                </div>
+                ${actionsHtml}
             </div>
         </div>
     `;

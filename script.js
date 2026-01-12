@@ -69,13 +69,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function updateAuthUI() {
-    const isAuth = await isLoggedIn();
     const user = await getCurrentUser();
-    // navbar.js handles most of this, but if we have specific page elements:
-    if (isAuth && user) {
-        if (dashboardLink) dashboardLink.style.display = 'block';
+    const heroAuthCtas = document.getElementById('heroAuthCtas');
+
+    if (user) {
+        if (heroAuthCtas) heroAuthCtas.style.display = 'none';
+        // Authentication state is handled by navbar.js renderDesktopNav
     } else {
-        if (dashboardLink) dashboardLink.style.display = 'none';
+        if (heroAuthCtas) heroAuthCtas.style.display = 'flex';
+        setupHeroListeners();
+    }
+}
+
+function setupHeroListeners() {
+    const signupBtn = document.getElementById('heroSignupBtn');
+    const loginBtn = document.getElementById('heroLoginBtn');
+    const authModal = document.getElementById('authModal');
+
+    if (signupBtn && authModal) {
+        signupBtn.onclick = () => {
+            document.querySelector('.auth-tab[data-tab="register"]')?.click();
+            authModal.classList.add('active');
+        };
+    }
+
+    if (loginBtn) {
+        loginBtn.onclick = () => {
+            // Scroll to marketplace
+            const marketplace = document.getElementById('marketplace');
+            if (marketplace) {
+                marketplace.scrollIntoView({ behavior: 'smooth' });
+            }
+        };
     }
 }
 
@@ -242,7 +267,7 @@ function setupEventListeners() {
     // DELEGATED EVENT LISTENERS (Fix for 'Dead Buttons')
     // Marketplace Grid Actions
     if (marketplaceGrid) {
-        marketplaceGrid.addEventListener('click', (e) => {
+        marketplaceGrid.addEventListener('click', async (e) => {
             const btn = e.target.closest('button');
             if (!btn) return;
 
@@ -255,7 +280,12 @@ function setupEventListeners() {
                 const sellerId = btn.dataset.sellerId;
                 window.location.href = `messages.html?partner_id=${sellerId}`;
             } else if (action === 'view') {
-                window.location.href = `item.html?id=${id}`;
+                const isAuth = await isLoggedIn();
+                if (isAuth) {
+                    window.location.href = `item.html?id=${id}`;
+                } else {
+                    document.dispatchEvent(new CustomEvent('open-auth-modal'));
+                }
             }
         });
     }

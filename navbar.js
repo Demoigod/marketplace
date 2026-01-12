@@ -81,9 +81,12 @@ async function renderDesktopNav() {
             </div>
         `;
     } else {
-        // Logged out: Show ONLY Login button
+        // Logged out: Show Sign up and Log in buttons
         rightNavHtml = `
-             <button class="btn-primary btn-nav" id="navLoginBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Login</button>
+             <div class="nav-links">
+                 <button class="btn-primary" id="navSignupBtn">Sign up</button>
+                 <button class="nav-link" id="navLoginBtn" style="border:none; background:none; cursor:pointer;">Log in</button>
+             </div>
         `;
     }
 
@@ -199,7 +202,25 @@ function attachEventListeners() {
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            document.dispatchEvent(new CustomEvent('open-auth-modal'));
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                // Show login tab
+                document.querySelector('.auth-tab[data-tab="login"]')?.click();
+                authModal.classList.add('active');
+            }
+        });
+    }
+
+    const signupBtn = document.getElementById('navSignupBtn');
+    if (signupBtn) {
+        signupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                // Show register tab
+                document.querySelector('.auth-tab[data-tab="register"]')?.click();
+                authModal.classList.add('active');
+            }
         });
     }
 }
