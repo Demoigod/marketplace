@@ -61,14 +61,12 @@ async function renderDesktopNav() {
         // Logged in: Show requested links
         rightNavHtml = `
             <div class="nav-links">
-                 <a href="index.html" class="nav-link">Home</a>
-                 <a href="dashboard.html" class="nav-link">${isSeller ? 'My Listings' : 'My Purchases'}</a>
-                 <a href="messages.html" class="nav-link">Messages</a>
                  <a href="#" id="navPostItem" class="nav-link">Post Item</a>
-                 <button id="navLogout" class="nav-link" style="border:none; background:none; cursor:pointer;">Logout</button>
+                 <a href="dashboard.html" class="nav-link">Dashboard</a>
+                 <a href="messages.html" class="nav-link">Messages</a>
             </div>
-            <div class="dropdown-container" id="profileDropdown" style="margin-left: 16px;">
-                <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
+            <div class="dropdown-container" id="profileDropdown" style="margin-left: 8px;">
+                 <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
                     ${userIcon}
                 </button>
                 <div class="dropdown-menu-modern" role="menu" style="display: none;">
@@ -92,8 +90,8 @@ async function renderDesktopNav() {
 
     // Logo HTML
     const logoHtml = `
-        <a href="index.html" class="logo">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+        <a href="index.html" class="logo" style="flex-direction: row; gap: 10px; align-items: center;">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
                 <path d="M16 8L22 14L16 20L10 14L16 20L16 8Z" fill="white" />
                 <defs>
@@ -103,8 +101,21 @@ async function renderDesktopNav() {
                     </linearGradient>
                 </defs>
             </svg>
-            <span class="logo-text">Campus Market</span>
+            <span class="logo-text" style="font-size: 1.1rem; margin-top: 0;">Campus Market</span>
         </a>
+    `;
+
+    // Nav Search HTML
+    const navSearchHtml = `
+        <div class="nav-search-wrapper">
+             <div class="nav-search-bar">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                    <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
+                    <path d="M14 14L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <input type="text" id="navSearchInput" placeholder="Search marketplace...">
+             </div>
+        </div>
     `;
 
     // Layout Assembly
@@ -112,14 +123,16 @@ async function renderDesktopNav() {
     const mobileToggleHtml = isAuth ? `<button class="menu-toggle">☰</button>` : '';
 
     navContent.innerHTML = `
-        <div style="display:flex; align-items:center; flex:1;">
-             <div class="nav-left" style="display: flex; gap: 8px; align-items: center; margin-right: 16px;">
-                 ${browseHtml}
-             </div>
+        <div class="nav-left" style="display:flex; align-items:center;">
              ${logoHtml}
+             <div style="margin-left: 16px;">${browseHtml}</div>
         </div>
         
-        <div class="nav-right" style="display: flex; align-items: center; gap: 16px;">
+        <div class="nav-center" style="flex: 1; display: flex; justify-content: center; padding: 0 20px;">
+             ${navSearchHtml}
+        </div>
+        
+        <div class="nav-right" style="display: flex; align-items: center; gap: 12px;">
              ${rightNavHtml}
              ${mobileToggleHtml}
         </div>
@@ -220,6 +233,19 @@ function attachEventListeners() {
                 // Show register tab
                 document.querySelector('.auth-tab[data-tab="register"]')?.click();
                 authModal.classList.add('active');
+            }
+        });
+    }
+
+    // Nav Search Listener
+    const navSearchInput = document.getElementById('navSearchInput');
+    if (navSearchInput) {
+        navSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const mainSearch = document.getElementById('marketplaceGrid'); // Checking if we are on index
+                if (!mainSearch) {
+                    window.location.href = `index.html?search=${encodeURIComponent(e.target.value)}`;
+                }
             }
         });
     }

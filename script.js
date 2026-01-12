@@ -189,9 +189,10 @@ function createResourceCard(resource) {
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-    // Search functionality
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(handleSearch, 300));
+    // Search functionality (Dynamic check for Nav Search)
+    const activeSearchInput = document.getElementById('navSearchInput') || searchInput;
+    if (activeSearchInput) {
+        activeSearchInput.addEventListener('input', debounce(handleSearch, 300));
     }
 
     // Category filters
