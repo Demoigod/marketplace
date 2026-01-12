@@ -94,8 +94,11 @@ function initCharts() {
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
+        // If the item has a real href that isn't '#', let the browser handle it
+        if (item.getAttribute('href') !== '#') return;
+
         item.addEventListener('click', (e) => {
-            // e.preventDefault();
+            e.preventDefault();
             navItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
         });

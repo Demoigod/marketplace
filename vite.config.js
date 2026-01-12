@@ -10,6 +10,7 @@ export default defineConfig({
                 item: resolve(__dirname, 'item.html'),
                 privacy: resolve(__dirname, 'privacy.html'),
                 admin: resolve(__dirname, 'admin.html'),
+                listings: resolve(__dirname, 'listings.html'),
             },
         },
     },
