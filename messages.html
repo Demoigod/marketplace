@@ -148,6 +148,93 @@
             color: #6b7280;
         }
 
+        .chat-item-header {
+            padding: 0.75rem 1.5rem;
+            background: #fdfaf6;
+            border-bottom: 1px solid #fee2e2;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-item-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .chat-item-info {
+            flex: 1;
+        }
+
+        .chat-item-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .chat-item-price {
+            font-size: 0.8rem;
+            color: #368CBF;
+            font-weight: 700;
+        }
+
+        .attachment-preview {
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            max-width: 200px;
+        }
+
+        .attachment-img {
+            width: 100%;
+            display: block;
+        }
+
+        .attachment-file {
+            padding: 0.5rem;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #374151;
+            text-decoration: none;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+        }
+
+        .upload-icon {
+            color: #6b7280;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+        }
+
+        #fileInput {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 40px;
+        }
+
+        .read-status {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            text-align: right;
+            margin-top: 2px;
+        }
+
         @media (max-width: 768px) {
             .messages-container {
                 grid-template-columns: 1fr;
