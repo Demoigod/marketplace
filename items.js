@@ -7,8 +7,11 @@ import { isLoggedIn } from './auth.js';
 export async function fetchAllItems() {
     try {
         const { data, error } = await supabase
-            .from('items')
-            .select('*')
+            .from('market_listings')
+            .select(`
+                *,
+                seller:profiles(username)
+            `)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -34,7 +37,7 @@ export function createItemCard(item, isAuth = false) {
         actionsHtml = `
             <div class="item-actions-grid">
                 <button class="btn-buy" data-action="buy" data-id="${item.id}">Buy</button>
-                <button class="btn-contact" data-action="contact" data-seller-id="${item.user_id}">Contact Seller</button>
+                <button class="btn-contact" data-action="contact" data-seller-id="${item.seller_id}">Contact Seller</button>
                 <button class="btn-save" data-action="save" data-item-id="${item.id}">Save</button>
                 <button class="btn-view" data-action="view" data-id="${item.id}">View Details</button>
             </div>
@@ -49,7 +52,7 @@ export function createItemCard(item, isAuth = false) {
     }
 
     return `
-        <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.user_id}">
+        <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.seller_id}">
             <div class="item-image" style="background-image: url('${mainImage}'); background-size: cover; background-position: center;"></div>
             <div class="item-content">
                 <div class="item-header">

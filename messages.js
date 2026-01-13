@@ -100,7 +100,7 @@ async function loadConversations() {
             .from('conversations')
             .select(`
                 *,
-                item:items(title, price, image_url),
+                item:market_listings(title, price, image_url),
                 messages (
                     content,
                     created_at,
@@ -129,8 +129,8 @@ async function renderConversationsList(conversations) {
 
     const processed = await Promise.all(conversations.map(async (conv) => {
         const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-        const { data: partner } = await supabase.from('users').select('name').eq('id', partnerId).single();
-        const partnerName = partner ? partner.name : 'Unknown User';
+        const { data: partner } = await supabase.from('profiles').select('username').eq('id', partnerId).single();
+        const partnerName = partner ? partner.username : 'Unknown User';
 
         const msgs = conv.messages || [];
         msgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -183,14 +183,14 @@ async function loadChat(conversationId) {
         // Fetch conversation details with item join
         const { data: conv } = await supabase
             .from('conversations')
-            .select('*, item:items(*)')
+            .select('*, item:market_listings(*)')
             .eq('id', conversationId)
             .single();
 
         const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-        const { data: partner } = await supabase.from('users').select('name').eq('id', partnerId).single();
+        const { data: partner } = await supabase.from('profiles').select('username').eq('id', partnerId).single();
 
-        renderChatArea(messages, partner ? partner.name : 'User', partnerId, conv.item);
+        renderChatArea(messages, partner ? partner.username : 'User', partnerId, conv.item);
         subscribeToConversation(conversationId);
         markMessagesRead(conversationId);
 
