@@ -90,14 +90,30 @@ export async function getCurrentUser() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return null;
 
-        // Fetch additional profile data from profiles table (renamed from users)
-        const { data: profile, error } = await supabase
+        // Fetch additional profile data from profiles table
+        const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
 
-        if (error) throw error;
+        if (profileError) {
+            console.warn('Profile not found, using basic auth data:', profileError.message);
+            // Fallback to basic data from auth metadata
+            return {
+                id: user.id,
+                username: user.user_metadata?.username || user.user_metadata?.name || 'User',
+                first_name: user.user_metadata?.first_name || '',
+                last_name: user.user_metadata?.last_name || '',
+                phone: user.user_metadata?.phone || '',
+                purchases: [],
+                listings: [],
+                sales: [],
+                downloads: [],
+                savedItems: [],
+                uploadedResources: []
+            };
+        }
 
         // Fetch activity data with relational joins
         // Note: Relation names updated to match new schema logic

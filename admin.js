@@ -1,3 +1,4 @@
+import { supabase } from './supabase-config.js';
 import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
