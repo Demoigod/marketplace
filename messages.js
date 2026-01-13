@@ -393,12 +393,26 @@ async function markMessagesRead(conversationId) {
 }
 
 async function startNewConversation(partnerId, itemId = null) {
-    if (partnerId === currentUser.id) return;
+    // 1. Validation
+    if (!partnerId || partnerId === 'null' || partnerId === currentUser.id) return;
+
+    // Validate UUID format (basic check)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(partnerId)) {
+        console.warn('Invalid partnerId:', partnerId);
+        return;
+    }
+
+    if (itemId === 'null' || itemId === '') itemId = null;
+    if (itemId && !uuidRegex.test(itemId)) {
+        console.warn('Invalid itemId:', itemId);
+        itemId = null;
+    }
 
     let u1 = currentUser.id < partnerId ? currentUser.id : partnerId;
     let u2 = currentUser.id < partnerId ? partnerId : currentUser.id;
 
-    // Check for existing conversation with item_id
+    // 2. Check for existing conversation with item_id
     let query = supabase
         .from('conversations')
         .select('id')
@@ -411,12 +425,21 @@ async function startNewConversation(partnerId, itemId = null) {
         query = query.is('item_id', null);
     }
 
-    const { data: existing } = await query.single();
+    const { data: existing, error: fetchError } = await query.single();
 
     if (existing) {
         loadChat(existing.id);
+    } else if (fetchError && fetchError.code !== 'PGRST116') {
+        // PGRST116 means "no rows found", which is fine. Other errors aren't.
+        console.error('Error checking for existing conversation:', fetchError);
+        if (fetchError.message.includes('column "item_id" does not exist')) {
+            alert('Database error: Please ensure you have run the messaging-upgrade.sql script in your Supabase SQL Editor.');
+        } else {
+            alert(`Error checking conversation: ${fetchError.message}`);
+        }
     } else {
-        const { data: newConv, error } = await supabase
+        // 3. Create new conversation
+        const { data: newConv, error: createError } = await supabase
             .from('conversations')
             .insert([{
                 user1_id: u1,
@@ -426,9 +449,13 @@ async function startNewConversation(partnerId, itemId = null) {
             .select()
             .single();
 
-        if (error) {
-            console.error('Create conv error:', error);
-            alert('Could not start conversation');
+        if (createError) {
+            console.error('Create conv error:', createError);
+            if (createError.message.includes('column "item_id" does not exist')) {
+                alert('Database error: Please ensure you have run the messaging-upgrade.sql script in your Supabase SQL Editor.');
+            } else {
+                alert(`Could not start conversation: ${createError.message}`);
+            }
         } else {
             loadChat(newConv.id);
             loadConversations();
