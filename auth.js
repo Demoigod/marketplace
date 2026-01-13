@@ -90,9 +90,9 @@ export async function getCurrentUser() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return null;
 
-        // Fetch additional profile data from users table
+        // Fetch additional profile data from profiles table (renamed from users)
         const { data: profile, error } = await supabase
-            .from('users')
+            .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
@@ -100,6 +100,7 @@ export async function getCurrentUser() {
         if (error) throw error;
 
         // Fetch activity data with relational joins
+        // Note: Relation names updated to match new schema logic
         const [
             { data: purchases },
             { data: listings },
@@ -110,14 +111,14 @@ export async function getCurrentUser() {
         ] = await Promise.all([
             // Purchases
             supabase.from('purchases').select('*').eq('buyer_id', user.id).order('purchase_date', { ascending: false }),
-            // Listings (Seller)
-            supabase.from('items').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-            // Sales (Seller)
-            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM items WHERE user_id = $1)'),
+            // Listings (Seller) - Using market_listings instead of items
+            supabase.from('market_listings').select('*').eq('seller_id', user.id).order('created_at', { ascending: false }),
+            // Sales (Seller) - Note: sales logic using seller_id
+            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM market_listings WHERE seller_id = $1)'),
             // Downloads with resource details
             supabase.from('downloads').select('*, resource:free_resources(*)').eq('user_id', user.id).order('download_date', { ascending: false }),
             // Saved Items
-            supabase.from('saved_items').select('*').eq('user_id', user.id),
+            supabase.from('saved_items').select('*').eq('profile_id', user.id),
             // Uploaded Resources (Seller)
             supabase.from('free_resources').select('*').eq('uploader_id', user.id).order('created_at', { ascending: false })
         ]);
@@ -126,7 +127,7 @@ export async function getCurrentUser() {
             ...profile,
             purchases: purchases || [],
             listings: listings || [],
-            sales: sales || [], // Note: Sales fetching logic is simplified here
+            sales: sales || [],
             downloads: downloads || [],
             savedItems: savedItems || [],
             uploadedResources: uploadedResources || []
@@ -144,7 +145,7 @@ export async function updateUser(updates) {
         if (!user) throw new Error('Not logged in');
 
         const { data, error } = await supabase
-            .from('users')
+            .from('profiles')
             .update(updates)
             .eq('id', user.id)
             .select()
@@ -195,11 +196,11 @@ export async function addListing(item) {
         if (!user) throw new Error('Not logged in');
 
         const { data, error } = await supabase
-            .from('items')
+            .from('market_listings')
             .insert([
                 {
                     ...item,
-                    user_id: user.id,
+                    seller_id: user.id, // Absolute identity linking
                     status: 'active'
                 }
             ])
