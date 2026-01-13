@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Resources - Campus Market</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .resources-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            overflow-x: auto;
+        }
+
+        .resource-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .resource-tab:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .resource-tab.active {
+            background-color: #368CBF;
+            color: white;
+            border-color: #368CBF;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .resource-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .resource-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background-color: rgba(54, 140, 191, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #368CBF;
+        }
+
+        .resource-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .badge-notes {
+            background: #E0F2FE;
+            color: #0369A1;
+        }
+
+        .badge-slides {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-exam {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .badge-info {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f3f4f6;
+            color: #374151;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .download-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="var(--primary-color)" />
+                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
+                    </svg>
+                    <span class="logo-text">CampusAdmin</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="admin.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="listings.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Market Listings
+                    </a>
+                    <a href="free-resources.html" class="nav-item active">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        Free Resources
+                    </a>
+                    <a href="messages.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Messages
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button class="logout-btn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Nav -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="resourceSearch" placeholder="Search resources...">
+                </div>
+                <div class="top-nav-right">
+                    <div class="admin-profile">
+                        <span class="admin-name">User</span>
+                        <img src="https://ui-avatars.com/api/?name=User&background=368CBF&color=fff" alt="Admin"
+                            class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="page-header">
+                    <h1 class="page-title">Free Resources</h1>
+                    <p style="color: #6b7280;">Download study materials shared by the community.</p>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="resources-tabs">
+                    <div class="resource-tab active" data-category="all">All Resources</div>
+                    <div class="resource-tab" data-category="notes">Study Notes</div>
+                    <div class="resource-tab" data-category="slides">Lecture Slides</div>
+                    <div class="resource-tab" data-category="exam">Exam Papers</div>
+                    <div class="resource-tab" data-category="info">Course Info</div>
+                </div>
+
+                <!-- Resources Grid -->
+                <div id="resourcesGrid" class="resources-grid">
+                    <!-- Dynamic content will load here -->
+                    <div style="padding: 40px; text-align: center; color: #6b7280; grid-column: 1/-1;">
+                        Loading resources...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="free-resources.js"></script>
+</body>
+
+</html>

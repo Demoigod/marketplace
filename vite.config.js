@@ -11,6 +11,7 @@ export default defineConfig({
                 privacy: resolve(__dirname, 'privacy.html'),
                 admin: resolve(__dirname, 'admin.html'),
                 listings: resolve(__dirname, 'listings.html'),
+                'free-resources': resolve(__dirname, 'free-resources.html'),
             },
         },
     },
