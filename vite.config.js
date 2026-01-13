@@ -12,6 +12,7 @@ export default defineConfig({
                 admin: resolve(__dirname, 'admin.html'),
                 listings: resolve(__dirname, 'listings.html'),
                 'free-resources': resolve(__dirname, 'free-resources.html'),
+                account: resolve(__dirname, 'account.html'),
             },
         },
     },
