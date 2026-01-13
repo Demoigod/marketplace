@@ -1,44 +1,94 @@
 import { supabase } from './supabase-config.js';
-import { isLoggedIn, getCurrentUser } from './auth.js';
-import { initNavigation } from './navbar.js';
+import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
 
 // State
 let currentConversationId = null;
 let currentUser = null;
 let realtimeSubscription = null;
+let allConversations = [];
 
 // DOM Elements
 const conversationsList = document.getElementById('conversationsList');
 const chatArea = document.getElementById('chatArea');
-const sidebar = document.getElementById('conversationsSidebar');
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await initNavigation();
-
-    if (!await isLoggedIn()) {
-        window.location.href = 'index.html'; // Redirect if not auth
+    // 1. Auth Guard
+    const session = await isLoggedIn();
+    if (!session) {
+        window.location.href = 'index.html';
         return;
     }
 
     currentUser = await getCurrentUser();
 
-    // Check for partner_id in URL (starting new conversation)
+    // 2. Initialize Dashboard UI
+    updateUserProfile();
+    setupEventListeners();
+
+    // 3. Check for partner_id in URL (starting new conversation)
     const urlParams = new URLSearchParams(window.location.search);
-    const partnerId = urlParams.get('partner_id'); // e.g., from "Contact Seller"
+    const partnerId = urlParams.get('partner_id');
 
     if (partnerId) {
         await startNewConversation(partnerId);
     }
 
-    // Load initial list
+    // 4. Load initial list
     loadConversations();
 
-    // Subscribe to global new messages/conversations (optional, for list updates)
+    // 5. Global subscriptions
     setupGlobalSubscription();
 
-    // Handle mobile view transitions if needed
-    // (Simpler implementation for MVP)
+    // Handle logout/auth changes
+    supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+            window.location.href = 'index.html';
+        }
+    });
 });
+
+async function updateUserProfile() {
+    if (currentUser) {
+        const adminNameElements = document.querySelectorAll('.admin-name');
+        adminNameElements.forEach(el => el.textContent = currentUser.name || 'User');
+
+        const avatarImages = document.querySelectorAll('.avatar');
+        avatarImages.forEach(img => {
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=368CBF&color=fff`;
+        });
+    }
+}
+
+function setupEventListeners() {
+    // 1. Conversation Search
+    const searchInput = document.getElementById('convSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.conversation-item');
+            items.forEach(item => {
+                const name = item.querySelector('span[style*="font-weight:600"]').textContent.toLowerCase();
+                const lastMsg = item.querySelector('div[style*="font-size:0.9rem"]').textContent.toLowerCase();
+                if (name.includes(query) || lastMsg.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // 2. Logout Logic (sidebar)
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to logout?')) {
+                await logoutUser();
+                window.location.href = 'index.html';
+            }
+        });
+    }
+}
 
 async function loadConversations() {
     if (!currentUser) return;
