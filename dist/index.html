@@ -11,9 +11,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-  <script type="module" crossorigin src="/assets/main-Df6aSQKV.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/navbar-DAxEynKi.js">
-  <link rel="stylesheet" crossorigin href="/assets/styles-DU33p99e.css">
+  <script type="module" crossorigin src="/assets/main-jkEww2sR.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/auth-DlafXHy2.js">
+  <link rel="modulepreload" crossorigin href="/assets/navbar-CyDIn5Kq.js">
+  <link rel="modulepreload" crossorigin href="/assets/save-item-D_o1zDvr.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles-DGZav4UQ.css">
 </head>
 
 <body>
@@ -44,21 +46,23 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Your Campus Marketplace</h1>
-                <p class="hero-subtitle">Buy, sell, and discover amazing deals from fellow students</p>
+                <p class="hero-subtitle">The safest and easiest way to buy, sell, and share textbooks, electronics, and
+                    resources with fellow students.</p>
 
-                <!-- Search Bar -->
-                <div class="search-container">
-                    <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2" />
-                        <path d="M14 14L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                    <input type="text" id="searchInput" class="search-input"
-                        placeholder="Search for items, services, or resources...">
-                    <button class="search-btn">Search</button>
+                <!-- Hero CTAs (Visible when logged out) -->
+                <div class="hero-ctas" id="heroAuthCtas">
+                    <button class="btn-primary btn-lg" id="heroSignupBtn">Start Selling Now</button>
+                    <button class="btn-secondary btn-lg" id="heroLoginBtn">Browse Marketplace</button>
                 </div>
 
-                <!-- Category Filters -->
-                <div class="category-filters">
+                <!-- Hero CTAs (Visible when logged out) -->
+                <div class="hero-ctas" id="heroAuthCtas">
+                    <button class="btn-primary btn-lg" id="heroSignupBtn">Start Selling Now</button>
+                    <button class="btn-secondary btn-lg" id="heroLoginBtn">Browse Marketplace</button>
+                </div>
+
+                <!-- Category Filters (Moved up slightly) -->
+                <div class="category-filters" style="margin-top: 2rem;">
                     <button class="category-chip active" data-category="all">All Items</button>
                     <button class="category-chip" data-category="electronics">Electronics</button>
                     <button class="category-chip" data-category="books">Books</button>

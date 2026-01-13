@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post New Item - Campus Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .post-form-card {
+            max-width: 800px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #111827;
+        }
+
+        .image-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-preview-box {
+            aspect-ratio: 1;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .image-preview-box:hover {
+            border-color: #368CBF;
+            background: #f9fafb;
+        }
+
+        .image-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-img {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .upload-placeholder svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/post-item-2r9tMBDV.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/auth-DlafXHy2.js">
+  <link rel="stylesheet" crossorigin href="/assets/admin-CcaTBpGa.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="#368CBF" />
+                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
+                    </svg>
+                    <span class="logo-text">CampusAdmin</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="admin.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="listings.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        Market Listings
+                    </a>
+                    <a href="post-item.html" class="nav-item active" style="background-color: #368CBF; color: white;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        Post New Item
+                    </a>
+                    <a href="free-resources.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        Free Resources
+                    </a>
+                    <a href="messages.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Messages
+                    </a>
+                    <a href="account.html" class="nav-item">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Account
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button class="logout-btn">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Nav -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="top-nav-right">
+                    <div class="admin-profile">
+                        <span class="admin-name" id="topNavName">Loading...</span>
+                        <img src="" alt="Profile" class="avatar" id="topNavAvatar">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <div class="page-header">
+                    <h1 class="page-title">Post New Item</h1>
+                    <p class="text-secondary">List your item for sale in the campus marketplace.</p>
+                </div>
+
+                <form id="postItemForm" class="post-form-card animate-fadeIn">
+                    <div class="form-section">
+                        <h3 class="form-section-title">Item Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Item Title</label>
+                            <input type="text" id="title" class="form-input" placeholder="e.g. MacBook Pro M1 2021"
+                                required style="cursor: text;">
+                        </div>
+                        <div class="form-grid"
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="category" class="form-input" required
+                                    style="cursor: pointer; background-color: white;">
+                                    <option value="">Select Category</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="books">Books</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="services">Services</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Price (R)</label>
+                                <input type="number" id="price" class="form-input" placeholder="0.00" required
+                                    step="0.01" style="cursor: text;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label class="form-label">Description</label>
+                            <textarea id="description" class="form-input" rows="5"
+                                placeholder="Tell buyers more about your item..." required
+                                style="cursor: text;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title">Images</h3>
+                        <p class="text-secondary" style="font-size: 0.85rem; margin-bottom: 1rem;">Upload up to 5
+                            high-quality images of your item.</p>
+                        <div class="image-upload-grid" id="imageGrid">
+                            <label class="image-preview-box" id="uploadBtn">
+                                <div class="upload-placeholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"></path>
+                                    </svg>
+                                    <div>Add Image</div>
+                                </div>
+                                <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                        <button type="submit" id="submitBtn" class="btn-pro"
+                            style="padding: 0.75rem 2rem; border: none; border-radius: 8px; cursor: pointer;">List Item
+                            Now</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

@@ -12,7 +12,7 @@ import {
     checkAuthStatus
 } from './auth.js';
 import { initNavigation } from './navbar.js';
-import { handleItemPost } from './post-item.js';
+// Removed invalid import
 import { fetchAllItems, createItemCard } from './items.js';
 import { initSaveListeners } from './save-item.js';
 

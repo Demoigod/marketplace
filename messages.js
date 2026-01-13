@@ -129,8 +129,9 @@ async function renderConversationsList(conversations) {
 
     const processed = await Promise.all(conversations.map(async (conv) => {
         const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-        const { data: partner } = await supabase.from('profiles').select('username').eq('id', partnerId).single();
+        const { data: partner } = await supabase.from('profiles').select('username, public_user_id').eq('id', partnerId).single();
         const partnerName = partner ? partner.username : 'Unknown User';
+        const partnerPublicId = partner ? partner.public_user_id : null;
 
         const msgs = conv.messages || [];
         msgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -140,6 +141,7 @@ async function renderConversationsList(conversations) {
         return {
             ...conv,
             partnerName,
+            partnerPublicId,
             lastMessage: lastMessageText,
             lastTime: lastMsg ? new Date(lastMsg.created_at).toLocaleDateString() : '',
             unread: lastMsg && !lastMsg.read && lastMsg.sender_id !== currentUser.id,
@@ -150,7 +152,14 @@ async function renderConversationsList(conversations) {
     conversationsList.innerHTML = processed.map(c => `
         <div class="conversation-item ${c.id === currentConversationId ? 'active' : ''}" onclick="window.routerOpenChat('${c.id}')">
             <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                <span style="font-weight:600; color:var(--text-primary);">${c.partnerName}</span>
+                <div>
+                    <span style="font-weight:600; color:var(--text-primary);">${c.partnerName}</span>
+                    ${c.partnerPublicId ? `
+                        <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px; opacity:0.8;">
+                            ID: ${c.partnerPublicId}
+                        </div>
+                    ` : ''}
+                </div>
                 <span style="font-size:0.8rem; color:var(--text-secondary);">${c.lastTime}</span>
             </div>
             ${c.itemTitle ? `<div style="font-size:0.75rem; color:#368CBF; margin-bottom:2px; font-weight:600;">Item: ${c.itemTitle}</div>` : ''}

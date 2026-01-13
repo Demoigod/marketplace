@@ -141,6 +141,7 @@ export async function getCurrentUser() {
 
         return {
             ...profile,
+            publicUserId: profile?.public_user_id || null, // 6-digit public ID (nullable)
             purchases: purchases || [],
             listings: listings || [],
             sales: sales || [],

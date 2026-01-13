@@ -68,7 +68,8 @@ function setupEventListeners() {
 
             // 2. Submit to Database
             const itemData = {
-                seller_id: user.id, // Immutable ID from session
+                seller_id: user.id, // Immutable UUID from session
+                seller_public_id: user.publicUserId || null, // 6-digit public ID
                 title: document.getElementById('title').value,
                 description: document.getElementById('description').value,
                 price: parseFloat(document.getElementById('price').value),
