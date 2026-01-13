@@ -82,6 +82,16 @@
                 container.innerHTML = `<div class="error-state">${err.message}</div>`;
             }
         }
+
+        window.handleBuyAction = (itemId) => {
+            window.location.href = `payment.html?item_id=${itemId}`;
+        };
+
+        window.handleContactAction = (sellerId) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const itemId = urlParams.get('id');
+            window.location.href = `messages.html?partner_id=${sellerId}&item_id=${itemId}`;
+        };
     </script>
 </body>
 
