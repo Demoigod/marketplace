@@ -47,7 +47,7 @@
 
             try {
                 const { data: item, error } = await supabase
-                    .from('items')
+                    .from('market_listings')
                     .select('*')
                     .eq('id', id)
                     .single();
@@ -73,7 +73,7 @@
                             </div>
                             <div class="detail-actions">
                                 <button class="btn-primary btn-full ${isAuth ? '' : 'disabled'}" onclick="handleBuyAction('${item.id}')">Buy Now</button>
-                                <button class="btn-secondary btn-full ${isAuth ? '' : 'disabled'}" onclick="handleContactAction('${item.user_id}')">Contact Seller</button>
+                                <button class="btn-secondary btn-full ${isAuth ? '' : 'disabled'}" onclick="handleContactAction('${item.seller_id}')">Contact Seller</button>
                             </div>
                         </div>
                     </div>

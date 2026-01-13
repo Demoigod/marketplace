@@ -94,7 +94,8 @@ function setupEventListeners() {
                 window.location.href = `payment.html?item_id=${id}`;
             } else if (action === 'contact') {
                 const sellerId = btn.dataset.sellerId;
-                window.location.href = `messages.html?partner_id=${sellerId}`;
+                const itemId = btn.dataset.id;
+                window.location.href = `messages.html?partner_id=${sellerId}&item_id=${itemId}`;
             } else if (action === 'view') {
                 window.location.href = `item.html?id=${id}`;
             }
