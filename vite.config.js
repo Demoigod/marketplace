@@ -13,6 +13,7 @@ export default defineConfig({
                 listings: resolve(__dirname, 'listings.html'),
                 'free-resources': resolve(__dirname, 'free-resources.html'),
                 account: resolve(__dirname, 'account.html'),
+                'post-item': resolve(__dirname, 'post-item.html'),
             },
         },
     },
