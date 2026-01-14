@@ -44,7 +44,14 @@ async function renderProfileData(user) {
     }
 
     if (profileFullName) {
-        profileFullName.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username || 'User';
+        // Prioritize Username as per user request
+        profileFullName.textContent = user.username || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
+    }
+
+    // Update Public ID Display
+    const publicIdDisplay = document.getElementById('publicUserIdDisplay');
+    if (publicIdDisplay) {
+        publicIdDisplay.textContent = user.publicUserId ? `ID: #${user.publicUserId}` : 'ID: Pending';
     }
 
     // Form Fields
