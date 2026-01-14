@@ -6,6 +6,8 @@ import { isLoggedIn } from './auth.js';
  */
 export async function fetchAllItems() {
     try {
+        console.log('Attempting to fetch items with profile join...');
+        // Try fetch with join (Ideal)
         const { data, error } = await supabase
             .from('market_listings')
             .select(`
@@ -18,15 +20,30 @@ export async function fetchAllItems() {
             .eq('status', 'active')
             .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error('Supabase fetch error:', error);
-            throw error;
+        if (!error) {
+            console.log('Successfully fetched items with join:', data?.length);
+            return data || [];
         }
 
-        console.log('Fetched items:', data);
-        return data || [];
+        console.warn('Fetch with join failed, trying fallback without join. Error:', error);
+
+        // Fallback: Fetch without join (Resilient)
+        const { data: fallbackData, error: fallbackError } = await supabase
+            .from('market_listings')
+            .select('*')
+            .eq('status', 'active')
+            .order('created_at', { ascending: false });
+
+        if (fallbackError) {
+            console.error('Ultimate fetch failure:', fallbackError);
+            throw fallbackError;
+        }
+
+        console.log('Fallback fetch successful:', fallbackData?.length);
+        return fallbackData || [];
+
     } catch (error) {
-        console.error('Error fetching items:', error);
+        console.error('Critical items fetch error:', error);
         return [];
     }
 }
