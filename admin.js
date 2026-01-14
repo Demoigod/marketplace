@@ -73,10 +73,21 @@ async function updateDashboardData() {
 }
 
 function initNavigation() {
-    // Logout button interaction (using user-trigger dropdown logic if available)
+    // Top nav logout logic
     const profileToggle = document.getElementById('profileToggle');
     if (profileToggle) {
         profileToggle.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                logoutUser();
+            }
+        });
+    }
+
+    // Sidebar logout logic
+    const sidebarLogout = document.getElementById('sidebarLogout');
+    if (sidebarLogout) {
+        sidebarLogout.addEventListener('click', (e) => {
+            e.preventDefault();
             if (confirm('Are you sure you want to logout?')) {
                 logoutUser();
             }
