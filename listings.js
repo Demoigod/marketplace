@@ -69,7 +69,7 @@ function setupEventListeners() {
 
             // Search items table
             const { data: items } = await supabase
-                .from('items')
+                .from('market_listings')
                 .select('*')
                 .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
                 .eq('status', 'active');
