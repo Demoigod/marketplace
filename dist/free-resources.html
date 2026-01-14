@@ -133,7 +133,7 @@
             height: 18px;
         }
     </style>
-  <script type="module" crossorigin src="/assets/free-resources-hFN_I7G2.js"></script>
+  <script type="module" crossorigin src="/assets/free-resources-DsadkaXz.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/auth-DlafXHy2.js">
   <link rel="stylesheet" crossorigin href="/assets/admin-CcaTBpGa.css">
 </head>
@@ -243,7 +243,6 @@
                     <div class="resource-tab" data-category="info">Course Info</div>
                 </div>
 
-                <!-- Resources Grid -->
                 <div id="resourcesGrid" class="resources-grid">
                     <!-- Dynamic content will load here -->
                     <div style="padding: 40px; text-align: center; color: #6b7280; grid-column: 1/-1;">
@@ -252,7 +251,258 @@
                 </div>
             </div>
         </main>
-    </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-upload" id="uploadFAB" title="Upload Resource">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"></path>
+        </svg>
+    </div>
+
+    <!-- Resource Upload Modal -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload Free Resource</h3>
+                <button class="modal-close" id="closeResourceModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <form id="resourceForm" class="upload-form">
+                <div class="form-group">
+                    <label for="resourceTitle">Resource Title</label>
+                    <input type="text" id="resourceTitle" required placeholder="e.g., CS101 Final Exam 2023">
+                </div>
+                <div class="form-group">
+                    <label for="resourceType">Resource Type</label>
+                    <select id="resourceType" required>
+                        <option value="">Select type</option>
+                        <option value="notes">Study Notes</option>
+                        <option value="slides">Lecture Slides</option>
+                        <option value="exam">Exam Paper</option>
+                        <option value="info">Course Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resourceCourse">Course/Subject</label>
+                    <input type="text" id="resourceCourse" required placeholder="e.g., Computer Science 101">
+                </div>
+                <div class="form-group">
+                    <label for="resourceYear">Year</label>
+                    <input type="number" id="resourceYear" placeholder="e.g., 2023" min="2000" max="2030">
+                </div>
+                <div class="form-group">
+                    <label for="resourceDescription">Description</label>
+                    <textarea id="resourceDescription" placeholder="Additional details..." rows="3"></textarea>
+                </div>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p id="fileNameDisplay">Click to upload or drag and drop</p>
+                    <p class="file-hint">PDF files only (max 50MB)</p>
+                    <input type="file" id="resourceFile" accept=".pdf" style="display: none;">
+                </div>
+                <button type="submit" class="btn-primary-modal" id="submitResourceBtn">Upload Resource</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Extra Styles for FAB and Modal -->
+    <style>
+        .fab-upload {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 64px;
+            height: 64px;
+            background-color: #368CBF;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(54, 140, 191, 0.4);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 999;
+        }
+
+        .fab-upload:hover {
+            transform: scale(1.1) rotate(90deg);
+            background-color: #2a6f97;
+            box-shadow: 0 6px 25px rgba(54, 140, 191, 0.5);
+        }
+
+        .fab-upload svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .modal-close {
+            background: #f3f4f6;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .upload-form {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #368CBF;
+            box-shadow: 0 0 0 3px rgba(54, 140, 191, 0.1);
+        }
+
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.dragover {
+            border-color: #368CBF;
+            background-color: rgba(54, 140, 191, 0.05);
+        }
+
+        .file-upload-area svg {
+            color: #368CBF;
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary-modal {
+            width: 100%;
+            padding: 14px;
+            background-color: #368CBF;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-modal:hover {
+            background-color: #2a6f97;
+        }
+
+        .btn-primary-modal:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+
 </body>
 
 </html>

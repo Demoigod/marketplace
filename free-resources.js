@@ -187,6 +187,138 @@ function setupEventListeners() {
             }
         });
     }
+
+    // 5. FAB & Modal Logic
+    const fab = document.getElementById('uploadFAB');
+    const modal = document.getElementById('resourceModal');
+    const closeBtn = document.getElementById('closeResourceModal');
+    const resourceForm = document.getElementById('resourceForm');
+    const fileArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('resourceFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+    if (fab && modal) {
+        fab.addEventListener('click', () => modal.classList.add('active'));
+    }
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    }
+
+    // Close on backdrop click
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+    }
+
+    // File selection handling
+    if (fileArea && fileInput) {
+        fileArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                fileNameDisplay.style.color = '#368CBF';
+            }
+        });
+
+        // Drag and drop
+        fileArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileArea.classList.add('dragover');
+        });
+
+        fileArea.addEventListener('dragleave', () => {
+            fileArea.classList.remove('dragover');
+        });
+
+        fileArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                fileInput.files = e.dataTransfer.files;
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                fileNameDisplay.style.color = '#368CBF';
+            } else {
+                alert('Please upload a PDF file.');
+            }
+        });
+    }
+
+    // Form Submission
+    if (resourceForm) {
+        resourceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitResourceBtn');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a PDF file to upload.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) throw new Error('You must be logged in to upload.');
+
+                // 1. Upload to Supabase Storage
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `resources/${user.id}/${fileName}`;
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('free-resources')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                // 2. Get Public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('free-resources')
+                    .getPublicUrl(filePath);
+
+                // 3. Insert into Database
+                const resourceData = {
+                    title: document.getElementById('resourceTitle').value,
+                    type: document.getElementById('resourceType').value,
+                    course: document.getElementById('resourceCourse').value,
+                    year: parseInt(document.getElementById('resourceYear').value) || new Date().getFullYear(),
+                    description: document.getElementById('resourceDescription').value,
+                    file_url: publicUrl,
+                    file_type: 'PDF',
+                    uploader_id: user.id
+                };
+
+                const { error: dbError } = await supabase
+                    .from('free_resources')
+                    .insert([resourceData]);
+
+                if (dbError) throw dbError;
+
+                alert('Resource uploaded successfully!');
+                modal.classList.remove('active');
+                resourceForm.reset();
+                fileNameDisplay.textContent = 'Click to upload or drag and drop';
+                fileNameDisplay.style.color = '';
+
+                // Refresh list
+                await loadResources();
+
+            } catch (err) {
+                console.error('Upload error:', err);
+                alert(`Error: ${err.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload Resource';
+            }
+        });
+    }
 }
 
 function debounce(func, wait) {
