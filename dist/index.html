@@ -11,10 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-  <script type="module" crossorigin src="/assets/main-CQZmjGl0.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/auth-DlafXHy2.js">
-  <link rel="modulepreload" crossorigin href="/assets/navbar-CyDIn5Kq.js">
-  <link rel="modulepreload" crossorigin href="/assets/save-item-BNnOAKNn.js">
+  <script type="module" crossorigin src="/assets/main-eS9hI53J.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/auth-C6Z0jTos.js">
+  <link rel="modulepreload" crossorigin href="/assets/navbar-DRMKLgtC.js">
+  <link rel="modulepreload" crossorigin href="/assets/save-item-wQTYy67U.js">
   <link rel="stylesheet" crossorigin href="/assets/styles-DGZav4UQ.css">
 </head>
 
@@ -340,13 +340,27 @@
 
             <!-- Register Form -->
             <form id="registerForm" class="upload-form" style="display: none;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="registerFirstName">First Name</label>
+                        <input type="text" id="registerFirstName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName">Last Name</label>
+                        <input type="text" id="registerLastName" required placeholder="Doe">
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" required placeholder="John Doe">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required placeholder="johndoe123">
                 </div>
                 <div class="form-group">
                     <label for="registerEmail">Email</label>
                     <input type="email" id="registerEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone Number</label>
+                    <input type="tel" id="registerPhone" required placeholder="e.g., +27 12 345 6789">
                 </div>
                 <div class="form-group">
                     <label for="registerPassword">Password</label>

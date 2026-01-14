@@ -1,4 +1,4 @@
-import{s as r,i as l,g as d}from"./auth-DlafXHy2.js";async function f(){try{console.log("Attempting to fetch items with profile join...");const{data:e,error:s}=await r.from("market_listings").select(`
+import{s as r,i as l,g as d}from"./auth-C6Z0jTos.js";async function f(){try{console.log("Attempting to fetch items with profile join...");const{data:e,error:s}=await r.from("market_listings").select(`
                 *,
                 profiles (
                     username,

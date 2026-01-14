@@ -3,16 +3,19 @@ import { supabase } from './supabase-config.js'
 
 // Register new user
 // Register new user
-export async function registerUser(email, password, name, role) {
+export async function registerUser(email, password, userData) {
     try {
+        const { firstName, lastName, username, phone, role } = userData;
         // 1. Sign up user with Supabase Auth including metadata
-        // The database trigger will handle creating the public.users record
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
-                    name: name,
+                    first_name: firstName,
+                    last_name: lastName,
+                    username: username,
+                    phone: phone,
                     role: role
                 }
             }

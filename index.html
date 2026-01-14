@@ -337,13 +337,27 @@
 
             <!-- Register Form -->
             <form id="registerForm" class="upload-form" style="display: none;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="registerFirstName">First Name</label>
+                        <input type="text" id="registerFirstName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName">Last Name</label>
+                        <input type="text" id="registerLastName" required placeholder="Doe">
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label for="registerName">Full Name</label>
-                    <input type="text" id="registerName" required placeholder="John Doe">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required placeholder="johndoe123">
                 </div>
                 <div class="form-group">
                     <label for="registerEmail">Email</label>
                     <input type="email" id="registerEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone Number</label>
+                    <input type="tel" id="registerPhone" required placeholder="e.g., +27 12 345 6789">
                 </div>
                 <div class="form-group">
                     <label for="registerPassword">Password</label>

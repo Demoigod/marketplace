@@ -258,13 +258,17 @@ function setupEventListeners() {
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            // simple registration handling
-            const name = document.getElementById('registerName').value;
+            const userData = {
+                firstName: document.getElementById('registerFirstName').value,
+                lastName: document.getElementById('registerLastName').value,
+                username: document.getElementById('registerUsername').value,
+                phone: document.getElementById('registerPhone').value,
+                role: document.getElementById('registerRole').value
+            };
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
-            const role = document.getElementById('registerRole').value;
 
-            const result = await registerUser(email, password, name, role);
+            const result = await registerUser(email, password, userData);
             if (result.success) {
                 window.location.href = 'admin.html';
             } else {
