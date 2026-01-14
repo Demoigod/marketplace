@@ -10,8 +10,12 @@ export async function fetchAllItems() {
             .from('market_listings')
             .select(`
                 *,
-                seller:profiles(username)
+                profiles:seller_id (
+                    username,
+                    full_name
+                )
             `)
+            .eq('status', 'active')
             .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -27,7 +31,15 @@ export async function fetchAllItems() {
  */
 export function createItemCard(item, isAuth = false) {
     const postedDate = new Date(item.created_at).toLocaleDateString();
-    const mainImage = item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/300x200';
+
+    // Prioritize image_url, fallback to images array, then placeholder
+    let mainImage = item.image_url;
+    if (!mainImage && item.images && item.images.length > 0) {
+        mainImage = item.images[0];
+    }
+    if (!mainImage) {
+        mainImage = 'https://via.placeholder.com/300x200?text=No+Image';
+    }
 
     // Unified actions logic for guest vs member
     let actionsHtml = '';
@@ -56,8 +68,11 @@ export function createItemCard(item, isAuth = false) {
             <div class="item-image" style="background-image: url('${mainImage}'); background-size: cover; background-position: center;"></div>
             <div class="item-content">
                 <div class="item-header">
-                    <h3 class="item-title">${escapeHtml(item.title)}</h3>
-                    <span class="item-price">$${parseFloat(item.price).toFixed(2)}</span>
+                    <h3 class="item-title">${escapeHtml(item.title || 'Untitled Item')}</h3>
+                    <span class="item-price">R ${parseFloat(item.price || 0).toLocaleString()}</span>
+                </div>
+                <div class="item-meta" style="margin-bottom: 0.5rem; font-size: 0.85rem; color: #666;">
+                    <span>By ${escapeHtml(item.profiles?.username || item.profiles?.full_name || 'Anonymous')}</span>
                 </div>
                 <p class="item-date">Posted on ${postedDate}</p>
                 <p class="item-description">${escapeHtml(item.description)}</p>

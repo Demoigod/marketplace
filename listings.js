@@ -29,11 +29,12 @@ async function updateUserProfile() {
     const user = await getCurrentUser();
     if (user) {
         const adminNameElements = document.querySelectorAll('.admin-name');
-        adminNameElements.forEach(el => el.textContent = user.name || 'User');
+        const displayName = user.username || user.full_name || 'User';
+        adminNameElements.forEach(el => el.textContent = displayName);
 
         const avatarImages = document.querySelectorAll('.avatar');
         avatarImages.forEach(img => {
-            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=368CBF&color=fff`;
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=368CBF&color=fff`;
         });
     }
 }
