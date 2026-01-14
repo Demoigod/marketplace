@@ -5,238 +5,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Campus Market</title>
-    <link rel="stylesheet" href="admin.css?v=3">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="admin.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Navigation Sidebar -->
+    <!-- Persistent Sidebar -->
     <nav class="sidebar">
-        <div class="sidebar-brand">
-            <div class="brand-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+        <div class="sidebar-logo">
+            <div class="logo-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
             </div>
-            <span class="brand-name">CampusAdmin v2.0</span>
+            <span class="logo-text">Logo</span>
         </div>
 
-        <div class="sidebar-nav">
-            <a href="admin.html" class="nav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="3" width="7" height="7"></rect>
-                    <rect x="14" y="14" width="7" height="7"></rect>
-                    <rect x="3" y="14" width="7" height="7"></rect>
+        <div class="nav-group">
+            <a href="admin.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 </svg>
-                <span>Dashboard</span>
+                Dashboard
             </a>
-            <a href="listings.html" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="listings.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                    <path d="M3 6h18"></path>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
                 </svg>
-                <span>Market Listings</span>
+                Market Listings
             </a>
-            <a href="post-item.html" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span>Post New Item</span>
-            </a>
-            <a href="free-resources.html" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="free-resources.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
-                <span>Free Resources</span>
+                Free Resources
             </a>
-            <a href="messages.html" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="messages.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>Messages</span>
+                Messages
             </a>
-            <a href="account.html" class="nav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="#" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Drawing Board
+            </a>
+            <a href="#" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z">
+                    </path>
+                </svg>
+                Business Partnership
+            </a>
+            <a href="account.html" class="nav-link" style="margin-top: 1.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>Account</span>
+                Account
             </a>
         </div>
 
         <div class="sidebar-footer">
-            <a href="#" class="logout-link" id="sidebarLogout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="#" class="nav-link" id="sidebarLogout" style="color: #E63946;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>
                     <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                <span>Logout</span>
+                Logout
             </a>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
+    <!-- Main Viewport Area -->
     <main class="main-viewport">
-        <div class="dashboard-container">
-            <!-- Top Bar -->
-            <header class="top-bar">
-                <div class="search-container">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="search-wrapper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ADB5BD" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="What are you looking for?">
+            </div>
+
+            <div class="header-right">
+                <div class="icon-trigger" title="Notifications">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    <input type="text" placeholder="Search for data...">
+                    <span class="badge-dot"></span>
                 </div>
-
-                <div class="top-bar-right">
-                    <button class="nav-icon-btn" title="Messages">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
-                            </path>
-                            <polyline points="22,6 12,13 2,6"></polyline>
-                        </svg>
-                    </button>
-                    <button class="nav-icon-btn" title="Notifications">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                    </button>
-                    <div class="user-trigger" id="profileToggle" style="margin-left: 0.5rem; cursor: pointer;">
-                        <img src="" alt="User" id="topNavAvatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="icon-trigger" title="Support">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <div class="user-info-trigger" id="profileToggle">
+                    <div class="user-meta">
+                        <span class="user-name" id="userName">Zakhele</span>
+                        <span class="user-id" id="userId">ID: 482917</span>
                     </div>
+                    <img src="" alt="Avatar" class="avatar-sm" id="userAvatar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <!-- Hero Greeting -->
-            <section class="hero-section">
-                <h1 id="welcomeGreeting">Welcome, User 👋</h1>
-                <p class="date-string" id="dashboardDate">Today is 14 January, 2026</p>
-            </section>
+        <!-- Dynamic Content -->
+        <div class="dashboard-content">
+            <div class="welcome-row">
+                <h1 id="welcomeTitle">Welcome, Zakhele 👋</h1>
+                <p class="date-sub" id="currentDate">Today is April 21, 2024</p>
+            </div>
 
-            <!-- Main Content Grid -->
+            <!-- Summary Cards Row -->
+            <div class="metrics-row">
+                <a href="listings.html" class="metric-card">
+                    <div class="metric-head">
+                        <span>🛒 My Listings</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="metric-val" id="countListings">
+                        0
+                    </div>
+                    <div class="metric-foot">
+                        <span>My Listings</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="messages.html" class="metric-card">
+                    <div class="metric-head">
+                        <span>📩 Messages</span>
+                        <span class="count-badge" id="unreadBadge">0</span>
+                    </div>
+                    <div class="metric-val" id="countMessages">
+                        0
+                    </div>
+                    <div class="metric-foot">
+                        <span>Messages</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="free-resources.html" class="metric-card">
+                    <div class="metric-head">
+                        <span>📚 Saved Resources</span>
+                    </div>
+                    <div class="metric-val" id="countResources">
+                        0
+                    </div>
+                    <div class="metric-foot">
+                        <span>Saved Items</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <a href="#" class="metric-card">
+                    <div class="metric-head">
+                        <span>💳 Sales</span>
+                    </div>
+                    <div class="metric-val" id="countSales">
+                        0
+                    </div>
+                    <div class="metric-foot">
+                        <span>Invoiced Items</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Content Grid Sections -->
             <div class="main-grid">
-                <!-- Left Column -->
-                <aside class="left-column">
-                    <div class="card">
-                        <div class="section-header">
-                            <h3><span class="dot" style="background: #FBBF24;"></span> Financials</h3>
-                        </div>
-                        <div class="financials-summary">
-                            <div class="fin-item">
-                                <div class="fin-label-row">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981"
-                                        stroke-width="3">
-                                        <polyline points="18 15 12 9 6 15"></polyline>
-                                    </svg>
-                                    IN
-                                </div>
-                                <span class="fin-val" id="statIncome">$524,927</span>
-                            </div>
-                            <div class="fin-item">
-                                <div class="fin-label-row">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF4444"
-                                        stroke-width="3">
-                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                    </svg>
-                                    PAYOUT
-                                </div>
-                                <span class="fin-val" id="statPayout">$524,927</span>
-                            </div>
-                        </div>
+                <!-- Activity Feed 1 -->
+                <div class="grid-card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="#" class="see-all">See all</a>
+                    </div>
+                    <div class="activity-list" id="activityFeed1">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
 
-                        <div class="section-header" style="margin-top: 1.5rem;">
-                            <h3>Recent Orders</h3>
+                <!-- Quick Actions & Online -->
+                <div class="activity-stack" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div class="grid-card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
                         </div>
-                        <div class="activity-list" id="recentActivityList">
-                            <div class="activity-item">
-                                <img src="https://ui-avatars.com/api/?name=Kathryn+M&background=368CBF&color=fff"
-                                    class="activity-avatar">
-                                <div class="activity-info">
-                                    <span class="activity-name">Kathryn Murphy</span>
-                                    <span class="activity-sub">from Campus Store</span>
-                                </div>
-                                <span class="activity-amount">$5.22</span>
-                            </div>
-                            <div class="activity-item">
-                                <img src="https://ui-avatars.com/api/?name=Eleanor+P&background=E6DBC9&color=fff"
-                                    class="activity-avatar">
-                                <div class="activity-info">
-                                    <span class="activity-name">Eleanor Pena</span>
-                                    <span class="activity-sub">from Campus Store</span>
-                                </div>
-                                <span class="activity-amount">$6.48</span>
-                            </div>
-                            <div class="activity-item">
-                                <img src="https://ui-avatars.com/api/?name=Darrell+S&background=368CBF&color=fff"
-                                    class="activity-avatar">
-                                <div class="activity-info">
-                                    <span class="activity-name">Darrell Steward</span>
-                                    <span class="activity-sub">from Campus Store</span>
-                                </div>
-                                <span class="activity-amount">$17.84</span>
-                            </div>
+                        <div class="actions-list">
+                            <button class="action-btn" onclick="window.location.href='post-item.html'">
+                                <span style="font-size: 1.2rem;">+</span> Post Item
+                            </button>
+                            <button class="action-btn">
+                                <span style="font-size: 1.2rem;">+</span> Upload Resource
+                            </button>
+                            <button class="action-btn" onclick="window.location.href='messages.html'">
+                                <span style="font-size: 1.2rem;">+</span> Start New Message
+                            </button>
                         </div>
                     </div>
-                </aside>
+                </div>
 
-                <!-- Right Column -->
-                <section class="right-column">
-                    <div class="mini-stats-row">
-                        <div class="card stat-card">
-                            <div class="stat-label"><span class="dot" style="background: #10B981;"></span> Users</div>
-                            <h2 id="statTotalUsers">1.9M</h2>
-                            <span class="subtext">840,763 buyers</span>
-                        </div>
-                        <div class="card stat-card">
-                            <div class="stat-label"><span class="dot" style="background: #3B82F6;"></span> Orders</div>
-                            <h2 id="statTotalOrders">32.4K</h2>
-                            <span class="subtext">Completed sales</span>
-                        </div>
-                        <div class="card stat-card">
-                            <div class="stat-label"><span class="dot" style="background: #6B7280;"></span> Listings
-                            </div>
-                            <h2 id="statTotalListings">1.2M</h2>
-                            <span class="subtext">Total stores</span>
-                        </div>
+                <!-- Notifications Feed -->
+                <div class="grid-card">
+                    <div class="card-header">
+                        <h3>Notifications</h3>
+                        <a href="#" class="see-all">See all</a>
                     </div>
+                    <div class="activity-list" id="notificationFeed">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
 
-                    <div class="online-users-section" style="margin-top: 1.5rem;">
-                        <div class="online-section-header">
-                            <h3
-                                style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">
-                                Online Now</h3>
-                        </div>
-                        <div class="online-grid">
-                            <div class="online-user"><img
-                                    src="https://ui-avatars.com/api/?name=S+W&background=random"><span
-                                    class="online-dot"></span></div>
-                            <div class="online-user"><img
-                                    src="https://ui-avatars.com/api/?name=M+C&background=random"><span
-                                    class="online-dot"></span></div>
-                            <div class="online-user"><img
-                                    src="https://ui-avatars.com/api/?name=E+S&background=random"><span
-                                    class="online-dot"></span></div>
-                            <div class="online-user"><img
-                                    src="https://ui-avatars.com/api/?name=J+D&background=random"><span
-                                    class="online-dot"></span></div>
-                            <div class="online-user"><img
-                                    src="https://ui-avatars.com/api/?name=A+B&background=random"><span
-                                    class="online-dot"></span></div>
-                        </div>
+
+                <!-- Online Now Row -->
+                <div class="grid-card online-row">
+                    <div class="card-header">
+                        <h3>Online Now</h3>
+                        <a href="#" class="see-all">See all</a>
                     </div>
-                </section>
+                    <div class="online-list" id="onlineGrid">
+                        <!-- Avatars injected by JS -->
+                    </div>
+                </div>
             </div>
         </div>
     </main>
+
     <script type="module" src="admin.js"></script>
 </body>
 
