@@ -45,11 +45,14 @@ async function loadMarketplace() {
 
     try {
         const items = await fetchAllItems();
+        console.log(`Loading ${items?.length || 0} items into grid...`);
         const isAuth = true; // Guarded by DOMContentLoaded check
 
         if (items && items.length > 0) {
             grid.innerHTML = items.map(item => createItemCard(item, isAuth)).join('');
+            console.log('Grid updated successfully');
         } else {
+            console.log('No items found, showing empty state');
             grid.innerHTML = '<div class="empty-state" style="padding: 60px; text-align: center; grid-column: 1/-1;">' +
                 '<p style="color: var(--text-secondary); font-size: 1.1rem;">No items found in the marketplace.</p>' +
                 '</div>';
@@ -68,12 +71,20 @@ function setupEventListeners() {
             const query = e.target.value.toLowerCase();
             const grid = document.getElementById('marketplaceGrid');
 
-            // Search items table
-            const { data: items } = await supabase
+            // Search market_listings table
+            const { data: items, error } = await supabase
                 .from('market_listings')
-                .select('*')
+                .select(`
+                    *,
+                    profiles (
+                        username,
+                        full_name
+                    )
+                `)
                 .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
                 .eq('status', 'active');
+
+            if (error) console.error('Search error:', error);
 
             if (grid) {
                 grid.innerHTML = (items || []).map(item => createItemCard(item, true)).join('');

@@ -10,7 +10,7 @@ export async function fetchAllItems() {
             .from('market_listings')
             .select(`
                 *,
-                profiles:seller_id (
+                profiles (
                     username,
                     full_name
                 )
@@ -18,7 +18,12 @@ export async function fetchAllItems() {
             .eq('status', 'active')
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase fetch error:', error);
+            throw error;
+        }
+
+        console.log('Fetched items:', data);
         return data || [];
     } catch (error) {
         console.error('Error fetching items:', error);
@@ -85,6 +90,7 @@ export function createItemCard(item, isAuth = false) {
 
 // Helper to escape HTML to prevent XSS
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;

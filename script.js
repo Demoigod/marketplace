@@ -408,12 +408,20 @@ function debounce(func, wait) {
 // Helper: Search
 async function handleSearch(e) {
     const query = e.target.value.toLowerCase();
-    // Use items table
-    const { data: items } = await supabase
+
+    const { data: items, error } = await supabase
         .from('market_listings')
-        .select('*')
+        .select(`
+            *,
+            profiles (
+                username,
+                full_name
+            )
+        `)
         .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
         .eq('status', 'active');
+
+    if (error) console.error('Search error:', error);
 
     const isAuth = await isLoggedIn();
     if (marketplaceGrid) {
@@ -424,14 +432,23 @@ async function handleSearch(e) {
 // Helper: Client-side Filter
 async function filterMarketplace(category) {
     const isAuth = await isLoggedIn();
-    const { data: items } = await supabase
+    const { data: items, error } = await supabase
         .from('market_listings')
-        .select('*')
+        .select(`
+            *,
+            profiles (
+                username,
+                full_name
+            )
+        `)
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
+
+    if (error) console.error('Filter error:', error);
 
     const filtered = category === 'all'
         ? items
-        : items.filter(i => i.category === category);
+        : (items || []).filter(i => i.category === category);
 
     if (marketplaceGrid) {
         marketplaceGrid.innerHTML = (filtered || []).map(item => createItemCard(item, isAuth)).join('');
