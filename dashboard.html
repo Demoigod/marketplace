@@ -5,65 +5,201 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Campus Market</title>
-    <meta name="description" content="Manage your marketplace activity, listings, and purchases">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="admin.css?v=2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-content">
-                <a href="index.html" class="logo">
-                    <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
-                        <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
-                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
-                        <defs>
-                            <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
-                                <stop offset="0%" stop-color="#368CBF" />
-                                <stop offset="100%" stop-color="#E6DBC9" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <span class="logo-text">Campus Market</span>
-                </a>
-
-                <button class="menu-toggle">☰</button>
-
-                <div class="nav-links">
-                    <a href="index.html" class="nav-link">Marketplace</a>
-                    <a href="index.html#free-resources" class="nav-link">Free Resources</a>
-                    <a href="dashboard.html" class="nav-link active">Dashboard</a>
-                </div>
-                <button class="btn-secondary" id="backToMarket" onclick="window.location.href='index.html'">
-                    Back to Market
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Dashboard Container -->
     <div class="dashboard-container">
-        <div class="container">
-            <!-- Welcome Header -->
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Welcome, <span id="dashboardUserName">User</span>!</h1>
-                <p class="dashboard-subtitle">Manage your marketplace activity</p>
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="What are you looking for?">
             </div>
 
-            <!-- Dashboard Content (Dynamic based on role) -->
-            <div id="dashboardContent"></div>
-        </div>
+            <div class="top-bar-right">
+                <div class="nav-icons">
+                    <button class="nav-icon-btn" title="Messages">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                            </path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </button>
+                    <button class="nav-icon-btn" title="Notifications">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="user-trigger" id="profileToggle">
+                    <img src="" alt="User avatar" id="topNavAvatar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Greeting -->
+        <section class="hero-section">
+            <h1 id="welcomeGreeting">Welcome, User 👋</h1>
+            <p class="date-string" id="dashboardDate">Today is 14 January, 2026</p>
+        </section>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+            <!-- Left Column -->
+            <aside class="left-column">
+                <!-- Financials Card -->
+                <div class="card">
+                    <div class="section-header">
+                        <h3><span class="dot" style="background: #FBBF24;"></span> Financials</h3>
+                        <a href="#" class="see-all">See all</a>
+                    </div>
+                    <div class="financials-summary">
+                        <div class="fin-item">
+                            <div class="fin-label-row">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981"
+                                    stroke-width="3">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 16 12 12 12 8"></polyline>
+                                    <polyline points="9 11 12 8 15 11"></polyline>
+                                </svg>
+                                IN
+                            </div>
+                            <span class="fin-val" id="statIncome">$524,927</span>
+                        </div>
+                        <div class="fin-item">
+                            <div class="fin-label-row">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444"
+                                    stroke-width="3">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 8 12 12 12 16"></polyline>
+                                    <polyline points="15 13 12 16 9 13"></polyline>
+                                </svg>
+                                PAYOUT
+                            </div>
+                            <span class="fin-val" id="statPayout">$524,927</span>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 1rem;">
+                        <h3>Recent Orders</h3>
+                    </div>
+                    <div class="activity-list" id="recentActivityList">
+                        <div class="activity-item">
+                            <img src="https://ui-avatars.com/api/?name=Kathryn+M&background=368CBF&color=fff"
+                                class="activity-avatar">
+                            <div class="activity-info">
+                                <span class="activity-name">Kathryn Murphy</span>
+                                <span class="activity-sub">from Marketplace Store</span>
+                            </div>
+                            <span class="activity-amount">$5.22</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://ui-avatars.com/api/?name=Eleanor+P&background=E6DBC9&color=fff"
+                                class="activity-avatar">
+                            <div class="activity-info">
+                                <span class="activity-name">Eleanor Pena</span>
+                                <span class="activity-sub">from Marketplace Store</span>
+                            </div>
+                            <span class="activity-amount">$6.48</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://ui-avatars.com/api/?name=Darrell+S&background=368CBF&color=fff"
+                                class="activity-avatar">
+                            <div class="activity-info">
+                                <span class="activity-name">Darrell Steward</span>
+                                <span class="activity-sub">from Marketplace Store</span>
+                            </div>
+                            <span class="activity-amount">$17.84</span>
+                        </div>
+                        <div class="activity-item">
+                            <img src="https://ui-avatars.com/api/?name=Annette+B&background=E6DBC9&color=fff"
+                                class="activity-avatar">
+                            <div class="activity-info">
+                                <span class="activity-name">Annette Black</span>
+                                <span class="activity-sub">from Marketplace Store</span>
+                            </div>
+                            <span class="activity-amount">$14.81</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Column -->
+            <section class="right-column">
+                <div class="mini-stats-row">
+                    <!-- Users Card -->
+                    <div class="card stat-card">
+                        <div class="stat-label">
+                            <span class="dot" style="background: #10B981;"></span> Users
+                        </div>
+                        <h2 id="statTotalUsers">1,973,297</h2>
+                        <span class="subtext">840,763 buyers</span>
+                    </div>
+
+                    <!-- Orders Card -->
+                    <div class="card stat-card">
+                        <div class="stat-label">
+                            <span class="dot" style="background: #3B82F6;"></span> Orders
+                        </div>
+                        <h2 id="statTotalOrders">32,429</h2>
+                        <span class="subtext">31,364 completed sales</span>
+                    </div>
+
+                    <!-- Listings Card -->
+                    <div class="card stat-card">
+                        <div class="stat-label">
+                            <span class="dot" style="background: #6B7280;"></span> Listings
+                        </div>
+                        <h2 id="statTotalListings">1,286,918</h2>
+                        <span class="subtext">From 132,534 stores</span>
+                    </div>
+                </div>
+
+                <!-- Online Users -->
+                <div class="online-users-container" style="margin-top: 2rem;">
+                    <div class="online-section-header">
+                        <h3>ONLINE Now</h3>
+                    </div>
+                    <div class="online-grid" id="onlineUsersGrid">
+                        <div class="online-user">
+                            <img src="https://ui-avatars.com/api/?name=S+W&background=random">
+                            <span class="online-dot"></span>
+                        </div>
+                        <div class="online-user">
+                            <img src="https://ui-avatars.com/api/?name=M+C&background=random">
+                            <span class="online-dot"></span>
+                        </div>
+                        <div class="online-user">
+                            <img src="https://ui-avatars.com/api/?name=E+S&background=random">
+                            <span class="online-dot"></span>
+                        </div>
+                        <div class="online-user">
+                            <img src="https://ui-avatars.com/api/?name=J+D&background=random">
+                            <span class="online-dot"></span>
+                        </div>
+                        <div class="online-user">
+                            <img src="https://ui-avatars.com/api/?name=A+B&background=random">
+                            <span class="online-dot"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-
-
+    <script type="module" src="admin.js"></script>
 </body>
 
 </html>
