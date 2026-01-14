@@ -237,8 +237,8 @@ function setupEventListeners() {
         });
     });
 
-    // Forms
-    if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
+    // Forms - Handled by standalone pages or updated logic
+    // if (uploadForm) uploadForm.addEventListener('submit', handleItemPost);
 
     // Auth Forms
     if (loginForm) {
@@ -410,7 +410,7 @@ async function handleSearch(e) {
     const query = e.target.value.toLowerCase();
     // Use items table
     const { data: items } = await supabase
-        .from('items')
+        .from('market_listings')
         .select('*')
         .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
         .eq('status', 'active');
@@ -425,7 +425,7 @@ async function handleSearch(e) {
 async function filterMarketplace(category) {
     const isAuth = await isLoggedIn();
     const { data: items } = await supabase
-        .from('items')
+        .from('market_listings')
         .select('*')
         .order('created_at', { ascending: false });
 
