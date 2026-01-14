@@ -20,16 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function renderProfileData(user) {
-    // Top Nav
-    const topNavName = document.getElementById('topNavName');
-    const topNavAvatar = document.getElementById('topNavAvatar');
-    const displayName = user.username || user.full_name || 'User';
-
-    if (topNavName) topNavName.textContent = displayName;
-    if (topNavAvatar) {
-        topNavAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=368CBF&color=fff`;
-    }
-
     // Profile Section
     const profileAvatar = document.getElementById('profileAvatar');
     const profileFullName = document.getElementById('profileFullName');
@@ -68,15 +58,5 @@ async function renderProfileData(user) {
 }
 
 function setupEventListeners() {
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            if (confirm('Are you sure you want to logout?')) {
-                const { success } = await logoutUser();
-                if (success) {
-                    window.location.href = 'index.html';
-                }
-            }
-        });
-    }
+    // Other listeners can go here
 }

@@ -12,23 +12,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 2. Initialize Page
-    updateTopNav();
     setupEventListeners();
 });
 
-async function updateTopNav() {
-    const user = await getCurrentUser();
-    if (user) {
-        const topNavName = document.getElementById('topNavName');
-        const topNavAvatar = document.getElementById('topNavAvatar');
-        const displayName = user.username || user.name || 'User';
-
-        if (topNavName) topNavName.textContent = displayName;
-        if (topNavAvatar) {
-            topNavAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=368CBF&color=fff`;
-        }
-    }
-}
 
 function setupEventListeners() {
     const imageInput = document.getElementById('imageInput');
@@ -97,15 +83,6 @@ function setupEventListeners() {
         }
     });
 
-    // Logout
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            if (confirm('Are you sure you want to logout?')) {
-                await logoutUser();
-                window.location.href = 'index.html';
-            }
-        });
-    }
 }
 
 function renderPreview(file) {

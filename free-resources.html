@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Resources - Campus Market</title>
-    <link rel="stylesheet" href="admin.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css?v=6">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         .resources-tabs {
             display: flex;
@@ -133,187 +133,8 @@
             width: 18px;
             height: 18px;
         }
-    </style>
-</head>
 
-<body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-top">
-                <div class="logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                        <rect width="32" height="32" rx="8" fill="var(--primary-color)" />
-                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
-                    </svg>
-                    <span class="logo-text">CampusAdmin</span>
-                </div>
-
-                <nav class="sidebar-nav">
-                    <a href="admin.html" class="nav-item">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                        Dashboard
-                    </a>
-                    <a href="listings.html" class="nav-item">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <path d="M16 10a4 4 0 0 1-8 0"></path>
-                        </svg>
-                        Market Listings
-                    </a>
-                    <a href="post-item.html" class="nav-item">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"></path>
-                        </svg>
-                        Post New Item
-                    </a>
-                    <a href="free-resources.html" class="nav-item active">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                        Free Resources
-                    </a>
-                    <a href="messages.html" class="nav-item">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        Messages
-                    </a>
-                    <a href="account.html" class="nav-item">
-                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        Account
-                    </a>
-                </nav>
-            </div>
-
-            <div class="sidebar-bottom">
-                <button class="logout-btn">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Logout
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Nav -->
-            <header class="top-nav">
-                <div class="search-bar">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="resourceSearch" placeholder="Search resources...">
-                </div>
-                <div class="top-nav-right">
-                    <div class="admin-profile">
-                        <span class="admin-name">User</span>
-                        <img src="https://ui-avatars.com/api/?name=User&background=368CBF&color=fff" alt="Admin"
-                            class="avatar">
-                    </div>
-                </div>
-            </header>
-
-            <div class="content-body">
-                <div class="page-header">
-                    <h1 class="page-title">Free Resources</h1>
-                    <p style="color: #6b7280;">Download study materials shared by the community.</p>
-                </div>
-
-                <!-- Category Tabs -->
-                <div class="resources-tabs">
-                    <div class="resource-tab active" data-category="all">All Resources</div>
-                    <div class="resource-tab" data-category="notes">Study Notes</div>
-                    <div class="resource-tab" data-category="slides">Lecture Slides</div>
-                    <div class="resource-tab" data-category="exam">Exam Papers</div>
-                    <div class="resource-tab" data-category="info">Course Info</div>
-                </div>
-
-                <div id="resourcesGrid" class="resources-grid">
-                    <!-- Dynamic content will load here -->
-                    <div style="padding: 40px; text-align: center; color: #6b7280; grid-column: 1/-1;">
-                        Loading resources...
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Floating Action Button -->
-    <div class="fab-upload" id="uploadFAB" title="Upload Resource">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M12 5v14M5 12h14"></path>
-        </svg>
-    </div>
-
-    <!-- Resource Upload Modal -->
-    <div id="resourceModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Upload Free Resource</h3>
-                <button class="modal-close" id="closeResourceModal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
-            <form id="resourceForm" class="upload-form">
-                <div class="form-group">
-                    <label for="resourceTitle">Resource Title</label>
-                    <input type="text" id="resourceTitle" required placeholder="e.g., CS101 Final Exam 2023">
-                </div>
-                <div class="form-group">
-                    <label for="resourceType">Resource Type</label>
-                    <select id="resourceType" required>
-                        <option value="">Select type</option>
-                        <option value="notes">Study Notes</option>
-                        <option value="slides">Lecture Slides</option>
-                        <option value="exam">Exam Paper</option>
-                        <option value="info">Course Info</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="resourceCourse">Course/Subject</label>
-                    <input type="text" id="resourceCourse" required placeholder="e.g., Computer Science 101">
-                </div>
-                <div class="form-group">
-                    <label for="resourceYear">Year</label>
-                    <input type="number" id="resourceYear" placeholder="e.g., 2023" min="2000" max="2030">
-                </div>
-                <div class="form-group">
-                    <label for="resourceDescription">Description</label>
-                    <textarea id="resourceDescription" placeholder="Additional details..." rows="3"></textarea>
-                </div>
-                <div class="file-upload-area" id="fileUploadArea">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    <p id="fileNameDisplay">Click to upload or drag and drop</p>
-                    <p class="file-hint">PDF files only (max 50MB)</p>
-                    <input type="file" id="resourceFile" accept=".pdf" style="display: none;">
-                </div>
-                <button type="submit" class="btn-primary-modal" id="submitResourceBtn">Upload Resource</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Extra Styles for FAB and Modal -->
-    <style>
+        /* FAB and Modal styles from the original free-resources.html */
         .fab-upload {
             position: fixed;
             bottom: 40px;
@@ -343,7 +164,6 @@
             height: 28px;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -500,7 +320,208 @@
             cursor: not-allowed;
         }
     </style>
+</head>
 
+<body>
+    <!-- Persistent Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <span class="logo-text">Logo</span>
+        </div>
+
+        <div class="nav-group">
+            <a href="admin.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                Dashboard
+            </a>
+            <a href="listings.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                </svg>
+                Market Listings
+            </a>
+            <a href="free-resources.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Free Resources
+            </a>
+            <a href="messages.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Messages
+            </a>
+            <a href="#" class="nav-link" data-route="drawing-board">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Drawing Board
+            </a>
+            <a href="#" class="nav-link" data-route="partnership">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z">
+                    </path>
+                </svg>
+                Business Partnership
+            </a>
+            <a href="account.html" class="nav-link" style="margin-top: 1.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Account
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-link" id="sidebarLogout" style="color: #E63946;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Viewport Area -->
+    <main class="main-viewport">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="search-wrapper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ADB5BD" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="resourceSearch" placeholder="Search resources...">
+            </div>
+
+            <div class="header-right">
+                <div class="icon-trigger" title="Notifications">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="badge-dot"></span>
+                </div>
+                <div class="icon-trigger" title="Support">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <div class="user-info-trigger" id="profileToggle">
+                    <div class="user-meta">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-id" id="userId">ID: 000000</span>
+                    </div>
+                    <img src="" alt="Avatar" class="avatar-sm" id="topNavAvatar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div class="dashboard-content">
+            <div class="welcome-row">
+                <h1>Free Resources 📚</h1>
+                <p class="date-sub">Download study materials shared by the community.</p>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="resources-tabs">
+                <div class="resource-tab active" data-category="all">All Resources</div>
+                <div class="resource-tab" data-category="notes">Study Notes</div>
+                <div class="resource-tab" data-category="slides">Lecture Slides</div>
+                <div class="resource-tab" data-category="exam">Exam Papers</div>
+                <div class="resource-tab" data-category="info">Course Info</div>
+            </div>
+
+            <div id="resourcesGrid" class="resources-grid">
+                <div style="padding: 100px; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+                    Loading resources...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <div class="fab-upload" id="uploadFAB" title="Upload Resource">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"></path>
+        </svg>
+    </div>
+
+    <!-- Resource Upload Modal -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload Free Resource</h3>
+                <button class="modal-close" id="closeResourceModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <form id="resourceForm" class="upload-form">
+                <div class="form-group">
+                    <label for="resourceTitle">Resource Title</label>
+                    <input type="text" id="resourceTitle" required placeholder="e.g., CS101 Final Exam 2023">
+                </div>
+                <div class="form-group">
+                    <label for="resourceType">Resource Type</label>
+                    <select id="resourceType" required>
+                        <option value="">Select type</option>
+                        <option value="notes">Study Notes</option>
+                        <option value="slides">Lecture Slides</option>
+                        <option value="exam">Exam Paper</option>
+                        <option value="info">Course Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="resourceCourse">Course/Subject</label>
+                    <input type="text" id="resourceCourse" required placeholder="e.g., Computer Science 101">
+                </div>
+                <div class="form-group">
+                    <label for="resourceYear">Year</label>
+                    <input type="number" id="resourceYear" placeholder="e.g., 2023" min="2000" max="2030">
+                </div>
+                <div class="form-group">
+                    <label for="resourceDescription">Description</label>
+                    <textarea id="resourceDescription" placeholder="Additional details..." rows="3"></textarea>
+                </div>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p id="fileNameDisplay">Click to upload or drag and drop</p>
+                    <p class="file-hint">PDF files only (max 50MB)</p>
+                    <input type="file" id="resourceFile" accept=".pdf" style="display: none;">
+                </div>
+                <button type="submit" class="btn-primary-modal" id="submitResourceBtn">Upload Resource</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
     <script type="module" src="free-resources.js"></script>
 </body>
 

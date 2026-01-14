@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 2. Initialize Page
-    updateUserProfile();
     await loadResources();
     setupEventListeners();
 
@@ -25,18 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function updateUserProfile() {
-    const user = await getCurrentUser();
-    if (user) {
-        const adminNameElements = document.querySelectorAll('.admin-name');
-        adminNameElements.forEach(el => el.textContent = user.name || 'User');
-
-        const avatarImages = document.querySelectorAll('.avatar');
-        avatarImages.forEach(img => {
-            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=368CBF&color=fff`;
-        });
-    }
-}
 
 async function loadResources() {
     const grid = document.getElementById('resourcesGrid');
@@ -177,16 +164,6 @@ function setupEventListeners() {
         });
     }
 
-    // 4. Logout
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            if (confirm('Are you sure you want to logout?')) {
-                await logoutUser();
-                window.location.href = 'index.html';
-            }
-        });
-    }
 
     // 5. FAB & Modal Logic
     const fab = document.getElementById('uploadFAB');

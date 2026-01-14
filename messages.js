@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = await getCurrentUser();
 
     // 2. Initialize Dashboard UI
-    updateUserProfile();
     setupEventListeners();
 
     // 3. Check for partner_id and item_id in URL
@@ -48,17 +47,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function updateUserProfile() {
-    if (currentUser) {
-        const adminNameElements = document.querySelectorAll('.admin-name');
-        adminNameElements.forEach(el => el.textContent = currentUser.name || 'User');
-
-        const avatarImages = document.querySelectorAll('.avatar');
-        avatarImages.forEach(img => {
-            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=368CBF&color=fff`;
-        });
-    }
-}
 
 function setupEventListeners() {
     // 1. Conversation Search
@@ -68,25 +56,17 @@ function setupEventListeners() {
             const query = e.target.value.toLowerCase();
             const items = document.querySelectorAll('.conversation-item');
             items.forEach(item => {
-                const name = item.querySelector('span[style*="font-weight:600"]').textContent.toLowerCase();
-                const lastMsg = item.querySelector('div[style*="font-size:0.9rem"]').textContent.toLowerCase();
+                const nameNode = item.querySelector('span[style*="font-weight:600"]');
+                const msgNode = item.querySelector('div[style*="font-size:0.9rem"]');
+                const name = nameNode ? nameNode.textContent.toLowerCase() : '';
+                const lastMsg = msgNode ? msgNode.textContent.toLowerCase() : '';
+
                 if (name.includes(query) || lastMsg.includes(query)) {
                     item.style.display = 'block';
                 } else {
                     item.style.display = 'none';
                 }
             });
-        });
-    }
-
-    // 2. Logout Logic (sidebar)
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            if (confirm('Are you sure you want to logout?')) {
-                await logoutUser();
-                window.location.href = 'index.html';
-            }
         });
     }
 }

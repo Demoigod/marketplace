@@ -49,7 +49,7 @@ export async function fetchAllItems() {
 }
 
 /**
- * Renders an item card following exact user requirements.
+ * Renders an item card following exact user requirements (Mockup Style).
  */
 export function createItemCard(item, isAuth = false) {
     const postedDate = new Date(item.created_at).toLocaleDateString();
@@ -63,43 +63,26 @@ export function createItemCard(item, isAuth = false) {
         mainImage = 'https://via.placeholder.com/300x200?text=No+Image';
     }
 
-    // Unified actions logic for guest vs member
-    let actionsHtml = '';
-
-    if (isAuth) {
-        // Authenticated user: Show full interaction buttons
-        actionsHtml = `
-            <div class="item-actions-grid">
-                <button class="btn-buy" data-action="buy" data-id="${item.id}">Buy</button>
-                <button class="btn-contact" data-action="contact" data-seller-id="${item.seller_id}">Contact Seller</button>
-                <button class="btn-save" data-action="save" data-item-id="${item.id}">Save</button>
-                <button class="btn-view" data-action="view" data-id="${item.id}">View Details</button>
-            </div>
-        `;
-    } else {
-        // Guest user: Show simplified preview with a clear 'View' CTA
-        actionsHtml = `
-            <div class="item-actions-preview">
-                <button class="btn-primary btn-full" data-action="view" data-id="${item.id}">View Item</button>
-            </div>
-        `;
-    }
-
     return `
         <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.seller_id}">
-            <div class="item-image" style="background-image: url('${mainImage}'); background-size: cover; background-position: center;"></div>
+            <div class="item-image" style="background-image: url('${mainImage}');"></div>
             <div class="item-content">
-                <div class="item-header">
-                    <h3 class="item-title">${escapeHtml(item.title || 'Untitled Item')}</h3>
-                    <span class="item-price">R ${parseFloat(item.price || 0).toLocaleString()}</span>
-                </div>
-                <div class="item-meta" style="margin-bottom: 0.5rem; font-size: 0.85rem; color: #666;">
-                    <span>By ${escapeHtml(item.profiles?.username || item.profiles?.full_name || 'Anonymous')}</span>
-                </div>
-                <p class="item-date">Posted on ${postedDate}</p>
-                <p class="item-description">${escapeHtml(item.description)}</p>
+                <h3 class="item-title">${escapeHtml(item.title || 'Untitled Item')}</h3>
+                <span class="item-price">R ${parseFloat(item.price || 0).toLocaleString()}</span>
                 
-                ${actionsHtml}
+                <div class="item-meta">
+                    By ${escapeHtml(item.profiles?.username || item.profiles?.full_name || 'Anonymous')}
+                </div>
+                <div class="item-date">
+                    Posted on ${postedDate}
+                </div>
+                <div class="item-desc-short">
+                    ${escapeHtml(item.description || '').substring(0, 60)}${item.description?.length > 60 ? '...' : ''}
+                </div>
+                
+                <div class="item-actions-preview">
+                    <button class="btn-view-item" data-action="view" data-id="${item.id}">View Item</button>
+                </div>
             </div>
         </div>
     `;
