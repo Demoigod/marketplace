@@ -5,92 +5,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Item Details - Campus Market</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css?v=7">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gray-50">
-    <!-- Navigation rendered by navbar.js -->
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-content"></div>
+<body>
+    <!-- Persistent Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <span class="logo-text">Logo</span>
+        </div>
+
+        <div class="nav-group">
+            <a href="admin.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                Dashboard
+            </a>
+            <a href="listings.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                </svg>
+                Market Listings
+            </a>
+            <a href="free-resources.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 20H4v-15a2 2 0 1 1 4 0v15h-4zm4-15h10v15h-10v-15z"></path>
+                </svg>
+                Free Resources
+            </a>
+            <a href="messages.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Messages
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="#" class="nav-link" id="sidebarLogout" style="color: #E63946;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Logout
+            </a>
         </div>
     </nav>
 
-    <main class="container" style="margin-top: 2rem;">
-        <div id="itemDetailContainer" class="item-detail-layout">
-            <div class="loading-state">Loading item details...</div>
+    <!-- Main Viewport Area -->
+    <main class="main-viewport">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="search-wrapper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ADB5BD" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" placeholder="Search marketplace...">
+            </div>
+
+            <div class="header-right">
+                <div class="icon-trigger">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="badge-dot" id="unreadBadge"></span>
+                </div>
+                <div class="user-info-trigger" id="profileToggle">
+                    <div class="user-meta">
+                        <span class="user-name" id="userName">User</span>
+                        <span class="user-id" id="userId">ID: 000000</span>
+                    </div>
+                    <img src="" alt="Avatar" class="avatar-sm" id="topNavAvatar">
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div class="dashboard-content">
+            <div class="welcome-row">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="listings.html" style="color: var(--primary-color);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </a>
+                    <h1>Back to Listings</h1>
+                </div>
+            </div>
+
+            <div id="itemDetailContainer">
+                <div class="p-8 text-center" style="color: var(--text-muted);">
+                    Loading item details...
+                </div>
+            </div>
         </div>
     </main>
 
+    <script type="module" src="admin.js?v=7"></script>
     <script type="module">
         import { supabase } from './supabase-config.js';
-        import { initNavigation } from './navbar.js';
-        import { isLoggedIn } from './auth.js';
+        import { getCurrentUser } from './auth.js';
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await initNavigation();
             const urlParams = new URLSearchParams(window.location.search);
             const itemId = urlParams.get('id');
 
             if (!itemId) {
-                window.location.href = 'index.html';
+                window.location.href = 'listings.html';
                 return;
             }
 
-            loadItemDetails(itemId);
+            renderItemDetails(itemId);
         });
 
-        async function loadItemDetails(id) {
+        async function renderItemDetails(id) {
             const container = document.getElementById('itemDetailContainer');
-            const isAuth = await isLoggedIn();
 
             try {
+                // Fetch item with profile join
                 const { data: item, error } = await supabase
                     .from('market_listings')
-                    .select('*')
+                    .select(`
+                        *,
+                        profiles (
+                            username,
+                            full_name,
+                            avatar_url,
+                            immutable_user_code
+                        )
+                    `)
                     .eq('id', id)
                     .single();
 
-                if (error || !item) throw new Error('Item not found');
+                if (error || !item) throw new Error('Item not found or has been removed.');
 
-                const mainImage = item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/600x400';
+                const mainImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/600x400?text=No+Image');
+                const sellerName = item.profiles?.username || item.profiles?.full_name || 'Anonymous Seller';
+                const sellerId = item.profiles?.immutable_user_code || item.seller_id.slice(0, 6).toUpperCase();
+                const sellerAvatar = item.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=368CBF&color=fff`;
 
                 container.innerHTML = `
-                    <div class="item-detail-grid">
-                        <div class="item-visuals">
-                            <img src="${mainImage}" alt="${item.title}" class="main-detail-image">
+                    <div class="item-detail-container">
+                        <div class="detail-visuals">
+                            <img src="${mainImage}" alt="${item.title}" class="detail-main-img">
                         </div>
-                        <div class="item-info-panel">
+                        <div class="detail-info-panel">
+                            <span class="detail-category">${item.category || 'MARKETPLACE'}</span>
                             <h1 class="detail-title">${item.title}</h1>
-                            <div class="detail-meta">
-                                <span class="detail-price">$${parseFloat(item.price).toFixed(2)}</span>
-                                <span class="detail-date">Posted ${new Date(item.created_at).toLocaleDateString()}</span>
+                            
+                            <div class="detail-price-box">
+                                <span class="detail-currency">R</span>
+                                <span class="detail-price">${parseFloat(item.price).toLocaleString()}</span>
                             </div>
-                            <div class="detail-description">
-                                <h3>Description</h3>
-                                <p>${item.description}</p>
+
+                            <div class="detail-section">
+                                <h4>Description</h4>
+                                <div class="detail-description">
+                                    ${item.description || 'No description provided.'}
+                                </div>
                             </div>
-                            <div class="detail-actions">
-                                <button class="btn-primary btn-full ${isAuth ? '' : 'disabled'}" onclick="handleBuyAction('${item.id}')">Buy Now</button>
-                                <button class="btn-secondary btn-full ${isAuth ? '' : 'disabled'}" onclick="handleContactAction('${item.seller_id}')">Contact Seller</button>
+
+                            <div class="detail-section">
+                                <h4>Listing Details</h4>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                    <strong>Status:</strong> <span class="status-tag active" style="font-size: 0.7rem;">${item.status.toUpperCase()}</span>
+                                </p>
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                                    <strong>Posted:</strong> ${new Date(item.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                </p>
+                            </div>
+
+                            <div class="detail-seller-card">
+                                <img src="${sellerAvatar}" class="seller-avatar">
+                                <div class="seller-meta-info">
+                                    <span class="name">${sellerName}</span>
+                                    <span class="id">User ID: #${sellerId}</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-actions-grid">
+                                <button class="btn-primary" onclick="window.handleBuyAction('${item.id}')" style="width: 100%; height: 48px; border-radius: 12px; font-weight: 700;">Buy Now</button>
+                                <button class="btn-secondary" onclick="window.handleContactAction('${item.seller_id}', '${item.id}')" style="width: 100%; height: 48px; border-radius: 12px; font-weight: 700; background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color);">Contact Seller</button>
                             </div>
                         </div>
                     </div>
                 `;
             } catch (err) {
-                container.innerHTML = `<div class="error-state">${err.message}</div>`;
+                console.error('Render error:', err);
+                container.innerHTML = `
+                    <div class="p-12 text-center">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">❌</div>
+                        <h3 style="font-weight: 800; font-size: 1.5rem; margin-bottom: 0.5rem;">Oops!</h3>
+                        <p style="color: var(--text-muted);">${err.message}</p>
+                        <a href="listings.html" class="btn-primary" style="display: inline-block; margin-top: 2rem; padding: 0.75rem 2rem; text-decoration: none; border-radius: 10px;">Back to Marketplace</a>
+                    </div>
+                `;
             }
         }
 
         window.handleBuyAction = (itemId) => {
-            window.location.href = `payment.html?item_id=${itemId}`;
+            alert('Payment integration coming soon! Item ID: ' + itemId);
         };
 
-        window.handleContactAction = (sellerId) => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const itemId = urlParams.get('id');
-            window.location.href = `messages.html?seller_id=${sellerId}&listing_id=${itemId}`;
+        window.handleContactAction = (sellerId, listingId) => {
+            window.location.href = `messages.html?seller_id=${sellerId}&listing_id=${listingId}`;
         };
     </script>
 </body>
