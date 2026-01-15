@@ -14,7 +14,8 @@ export async function fetchAllItems() {
                 *,
                 profiles (
                     username,
-                    full_name
+                    full_name,
+                    immutable_user_code
                 )
             `)
             .eq('status', 'active')
@@ -63,6 +64,10 @@ export function createItemCard(item, isAuth = false) {
         mainImage = 'https://via.placeholder.com/300x200?text=No+Image';
     }
 
+    const sellerName = item.profiles?.username || item.profiles?.full_name || 'Anonymous';
+    // Use immutable_user_code for display, fallback to slice of internal UUID
+    const sellerId = item.profiles?.immutable_user_code || (item.seller_id ? item.seller_id.slice(0, 6).toUpperCase() : 'N/A');
+
     return `
         <div class="marketplace-item" data-id="${item.id}" data-user-id="${item.seller_id}">
             <div class="item-image" style="background-image: url('${mainImage}');"></div>
@@ -70,10 +75,14 @@ export function createItemCard(item, isAuth = false) {
                 <h3 class="item-title">${escapeHtml(item.title || 'Untitled Item')}</h3>
                 <div class="item-price">R ${parseFloat(item.price || 0).toLocaleString()}</div>
                 
-                <div class="item-meta">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span>By ${escapeHtml(item.profiles?.username || item.profiles?.full_name || 'Anonymous')}</span>
+                <div class="item-meta" style="flex-direction: column; align-items: flex-start; gap: 2px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span style="font-weight: 700;">${escapeHtml(sellerName)}</span>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); padding-left: 1.4rem;">Posted by User ID: ${sellerId}</span>
                 </div>
+                
                 <div class="item-date">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <span>Posted on ${postedDate}</span>
@@ -83,7 +92,15 @@ export function createItemCard(item, isAuth = false) {
                     <span>Directions Available</span>
                 </div>
                 
-                <button class="btn-view-item" data-action="view" data-id="${item.id}">View Detailed Info</button>
+                <div class="item-actions" style="margin-top: auto; display: flex; gap: 0.5rem;">
+                    <button class="btn-view-item" data-action="view" data-id="${item.id}" style="flex:1;">View Info</button>
+                    <button class="btn-view-item contact-seller-btn" 
+                            data-seller-id="${item.seller_id}" 
+                            data-listing-id="${item.id}"
+                            style="flex:1; background:transparent; color:var(--primary-color); border-color:var(--primary-color);">
+                        Contact
+                    </button>
+                </div>
             </div>
         </div>
     `;

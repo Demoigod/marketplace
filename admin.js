@@ -20,18 +20,10 @@ async function initDashboard() {
     const user = await getCurrentUser();
     if (!user) return;
 
-    // 1. Set User Profile Info
-    const nameEl = document.getElementById('userName');
-    const welcomeEl = document.getElementById('welcomeTitle');
-    const idEl = document.getElementById('userId');
-    const avatarImg = document.getElementById('userAvatar');
+    // 1. Sync all profile UI elements (Header + Page content)
+    syncProfileUI(user);
 
-    if (nameEl) nameEl.textContent = user.first_name || user.username || 'User';
-    if (welcomeEl) welcomeEl.textContent = `Welcome, ${user.first_name || user.username || 'User'} 👋`;
-    if (idEl) idEl.textContent = `ID: ${user.id.slice(0, 6).toUpperCase()}`;
-    if (avatarImg) {
-        avatarImg.src = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username || 'User')}&background=368CBF&color=fff`;
-    }
+    // 2. Load Metrics (Only if elements exist)
 
     // 2. Load Metrics (Only if elements exist)
     if (document.getElementById('countListings')) {
@@ -43,10 +35,80 @@ async function initDashboard() {
         loadActivityFeeds();
     }
 
-    // 4. Load Online Users
-    if (document.getElementById('onlineGrid')) {
-        loadOnlineUsers();
+    // 5. Load User Specific Listings
+    if (document.getElementById('myListingsFeed')) {
+        loadMyListings(user.id);
+        setupRealtimeListings(user.id);
     }
+
+    // 6. Global Unread Messages Notifications
+    loadUnreadMessages(user.id);
+    subscribeToNewMessages(user.id);
+}
+
+/**
+ * Fetches and displays listings belonging only to the authenticated user.
+ */
+async function loadMyListings(userId) {
+    const listEl = document.getElementById('myListingsFeed');
+    const badgeEl = document.getElementById('myListingsCountBadge');
+    if (!listEl) return;
+
+    try {
+        const { data: listings, error } = await supabase
+            .from('market_listings')
+            .select('title, price, status, created_at')
+            .eq('seller_id', userId)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (badgeEl) badgeEl.textContent = listings.length;
+
+        // Update the metric card count too if it exists
+        const mainCountEl = document.getElementById('countListings');
+        if (mainCountEl) mainCountEl.textContent = listings.length;
+
+        if (listings.length === 0) {
+            listEl.innerHTML = '<div class="p-4 text-center text-gray-500">You haven\'t posted anything yet.</div>';
+            return;
+        }
+
+        listEl.innerHTML = listings.map(item => `
+            <div class="activity-item">
+                <div class="logo-box" style="background: #F8F9FA; color: var(--primary-color); width: 32px; height: 32px;">
+                    <span style="font-size: 0.8rem; font-weight: 800;">🛒</span>
+                </div>
+                <div class="act-body">
+                    <span class="act-user">${item.title}</span>
+                    <span class="act-desc">R ${item.price} • <span class="status-tag ${item.status}">${item.status.toUpperCase()}</span></span>
+                </div>
+                <span class="act-time">${new Date(item.created_at).toLocaleDateString()}</span>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error('Error loading my listings:', err);
+        listEl.innerHTML = '<div class="p-4 text-red-500">Could not load your listings.</div>';
+    }
+}
+
+/**
+ * Listens for real-time changes to the market_listings table.
+ */
+function setupRealtimeListings(userId) {
+    supabase
+        .channel('my-listings-changes')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'market_listings',
+            filter: `seller_id=eq.${userId}`
+        }, (payload) => {
+            console.log('Real-time listing change detected:', payload.eventType);
+            loadMyListings(userId);
+        })
+        .subscribe();
 }
 
 async function loadCounts(userId) {
@@ -185,26 +247,84 @@ function setupSidebar() {
     }
 
     // Initialize Header Profile Info (if elements exist)
-    syncHeaderProfile();
+    syncProfileUI();
 }
 
 /**
- * Syncs the Top-Bar profile section on every page
+ * CRITICAL FIX: Unified UI Synching for all Profile data
+ * Handles Header, Sidebar, and Account page middle section.
  */
-async function syncHeaderProfile() {
-    const user = await getCurrentUser();
-    if (!user) return;
+async function syncProfileUI(existingUser = null) {
+    console.log('--- SYNC ATTEMPT START ---');
+    try {
+        const user = existingUser || await getCurrentUser();
+        if (!user) {
+            console.warn('Sync aborted: User object not found.');
+            return;
+        }
 
-    const nameEl = document.getElementById('userName');
-    const idEl = document.getElementById('userId');
-    const avatarEl = document.getElementById('topNavAvatar') || document.getElementById('userAvatar');
+        const applyUpdates = () => {
+            // 1. Resolve Data with string safety
+            const first = String(user.first_name || user.user_metadata?.first_name || '');
+            const last = String(user.last_name || user.user_metadata?.last_name || '');
+            const uname = String(user.username || user.user_metadata?.username || 'User');
+            const email = String(user.email || '');
+            const phone = String(user.phone || user.phone_number || '');
+            const displayId = String(user.immutable_user_code || (user.id ? user.id.slice(0, 6).toUpperCase() : '000000'));
 
-    if (nameEl) nameEl.textContent = user.first_name || user.username || 'User';
-    if (idEl) idEl.textContent = `ID: ${user.id.slice(0, 6).toUpperCase()}`;
-    if (avatarEl) {
-        avatarEl.src = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username || 'User')}&background=368CBF&color=fff`;
+            // Determine full display name
+            let fullDisplay = uname;
+            if (first) fullDisplay = `${first} ${last}`.trim();
+            if (fullDisplay === 'User' && first) fullDisplay = `${first} ${last}`.trim();
+
+            const avatarSrc = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullDisplay)}&background=368CBF&color=fff`;
+
+            // 2. Element Registry (ID -> Value/Action)
+            const registry = [
+                { id: 'userName', attr: 'textContent', val: fullDisplay },
+                { id: 'welcomeTitle', attr: 'textContent', val: `Welcome, ${first || uname} 👋` },
+                { id: 'userId', attr: 'textContent', val: `ID: ${displayId}` },
+                { id: 'profileFullName', attr: 'textContent', val: fullDisplay },
+                { id: 'profileRole', attr: 'textContent', val: (user.role || 'Member').charAt(0).toUpperCase() + (user.role || 'Member').slice(1) },
+                { id: 'publicUserIdDisplay', attr: 'textContent', val: `ID: #${displayId}` },
+                { id: 'topNavAvatar', attr: 'src', val: avatarSrc },
+                { id: 'userAvatar', attr: 'src', val: avatarSrc },
+                { id: 'profileAvatar', attr: 'src', val: avatarSrc },
+                { id: 'firstName', attr: 'value', val: first },
+                { id: 'lastName', attr: 'value', val: last },
+                { id: 'username', attr: 'value', val: uname },
+                { id: 'email', attr: 'value', val: email },
+                { id: 'phone', attr: 'value', val: phone }
+            ];
+
+            registry.forEach(item => {
+                const el = document.getElementById(item.id);
+                if (el) {
+                    if (item.attr === 'value') {
+                        el.value = item.val;
+                        el.placeholder = item.val || 'Not provided';
+                    } else {
+                        el[item.attr] = item.val;
+                    }
+                }
+            });
+            console.log('--- SYNC SUCCESSFUL ---');
+        };
+
+        // Run immediately
+        applyUpdates();
+
+        // Also run in 300ms to catch any late DOM transitions or browser autofill delays
+        setTimeout(applyUpdates, 300);
+
+    } catch (error) {
+        console.error('CRITICAL ERROR during Profile UI sync:', error);
     }
 }
+
+// Alias for compatibility with cached scripts
+const syncHeaderProfile = syncProfileUI;
+window.syncProfileUI = syncProfileUI; // Also export to window for debugging
 
 /**
  * Robust Logout Implementation
@@ -220,4 +340,65 @@ async function handleLogout() {
             window.location.href = 'index.html';
         }
     }
+}
+
+/**
+ * Global Notifications: Unread Messages Count
+ */
+async function loadUnreadMessages(userId) {
+    try {
+        const { count, error } = await supabase
+            .from('messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('receiver_id', userId)
+            .is('read_at', null);
+
+        if (error) throw error;
+
+        // Update Header Badge
+        const headerBadge = document.getElementById('unreadBadge');
+        if (headerBadge) {
+            headerBadge.textContent = count || 0;
+            headerBadge.style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        // Update Dashboard Metric Card
+        const metricCount = document.getElementById('countMessages');
+        if (metricCount) {
+            metricCount.textContent = count || 0;
+        }
+
+        // Update Sidebar Badge (if exists)
+        const sidebarLink = document.querySelector('a[href="messages.html"]');
+        if (sidebarLink && count > 0) {
+            let badge = sidebarLink.querySelector('.sidebar-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'sidebar-badge';
+                badge.style = "background: #E63946; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: 700;";
+                sidebarLink.appendChild(badge);
+            }
+            badge.textContent = count;
+        } else if (sidebarLink) {
+            const badge = sidebarLink.querySelector('.sidebar-badge');
+            if (badge) badge.remove();
+        }
+
+    } catch (err) {
+        console.error('Error loading unread count:', err);
+    }
+}
+
+function subscribeToNewMessages(userId) {
+    supabase
+        .channel('global-unread-sync')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `receiver_id=eq.${userId}`
+        }, () => {
+            loadUnreadMessages(userId);
+        })
+        .subscribe();
 }

@@ -1,11 +1,10 @@
 import { supabase } from './supabase-config.js';
-import { isLoggedIn, logoutUser, getCurrentUser } from './auth.js';
+import { isLoggedIn, getCurrentUser } from './auth.js';
 
 // State
 let currentConversationId = null;
 let currentUser = null;
 let realtimeSubscription = null;
-let allConversations = [];
 
 // DOM Elements
 const conversationsList = document.getElementById('conversationsList');
@@ -13,441 +12,435 @@ const chatArea = document.getElementById('chatArea');
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Auth Guard
-    const session = await isLoggedIn();
-    if (!session) {
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn) {
         window.location.href = 'index.html';
         return;
     }
 
     currentUser = await getCurrentUser();
 
-    // 2. Initialize Dashboard UI
-    setupEventListeners();
+    // 2. Initialize UI
+    setupSearch();
 
-    // 3. Check for partner_id and item_id in URL
+    // 3. Check for specific conversation in URL (from listings)
     const urlParams = new URLSearchParams(window.location.search);
-    const partnerId = urlParams.get('partner_id');
-    const itemId = urlParams.get('item_id');
+    const sellerId = urlParams.get('seller_id');
+    const listingId = urlParams.get('listing_id');
 
-    if (partnerId) {
-        await startNewConversation(partnerId, itemId);
+    if (sellerId && listingId) {
+        await startOrOpenConversation(sellerId, listingId);
     }
 
-    // 4. Load initial list
-    loadConversations();
+    // 4. Load Inbox
+    loadInbox();
 
-    // 5. Global subscriptions
-    setupGlobalSubscription();
-
-    // Handle logout/auth changes
-    supabase.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_OUT') {
-            window.location.href = 'index.html';
-        }
-    });
+    // 5. Global Realtime for Inbox Updates
+    subscribeToInbox();
 });
 
-
-function setupEventListeners() {
-    // 1. Conversation Search
-    const searchInput = document.getElementById('convSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.conversation-item');
-            items.forEach(item => {
-                const nameNode = item.querySelector('span[style*="font-weight:600"]');
-                const msgNode = item.querySelector('div[style*="font-size:0.9rem"]');
-                const name = nameNode ? nameNode.textContent.toLowerCase() : '';
-                const lastMsg = msgNode ? msgNode.textContent.toLowerCase() : '';
-
-                if (name.includes(query) || lastMsg.includes(query)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    }
-}
-
-async function loadConversations() {
+/**
+ * Loads the list of conversations for the current user.
+ */
+async function loadInbox() {
     if (!currentUser) return;
 
     try {
-        // Fetch conversations joined with items
         const { data: conversations, error } = await supabase
             .from('conversations')
             .select(`
                 *,
                 item:market_listings(title, price, image_url),
-                messages (
-                    content,
-                    created_at,
-                    read,
-                    sender_id
-                )
+                buyer:profiles!buyer_id(username, avatar_url),
+                seller:profiles!seller_id(username, avatar_url)
             `)
-            .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+            .or(`buyer_id.eq.${currentUser.id},seller_id.eq.${currentUser.id}`)
             .order('updated_at', { ascending: false });
 
         if (error) throw error;
-        renderConversationsList(conversations || []);
+
+        // For each conversation, fetch the last message
+        const inboxData = await Promise.all(conversations.map(async (conv) => {
+            const { data: lastMsg } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', conv.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            const isBuyer = conv.buyer_id === currentUser.id;
+            const partner = isBuyer ? conv.seller : conv.buyer;
+            const partnerId = isBuyer ? conv.seller_id : conv.buyer_id;
+
+            // Get partner's immutable code for display
+            const { data: partnerProfile } = await supabase
+                .from('profiles')
+                .select('immutable_user_code')
+                .eq('id', partnerId)
+                .single();
+
+            // Count unread
+            const { count: unreadCount } = await supabase
+                .from('messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('conversation_id', conv.id)
+                .is('read_at', null)
+                .neq('sender_id', currentUser.id);
+
+            return {
+                ...conv,
+                partnerName: partner?.username || 'User',
+                partnerId: partnerId,
+                displayId: partnerProfile?.immutable_user_code || partnerId.slice(0, 6).toUpperCase(),
+                lastMessage: lastMsg?.content || (lastMsg?.message_type !== 'text' ? 'Sent a file' : 'No messages yet'),
+                lastTime: lastMsg ? formatTime(lastMsg.created_at) : '',
+                unreadCount: unreadCount || 0
+            };
+        }));
+
+        renderInbox(inboxData);
     } catch (err) {
-        console.error('Error loading conversations:', err);
-        if (conversationsList) {
-            conversationsList.innerHTML = '<div class="p-4 text-red-500">Error loading inbox. Please refresh.</div>';
-        }
+        console.error('Inbox load error:', err);
     }
 }
 
-async function renderConversationsList(conversations) {
-    if (!conversations || conversations.length === 0) {
-        conversationsList.innerHTML = '<div class="p-4 text-gray-500 text-center">No conversations yet</div>';
+function renderInbox(data) {
+    if (!conversationsList) return;
+    if (data.length === 0) {
+        conversationsList.innerHTML = '<div class="p-8 text-center text-gray-400">No conversations yet.</div>';
         return;
     }
 
-    const processed = await Promise.all(conversations.map(async (conv) => {
-        const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-        const { data: partner } = await supabase.from('profiles').select('username, public_user_id').eq('id', partnerId).single();
-        const partnerName = partner ? partner.username : 'Unknown User';
-        const partnerPublicId = partner ? partner.public_user_id : null;
-
-        const msgs = conv.messages || [];
-        msgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        const lastMsg = msgs[0];
-        const lastMessageText = lastMsg ? (lastMsg.content || 'New message') : 'No messages';
-
-        return {
-            ...conv,
-            partnerName,
-            partnerPublicId,
-            lastMessage: lastMessageText,
-            lastTime: lastMsg ? new Date(lastMsg.created_at).toLocaleDateString() : '',
-            unread: lastMsg && !lastMsg.read && lastMsg.sender_id !== currentUser.id,
-            itemTitle: conv.item ? conv.item.title : null
-        };
-    }));
-
-    conversationsList.innerHTML = processed.map(c => `
-        <div class="conversation-item ${c.id === currentConversationId ? 'active' : ''}" onclick="window.routerOpenChat('${c.id}')">
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+    conversationsList.innerHTML = data.map(conv => `
+        <div class="conversation-item ${conv.id === currentConversationId ? 'active' : ''}" 
+             onclick="window.selectConversation('${conv.id}')">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
-                    <span style="font-weight:600; color:var(--text-primary);">${c.partnerName}</span>
-                    ${c.partnerPublicId ? `
-                        <div style="font-size:0.7rem; color:var(--text-secondary); margin-top:2px; opacity:0.8;">
-                            ID: ${c.partnerPublicId}
-                        </div>
-                    ` : ''}
+                    <span style="font-weight:700; color:var(--text-main); font-size:0.95rem;">${escapeHtml(conv.partnerName)}</span>
+                    <div style="font-size:0.7rem; color:var(--text-muted);">ID: ${conv.displayId}</div>
                 </div>
-                <span style="font-size:0.8rem; color:var(--text-secondary);">${c.lastTime}</span>
+                <div style="text-align:right;">
+                    <div style="font-size:0.75rem; color:var(--text-muted);">${conv.lastTime}</div>
+                    ${conv.unreadCount > 0 ? `<span style="display:inline-block; background:var(--primary-color); color:white; font-size:0.7rem; padding:1px 6px; border-radius:10px; font-weight:700; margin-top:4px;">${conv.unreadCount}</span>` : ''}
+                </div>
             </div>
-            ${c.itemTitle ? `<div style="font-size:0.75rem; color:#368CBF; margin-bottom:2px; font-weight:600;">Item: ${c.itemTitle}</div>` : ''}
-            <div style="font-size:0.9rem; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                ${c.unread ? '<span style="color:#368CBF;">● </span>' : ''}${c.lastMessage}
+            <div style="font-size:0.85rem; color:var(--text-secondary); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; ${conv.unreadCount > 0 ? 'font-weight:600;' : ''}">
+                ${escapeHtml(conv.lastMessage || '')}
             </div>
+            ${conv.item ? `<div style="font-size:0.75rem; color:var(--primary-color); font-weight:600; margin-top:4px;">Item: ${escapeHtml(conv.item.title)}</div>` : ''}
         </div>
     `).join('');
 }
 
-window.routerOpenChat = (id) => {
-    loadChat(id);
+window.selectConversation = async (id) => {
+    currentConversationId = id;
+    renderInboxActiveState();
+    await loadChat(id);
 };
 
-async function loadChat(conversationId) {
-    currentConversationId = conversationId;
-    document.querySelectorAll('.conversation-item').forEach(el => el.classList.remove('active'));
+function renderInboxActiveState() {
+    document.querySelectorAll('.conversation-item').forEach(el => {
+        el.classList.remove('active');
+        if (el.getAttribute('onclick')?.includes(currentConversationId)) {
+            el.classList.add('active');
+        }
+    });
+}
 
-    chatArea.innerHTML = '<div style="padding:40px; display:flex; justify-content:center;"><div class="spinner"></div></div>';
+/**
+ * Loads the messages for a specific conversation.
+ */
+async function loadChat(convId) {
+    if (!chatArea) return;
+    chatArea.innerHTML = '<div class="flex items-center justify-center h-full"><div class="spinner"></div></div>';
 
     try {
         const { data: messages, error } = await supabase
             .from('messages')
             .select('*')
-            .eq('conversation_id', conversationId)
+            .eq('conversation_id', convId)
             .order('created_at', { ascending: true });
 
         if (error) throw error;
 
-        // Fetch conversation details with item join
         const { data: conv } = await supabase
             .from('conversations')
-            .select('*, item:market_listings(*)')
-            .eq('id', conversationId)
+            .select('*, item:market_listings(*), buyer:profiles!buyer_id(username), seller:profiles!seller_id(username)')
+            .eq('id', convId)
             .single();
 
-        const partnerId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-        const { data: partner } = await supabase.from('profiles').select('username').eq('id', partnerId).single();
+        const partner = conv.buyer_id === currentUser.id ? conv.seller : conv.buyer;
+        const partnerId = conv.buyer_id === currentUser.id ? conv.seller_id : conv.buyer_id;
 
-        renderChatArea(messages, partner ? partner.username : 'User', partnerId, conv.item);
-        subscribeToConversation(conversationId);
-        markMessagesRead(conversationId);
+        // Ensure we have the code for the chat header too
+        const { data: pProfile } = await supabase.from('profiles').select('immutable_user_code').eq('id', partnerId).single();
+        const displayId = pProfile?.immutable_user_code || partnerId.slice(0, 6).toUpperCase();
+
+        renderChatWindow(messages, partner?.username || 'User', displayId, conv.item);
+
+        // Mark as read
+        markAsRead(convId);
+
+        // Subscribe to real-time messages
+        subscribeToChat(convId);
 
     } catch (err) {
         console.error('Chat load error:', err);
-        chatArea.innerHTML = 'Error loading chat.';
     }
 }
 
-function renderChatArea(messages, partnerName, partnerId, item) {
+function renderChatWindow(messages, partnerName, displayId, item) {
     chatArea.innerHTML = `
         <div class="chat-header">
-            <h3 class="font-bold text-lg">${partnerName}</h3>
+            <div>
+                <h3 style="font-weight:700; font-size:1.1rem;">${escapeHtml(partnerName)}</h3>
+                <span style="font-size:0.75rem; color:var(--text-muted);">User ID: ${displayId}</span>
+            </div>
         </div>
         ${item ? `
-        <div class="chat-item-header">
-            <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="chat-item-img" alt="Item">
-            <div class="chat-item-info">
-                <div class="chat-item-title">${item.title}</div>
-                <div class="chat-item-price">R ${item.price}</div>
+            <div class="chat-item-header">
+                <img src="${item.image_url || 'https://via.placeholder.com/40'}" class="chat-item-img">
+                <div class="chat-item-info">
+                    <div class="chat-item-title">${escapeHtml(item.title)}</div>
+                    <div class="chat-item-price">R ${item.price}</div>
+                </div>
+                <a href="listings.html?id=${item.id}" class="action-btn" style="padding:4px 12px; font-size:0.8rem;">View Item</a>
             </div>
-            <a href="item.html?id=${item.id}" class="btn btn-sm" style="font-size: 0.8rem; padding: 4px 12px;">View Item</a>
-        </div>
         ` : ''}
         <div id="messagesList" class="messages-list">
-            ${messages.length ? messages.map(msg => renderMessageBubble(msg)).join('') : '<p class="text-center text-gray-400 mt-4">No messages yet. Say hi!</p>'}
+            ${messages.map(msg => renderMessage(msg)).join('')}
         </div>
         <div class="chat-input-area">
             <div class="upload-btn-wrapper">
-                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                </svg>
-                <input type="file" id="fileInput" name="attachment">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                <input type="file" id="fileAttach" onchange="window.handleChatUpload(this)">
             </div>
-            <textarea id="messageInput" class="message-input" rows="1" placeholder="Type a message..."></textarea>
-            <button id="sendBtn" class="send-btn">Send</button>
+            <textarea id="msgInput" class="message-input" placeholder="Type a message..." rows="1"></textarea>
+            <button onclick="window.sendChatMessage()" class="send-btn">Send</button>
         </div>
     `;
 
     const list = document.getElementById('messagesList');
     list.scrollTop = list.scrollHeight;
 
-    const sendBtn = document.getElementById('sendBtn');
-    const input = document.getElementById('messageInput');
-    const fileInput = document.getElementById('fileInput');
-
-    sendBtn.onclick = () => sendMessage(input.value);
-    input.addEventListener('keypress', (e) => {
+    // Enter key support
+    document.getElementById('msgInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage(input.value);
+            window.sendChatMessage();
         }
     });
-
-    fileInput.onchange = async () => {
-        const file = fileInput.files[0];
-        if (file) {
-            await handleFileUpload(file);
-        }
-    };
 }
 
-async function handleFileUpload(file) {
-    const fileName = `${Date.now()}_${file.name}`;
-    const filePath = `attachments/${currentUser.id}/${fileName}`;
+function renderMessage(msg) {
+    const isMe = msg.sender_id === currentUser.id;
+    let contentHtml = escapeHtml(msg.content || '');
 
-    try {
-        // 1. Upload to Supabase Storage
-        const { data, error } = await supabase.storage
-            .from('message-attachments')
-            .upload(filePath, file);
-
-        if (error) throw error;
-
-        // 2. Get Public URL
-        const { data: { publicUrl } } = supabase.storage
-            .from('message-attachments')
-            .getPublicUrl(filePath);
-
-        // 3. Send message with attachment
-        const isImage = file.type.startsWith('image/');
-        await sendMessage('', {
-            url: publicUrl,
-            type: isImage ? 'image' : 'file'
-        });
-
-    } catch (err) {
-        console.error('Upload error:', err);
-        alert('Failed to upload file. Ensure you have the "message-attachments" bucket created.');
+    if (msg.message_type === 'image') {
+        contentHtml = `<img src="${msg.file_url}" style="max-width:100%; border-radius:8px; display:block;">`;
+    } else if (msg.message_type === 'file') {
+        contentHtml = `<a href="${msg.file_url}" target="_blank" class="attachment-file"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg> Document</a>`;
     }
+
+    return `
+        <div class="message-bubble ${isMe ? 'message-sent' : 'message-received'}">
+            ${contentHtml}
+            <div class="read-status">
+                ${formatTimeShort(msg.created_at)}
+                ${isMe ? (msg.read_at ? ' • Seen' : ' • Sent') : ''}
+            </div>
+        </div>
+    `;
 }
 
-async function sendMessage(text, attachment = null) {
-    if (!text.trim() && !attachment) return;
+window.sendChatMessage = async () => {
+    const input = document.getElementById('msgInput');
+    const content = input.value.trim();
+    if (!content || !currentConversationId) return;
 
-    const input = document.getElementById('messageInput');
-    if (input) input.value = '';
+    input.value = '';
+
+    // Get partner ID from existing current chat
+    const { data: conv } = await supabase.from('conversations').select('buyer_id, seller_id').eq('id', currentConversationId).single();
+    const receiverId = conv.buyer_id === currentUser.id ? conv.seller_id : conv.buyer_id;
 
     const { error } = await supabase
         .from('messages')
         .insert([{
             conversation_id: currentConversationId,
             sender_id: currentUser.id,
-            content: text,
-            attachment_url: attachment ? attachment.url : null,
-            attachment_type: attachment ? attachment.type : null
+            receiver_id: receiverId,
+            content: content,
+            message_type: 'text'
         }]);
 
-    if (error) {
-        console.error('Send error:', error);
-        alert('Failed to send message');
+    if (error) console.error('Send error:', error);
+};
+
+window.handleChatUpload = async (input) => {
+    const file = input.files[0];
+    if (!file || !currentConversationId) return;
+
+    const fileName = `${Date.now()}_${file.name}`;
+    const filePath = `${currentUser.id}/${fileName}`;
+
+    try {
+        const { error: uploadError } = await supabase.storage
+            .from('chat-attachments')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('chat-attachments')
+            .getPublicUrl(filePath);
+
+        const { data: conv } = await supabase.from('conversations').select('buyer_id, seller_id').eq('id', currentConversationId).single();
+        const receiverId = conv.buyer_id === currentUser.id ? conv.seller_id : conv.buyer_id;
+
+        const type = file.type.startsWith('image/') ? 'image' : 'file';
+
+        await supabase.from('messages').insert([{
+            conversation_id: currentConversationId,
+            sender_id: currentUser.id,
+            receiver_id: receiverId,
+            message_type: type,
+            file_url: publicUrl
+        }]);
+
+    } catch (err) {
+        console.error('Upload Error:', err);
+        alert('Failed to upload file.');
     }
-}
+};
 
-function renderMessageBubble(msg) {
-    const isMe = msg.sender_id === currentUser.id;
-    const content = msg.content || '';
-
-    let attachmentHtml = '';
-    if (msg.attachment_url) {
-        if (msg.attachment_type === 'image') {
-            attachmentHtml = `<div class="attachment-preview"><img src="${msg.attachment_url}" class="attachment-img"></div>`;
-        } else {
-            attachmentHtml = `<a href="${msg.attachment_url}" target="_blank" class="attachment-file">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                    <polyline points="13 2 13 9 20 9"></polyline>
-                </svg>
-                Download File
-            </a>`;
-        }
-    }
-
-    return `
-        <div class="message-bubble ${isMe ? 'message-sent' : 'message-received'}">
-            <div>${content}</div>
-            ${attachmentHtml}
-            ${isMe && msg.read ? '<div class="read-status">Seen</div>' : ''}
-        </div>
-    `;
-}
-
-function subscribeToConversation(conversationId) {
+/**
+ * Real-time Subscriptions
+ */
+function subscribeToChat(convId) {
     if (realtimeSubscription) supabase.removeChannel(realtimeSubscription);
 
     realtimeSubscription = supabase
-        .channel(`public:messages:conversation_id=eq.${conversationId}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, payload => {
+        .channel(`chat:${convId}`)
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${convId}`
+        }, payload => {
             if (payload.eventType === 'INSERT') {
-                const newMsg = payload.new;
                 const list = document.getElementById('messagesList');
                 if (list) {
-                    if (list.querySelector('p.text-center')) list.innerHTML = '';
                     const div = document.createElement('div');
-                    div.innerHTML = renderMessageBubble(newMsg).trim();
-                    list.appendChild(div.firstChild);
+                    div.innerHTML = renderMessage(payload.new);
+                    list.appendChild(div.firstElementChild);
                     list.scrollTop = list.scrollHeight;
 
-                    if (newMsg.sender_id !== currentUser.id) {
-                        markMessagesRead(conversationId);
+                    if (payload.new.sender_id !== currentUser.id) {
+                        markAsRead(convId);
                     }
                 }
             } else if (payload.eventType === 'UPDATE') {
-                // Handle read status updates live
-                loadChat(conversationId); // Simple way to refresh UI for seen status
+                // If a message was marked as read, we might want to update the bubble
+                loadChat(convId); // Simple refresh for now
             }
         })
         .subscribe();
 }
 
-function setupGlobalSubscription() {
+function subscribeToInbox() {
     supabase
-        .channel('public:messages:global')
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages'
-        }, async (payload) => {
-            const { data: conv } = await supabase
-                .from('conversations')
-                .select('id')
-                .eq('id', payload.new.conversation_id)
-                .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
-                .single();
-
-            if (conv) {
-                loadConversations();
-            }
+        .channel('inbox-updates')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+            loadInbox();
         })
         .subscribe();
 }
 
-async function markMessagesRead(conversationId) {
+async function markAsRead(convId) {
     await supabase
         .from('messages')
-        .update({ read: true })
-        .eq('conversation_id', conversationId)
+        .update({ read_at: new Date().toISOString() })
+        .eq('conversation_id', convId)
         .neq('sender_id', currentUser.id)
-        .eq('read', false);
+        .is('read_at', null);
 }
 
-async function startNewConversation(partnerId, itemId = null) {
-    // 1. Validation
-    if (!partnerId || partnerId === 'null' || partnerId === currentUser.id) return;
-
-    // Validate UUID format (basic check)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(partnerId)) {
-        console.warn('Invalid partnerId:', partnerId);
+/**
+ * Conversation Creation Logic (Contact Seller Button Redirect)
+ */
+async function startOrOpenConversation(sellerId, listingId) {
+    if (sellerId === currentUser.id) {
+        alert("You cannot message yourself.");
         return;
     }
 
-    if (itemId === 'null' || itemId === '') itemId = null;
-    if (itemId && !uuidRegex.test(itemId)) {
-        console.warn('Invalid itemId:', itemId);
-        itemId = null;
-    }
+    try {
+        // Find existing
+        const { data: existing } = await supabase
+            .from('conversations')
+            .select('id')
+            .eq('listing_id', listingId)
+            .eq('buyer_id', currentUser.id)
+            .eq('seller_id', sellerId)
+            .single();
 
-    let u1 = currentUser.id < partnerId ? currentUser.id : partnerId;
-    let u2 = currentUser.id < partnerId ? partnerId : currentUser.id;
-
-    // 2. Check for existing conversation with item_id
-    let query = supabase
-        .from('conversations')
-        .select('id')
-        .eq('user1_id', u1)
-        .eq('user2_id', u2);
-
-    if (itemId) {
-        query = query.eq('item_id', itemId);
-    } else {
-        query = query.is('item_id', null);
-    }
-
-    const { data: existing, error: fetchError } = await query.single();
-
-    if (existing) {
-        loadChat(existing.id);
-    } else if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 means "no rows found", which is fine. Other errors aren't.
-        console.error('Error checking for existing conversation:', fetchError);
-        if (fetchError.message.includes('column "item_id" does not exist')) {
-            alert('Database error: Please ensure you have run the messaging-upgrade.sql script in your Supabase SQL Editor.');
-        } else {
-            alert(`Error checking conversation: ${fetchError.message}`);
+        if (existing) {
+            window.selectConversation(existing.id);
+            return;
         }
-    } else {
-        // 3. Create new conversation
-        const { data: newConv, error: createError } = await supabase
+
+        // Create new
+        const { data: newConv, error } = await supabase
             .from('conversations')
             .insert([{
-                user1_id: u1,
-                user2_id: u2,
-                item_id: itemId
+                listing_id: listingId,
+                buyer_id: currentUser.id,
+                seller_id: sellerId
             }])
             .select()
             .single();
 
-        if (createError) {
-            console.error('Create conv error:', createError);
-            if (createError.message.includes('column "item_id" does not exist')) {
-                alert('Database error: Please ensure you have run the messaging-upgrade.sql script in your Supabase SQL Editor.');
-            } else {
-                alert(`Could not start conversation: ${createError.message}`);
-            }
-        } else {
-            loadChat(newConv.id);
-            loadConversations();
-        }
+        if (error) throw error;
+        window.selectConversation(newConv.id);
+
+    } catch (err) {
+        console.error('Conv Error:', err);
     }
+}
+
+/**
+ * UI Helpers
+ */
+function formatTime(iso) {
+    const d = new Date(iso);
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) {
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+function formatTimeShort(iso) {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function setupSearch() {
+    const input = document.getElementById('convSearch');
+    if (!input) return;
+    input.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.conversation-item').forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(query) ? 'block' : 'none';
+        });
+    });
 }

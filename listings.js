@@ -82,20 +82,22 @@ function setupEventListeners() {
             const btn = e.target.closest('button');
             if (!btn) return;
 
-            const action = btn.dataset.action;
-            const id = btn.dataset.id;
-
-            if (action === 'buy') {
-                window.location.href = `payment.html?item_id=${id}`;
-            } else if (action === 'contact') {
-                const sellerId = btn.dataset.sellerId;
-                window.location.href = `messages.html?partner_id=${sellerId}&item_id=${id}`;
-            } else if (action === 'view') {
+            // Handle View Button
+            if (btn.dataset.action === 'view') {
+                const id = btn.dataset.id;
                 window.location.href = `item.html?id=${id}`;
+                return;
+            }
+
+            // Handle Contact Button
+            if (btn.classList.contains('contact-seller-btn')) {
+                const sellerId = btn.dataset.sellerId;
+                const listingId = btn.dataset.listingId;
+                window.location.href = `messages.html?seller_id=${sellerId}&listing_id=${listingId}`;
+                return;
             }
         });
     }
-
 }
 
 // Helper: Debounce

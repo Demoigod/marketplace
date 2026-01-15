@@ -48,6 +48,8 @@
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
                 Messages
+                <span class="sidebar-badge" id="sidebarMessagesBadge"
+                    style="display:none; background: #E63946; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; margin-left: auto; font-weight: 700;">0</span>
             </a>
             <a href="#" class="nav-link" data-route="drawing-board">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -103,7 +105,7 @@
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    <span class="badge-dot"></span>
+                    <span class="badge-dot" id="unreadBadgeHeader"></span>
                 </div>
                 <div class="icon-trigger" title="Support">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -204,10 +206,24 @@
 
             <!-- Content Grid Sections -->
             <div class="main-grid">
-                <!-- Activity Feed 1 -->
+                <!-- My Listings Feed (New) -->
                 <div class="grid-card">
                     <div class="card-header">
-                        <h3>Recent Activity</h3>
+                        <h3>My Listings</h3>
+                        <span class="count-badge" id="myListingsCountBadge">0</span>
+                    </div>
+                    <div class="activity-list" id="myListingsFeed">
+                        <!-- User listings injected by JS -->
+                        <div class="loading-state" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                            Loading your listings...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity (Existing) -->
+                <div class="grid-card">
+                    <div class="card-header">
+                        <h3>Community Activity</h3>
                         <a href="#" class="see-all">See all</a>
                     </div>
                     <div class="activity-list" id="activityFeed1">
@@ -261,7 +277,7 @@
         </div>
     </main>
 
-    <script type="module" src="admin.js"></script>
+    <script type="module" src="admin.js?v=7"></script>
 </body>
 
 </html>

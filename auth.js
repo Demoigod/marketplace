@@ -102,13 +102,17 @@ export async function getCurrentUser() {
 
         if (profileError) {
             console.warn('Profile not found, using basic auth data:', profileError.message);
-            // Fallback to basic data from auth metadata
+            // Fallback to basic data from auth metadata + auth object
             return {
                 id: user.id,
+                email: user.email,
                 username: user.user_metadata?.username || user.user_metadata?.name || 'User',
                 first_name: user.user_metadata?.first_name || '',
                 last_name: user.user_metadata?.last_name || '',
                 phone: user.user_metadata?.phone || '',
+                role: user.user_metadata?.role || 'buyer',
+                avatar_url: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_metadata?.username || 'User')}&background=368CBF&color=fff`,
+                immutable_user_code: null,
                 purchases: [],
                 listings: [],
                 sales: [],
@@ -120,37 +124,53 @@ export async function getCurrentUser() {
 
         // Fetch activity data with relational joins
         // Note: Relation names updated to match new schema logic
-        const [
-            { data: purchases },
-            { data: listings },
-            { data: sales },
-            { data: downloads },
-            { data: savedItems },
-            { data: uploadedResources }
-        ] = await Promise.all([
-            // Purchases
-            supabase.from('purchases').select('*').eq('buyer_id', user.id).order('purchase_date', { ascending: false }),
-            // Listings (Seller) - Using market_listings instead of items
-            supabase.from('market_listings').select('*').eq('seller_id', user.id).order('created_at', { ascending: false }),
-            // Sales (Seller) - Note: sales logic using seller_id
-            supabase.from('purchases').select('*').eq('item_id', 'ANY(SELECT id FROM market_listings WHERE seller_id = $1)'),
-            // Downloads with resource details
-            supabase.from('downloads').select('*, resource:free_resources(*)').eq('user_id', user.id).order('download_date', { ascending: false }),
-            // Saved Items
-            supabase.from('saved_items').select('*').eq('profile_id', user.id),
-            // Uploaded Resources (Seller)
-            supabase.from('free_resources').select('*').eq('uploader_id', user.id).order('created_at', { ascending: false })
-        ]);
+        // Initialize activity data with empty defaults
+        let purchases = [], listings = [], sellerListingsForSales = [], downloads = [], savedItems = [], uploadedResources = [];
+
+        try {
+            const results = await Promise.all([
+                supabase.from('purchases').select('*').eq('buyer_id', user.id).order('purchase_date', { ascending: false }).then(r => r.data || []),
+                supabase.from('market_listings').select('*').eq('seller_id', user.id).order('created_at', { ascending: false }).then(r => r.data || []),
+                supabase.from('market_listings').select('id').eq('seller_id', user.id).then(r => r.data || []),
+                supabase.from('downloads').select('*, resource:free_resources(*)').eq('user_id', user.id).order('download_date', { ascending: false }).then(r => r.data || []),
+                supabase.from('saved_items').select('*').eq('profile_id', user.id).then(r => r.data || []),
+                supabase.from('free_resources').select('*').eq('uploader_id', user.id).order('created_at', { ascending: false }).then(r => r.data || [])
+            ]);
+            [purchases, listings, sellerListingsForSales, downloads, savedItems, uploadedResources] = results;
+        } catch (e) {
+            console.warn('Error fetching supplementary activity data:', e.message);
+        }
+
+        // Post-process sales
+        let sales = [];
+        try {
+            if (sellerListingsForSales && sellerListingsForSales.length > 0) {
+                const myItemIds = sellerListingsForSales.map(l => l.id);
+                const { data: salesData } = await supabase
+                    .from('purchases')
+                    .select('*')
+                    .in('item_id', myItemIds);
+                sales = salesData || [];
+            }
+        } catch (e) {
+            console.warn('Could not fetch sales data:', e.message);
+        }
 
         return {
             ...profile,
-            publicUserId: profile?.public_user_id || null, // 6-digit public ID (nullable)
-            purchases: purchases || [],
-            listings: listings || [],
-            sales: sales || [],
-            downloads: downloads || [],
-            savedItems: savedItems || [],
-            uploadedResources: uploadedResources || []
+            id: user.id,
+            first_name: profile?.first_name || user.user_metadata?.first_name || '',
+            last_name: profile?.last_name || user.user_metadata?.last_name || '',
+            username: profile?.username || user.user_metadata?.username || user.user_metadata?.name || 'User',
+            email: profile?.email || user.email || '',
+            phone: profile?.phone_number || user.user_metadata?.phone || '',
+            immutable_user_code: profile?.immutable_user_code || null,
+            purchases: purchases,
+            listings: listings,
+            sales: sales,
+            downloads: downloads,
+            savedItems: savedItems,
+            uploadedResources: uploadedResources
         };
     } catch (error) {
         console.error('Get user error:', error.message);
@@ -275,7 +295,7 @@ export async function toggleSavedItem(itemId) {
         const { data: existing } = await supabase
             .from('saved_items')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('profile_id', user.id)
             .eq('item_id', itemId)
             .single();
 
@@ -284,7 +304,7 @@ export async function toggleSavedItem(itemId) {
             const { error } = await supabase
                 .from('saved_items')
                 .delete()
-                .eq('user_id', user.id)
+                .eq('profile_id', user.id)
                 .eq('item_id', itemId);
 
             if (error) throw error;
@@ -293,7 +313,7 @@ export async function toggleSavedItem(itemId) {
             // Add it
             const { error } = await supabase
                 .from('saved_items')
-                .insert([{ user_id: user.id, item_id: itemId }]);
+                .insert([{ profile_id: user.id, item_id: itemId }]);
 
             if (error) throw error;
             return { success: true, message: 'Item saved', saved: true };
