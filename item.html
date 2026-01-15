@@ -219,7 +219,7 @@
         }
 
         window.handleBuyAction = (itemId) => {
-            alert('Payment integration coming soon! Item ID: ' + itemId);
+            window.location.href = `checkout.html?id=${itemId}`;
         };
 
         window.handleContactAction = (sellerId, listingId) => {
