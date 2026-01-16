@@ -1,6 +1,7 @@
 import { supabase } from './supabase-config.js';
 import { getCurrentUser, logoutUser } from './auth.js';
 
+
 document.addEventListener('DOMContentLoaded', async () => {
     updateDate();
     await initDashboard();
@@ -308,6 +309,130 @@ async function syncProfileUI(existingUser = null) {
                     }
                 }
             });
+
+            // CRITICAL FIX: Inject Avatar Upload UI if User has cached HTML
+            const avatarImg = document.getElementById('profileAvatar');
+            if (avatarImg && !avatarImg.closest('.avatar-upload-wrapper')) {
+                console.log('Detected cached HTML: Injecting Avatar Upload UI...');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'avatar-upload-wrapper';
+                wrapper.style.position = 'relative';
+                wrapper.style.display = 'inline-block';
+
+                // Clone image to preserve it
+                const newImg = avatarImg.cloneNode(true);
+                wrapper.appendChild(newImg);
+
+                // Add Overlay
+                const label = document.createElement('label');
+                label.className = 'avatar-edit-overlay';
+                label.htmlFor = 'avatarInput';
+                label.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+                wrapper.appendChild(label);
+
+                // Add Input
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'avatarInput';
+                input.accept = 'image/*';
+                input.style.display = 'none';
+                wrapper.appendChild(input);
+
+                // Add "Change Photo" Link
+                const linkDiv = document.createElement('div');
+                linkDiv.style.marginTop = '5px';
+                linkDiv.style.marginLeft = '-10px';
+                linkDiv.innerHTML = `<label for="avatarInput" style="font-size: 0.8rem; color: var(--primary-color); cursor: pointer; text-decoration: underline;">Change Photo</label>`;
+
+                // Perform Replacement
+                avatarImg.parentNode.insertBefore(wrapper, avatarImg);
+                avatarImg.parentNode.insertBefore(linkDiv, wrapper.nextSibling);
+                avatarImg.remove(); // Remove old orphan image
+
+                // Add CSS if missing
+                if (!document.getElementById('avatar-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'avatar-styles';
+                    style.textContent = `
+                        .avatar-edit-overlay { position: absolute; bottom: 0; right: 0; background: #368CBF; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; transition: transform 0.2s; }
+                        .avatar-edit-overlay:hover { transform: scale(1.1); }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+
+            // CRITICAL FIX: Inject Username Edit UI if User has cached HTML
+            const usernameInput = document.getElementById('username');
+            if (usernameInput && usernameInput.hasAttribute('readonly') && document.querySelector('.profile-form')) {
+                console.log('Detected cached HTML: Injecting Username Edit UI...');
+
+                // 1. Transform Input
+                usernameInput.removeAttribute('readonly');
+                usernameInput.placeholder = 'Choose a unique username';
+                usernameInput.autocomplete = 'off';
+                usernameInput.classList.add('editable-username'); // Marker
+
+                // 2. Add Feedback Area
+                if (!document.getElementById('usernameFeedback')) {
+                    const feedback = document.createElement('small');
+                    feedback.id = 'usernameFeedback';
+                    feedback.style.display = 'block';
+                    feedback.style.marginTop = '4px';
+                    feedback.style.fontSize = '0.75rem';
+                    feedback.style.minHeight = '1.2em';
+                    usernameInput.parentNode.appendChild(feedback);
+                }
+
+                // 3. Add Save Button
+                if (!document.getElementById('saveProfileBtn')) {
+                    const btnDiv = document.createElement('div');
+                    btnDiv.className = 'form-actions';
+                    btnDiv.style.marginTop = '0.5rem';
+                    btnDiv.style.textAlign = 'right';
+                    btnDiv.innerHTML = `<button id="saveProfileBtn" class="btn-primary" style="padding: 0.75rem 1.5rem; border-radius: 6px; border: none; background: #368CBF; color: white; font-weight: 600; cursor: pointer; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;">Save Changes</button>`;
+                    usernameInput.parentNode.parentNode.appendChild(btnDiv); // append to form-grid or group parent? 
+                    // The structure is form-grid -> form-group -> input. 
+                    // We want the button after the form-group.
+                    usernameInput.parentNode.after(btnDiv);
+                }
+
+                // 4. Attach Logic (Self-contained to bypass stale account.js)
+                const saveBtn = document.getElementById('saveProfileBtn');
+                const feedback = document.getElementById('usernameFeedback');
+                let originalName = usernameInput.value;
+
+                usernameInput.addEventListener('focus', () => { if (!originalName) originalName = usernameInput.value; });
+                usernameInput.addEventListener('input', (e) => {
+                    const val = e.target.value.trim();
+                    const valid = /^[a-zA-Z0-9_]{3,20}$/.test(val);
+                    if (val === originalName) {
+                        saveBtn.style.opacity = '0.5'; saveBtn.style.pointerEvents = 'none'; feedback.textContent = ''; usernameInput.style.borderColor = '#d1d5db';
+                    } else if (!valid) {
+                        saveBtn.style.opacity = '0.5'; saveBtn.style.pointerEvents = 'none'; feedback.textContent = 'Invalid format (3-20 chars, alphanumeric/_)'; feedback.style.color = 'red'; usernameInput.style.borderColor = 'red';
+                    } else {
+                        saveBtn.style.opacity = '1'; saveBtn.style.pointerEvents = 'auto'; feedback.textContent = 'Looks good!'; feedback.style.color = 'green'; usernameInput.style.borderColor = 'green';
+                    }
+                });
+
+                saveBtn.addEventListener('click', async () => {
+                    const newName = usernameInput.value.trim();
+                    saveBtn.textContent = 'Saving...'; saveBtn.disabled = true;
+                    try {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) throw new Error('Not logged in');
+                        const { error } = await supabase.from('profiles').update({ username: newName }).eq('id', user.id);
+                        if (error) { if (error.code === '23505') throw new Error('Username taken'); else throw error; }
+                        alert('Username updated!');
+                        originalName = newName;
+                        saveBtn.textContent = 'Saved';
+                        setTimeout(() => { saveBtn.textContent = 'Save Changes'; saveBtn.style.opacity = '0.5'; saveBtn.style.pointerEvents = 'none'; }, 2000);
+                    } catch (err) {
+                        alert(err.message);
+                        saveBtn.textContent = 'Save Changes'; saveBtn.disabled = false;
+                    }
+                });
+            }
+
             console.log('--- SYNC SUCCESSFUL ---');
         };
 
