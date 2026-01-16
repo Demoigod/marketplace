@@ -1,4 +1,4 @@
-import{s as v}from"./auth-BNhlD6S9.js";/* empty css              */import"./admin-C48qMl0r.js";document.addEventListener("DOMContentLoaded",async()=>{const t=new URLSearchParams(window.location.search).get("id");if(!t){window.location.href="listings.html";return}f(t)});async function f(a){var r,n,o,l;const t=document.getElementById("itemDetailContainer");try{const{data:e,error:p}=await v.from("market_listings").select(`
+import{s as v}from"./auth-BNhlD6S9.js";/* empty css              */import"./admin-Bu9uiZ5z.js";document.addEventListener("DOMContentLoaded",async()=>{const t=new URLSearchParams(window.location.search).get("id");if(!t){window.location.href="listings.html";return}f(t)});async function f(a){var r,n,o,l;const t=document.getElementById("itemDetailContainer");try{const{data:e,error:p}=await v.from("market_listings").select(`
                         *,
                         profiles (
                             username,

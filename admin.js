@@ -338,15 +338,8 @@ async function syncProfileUI(existingUser = null) {
                 input.style.display = 'none';
                 wrapper.appendChild(input);
 
-                // Add "Change Photo" Link
-                const linkDiv = document.createElement('div');
-                linkDiv.style.marginTop = '5px';
-                linkDiv.style.marginLeft = '-10px';
-                linkDiv.innerHTML = `<label for="avatarInput" style="font-size: 0.8rem; color: var(--primary-color); cursor: pointer; text-decoration: underline;">Change Photo</label>`;
-
                 // Perform Replacement
                 avatarImg.parentNode.insertBefore(wrapper, avatarImg);
-                avatarImg.parentNode.insertBefore(linkDiv, wrapper.nextSibling);
                 avatarImg.remove(); // Remove old orphan image
 
                 // Add CSS if missing
