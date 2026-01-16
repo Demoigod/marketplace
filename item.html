@@ -154,15 +154,39 @@
 
                 if (error || !item) throw new Error('Item not found or has been removed.');
 
-                const mainImage = item.image_url || (item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/600x400?text=No+Image');
+                // Consolidate images: prioritize image_url, then images array
+                let images = [];
+                if (item.image_url) images.push(item.image_url);
+                if (item.images && Array.isArray(item.images)) {
+                    item.images.forEach(img => {
+                        if (img && !images.includes(img)) images.push(img);
+                    });
+                }
+                if (images.length === 0) images.push('https://via.placeholder.com/600x400?text=No+Image');
+
+                const mainImage = images[0];
                 const sellerName = item.profiles?.username || item.profiles?.full_name || 'Anonymous Seller';
                 const sellerId = item.profiles?.immutable_user_code || item.seller_id.slice(0, 6).toUpperCase();
                 const sellerAvatar = item.profiles?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(sellerName)}&background=368CBF&color=fff`;
 
+                // Build Thumbnails HTML
+                let thumbnailsHtml = '';
+                if (images.length > 1) {
+                    thumbnailsHtml = `<div class="detail-thumbnails">` +
+                        images.map((img, index) => `
+                            <img src="${img}" 
+                                 class="thumbnail-img ${index === 0 ? 'active' : ''}" 
+                                 onclick="changeMainImage('${img}', this)"
+                                 alt="Thumbnail ${index + 1}">
+                        `).join('') +
+                        `</div>`;
+                }
+
                 container.innerHTML = `
                     <div class="item-detail-container">
                         <div class="detail-visuals">
-                            <img src="${mainImage}" alt="${item.title}" class="detail-main-img">
+                            <img src="${mainImage}" alt="${item.title}" class="detail-main-img" id="mainImageDisplay">
+                            ${thumbnailsHtml}
                         </div>
                         <div class="detail-info-panel">
                             <span class="detail-category">${item.category || 'MARKETPLACE'}</span>
@@ -217,6 +241,16 @@
                 `;
             }
         }
+
+        window.changeMainImage = (src, thumbEl) => {
+            const mainImg = document.getElementById('mainImageDisplay');
+            if (mainImg) {
+                mainImg.src = src;
+                // Update active state
+                document.querySelectorAll('.thumbnail-img').forEach(el => el.classList.remove('active'));
+                if (thumbEl) thumbEl.classList.add('active');
+            }
+        };
 
         window.handleBuyAction = (itemId) => {
             window.location.href = `checkout.html?id=${itemId}`;
