@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Campus Market</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .checkout-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 2.5rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 3rem;
+        }
+
+        .checkout-left {
+            padding-right: 2rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .checkout-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkout-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .item-summary-card {
+            display: flex;
+            gap: 1rem;
+            background: #F8F9FA;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            align-items: center;
+        }
+
+        .summary-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-info h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-info .price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .payment-method-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-method-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(54, 140, 191, 0.05);
+        }
+
+        .payment-method-card svg {
+            color: var(--text-muted);
+        }
+
+        .payment-method-card.selected svg {
+            color: var(--primary-color);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--border-color);
+        }
+
+        .btn-confirm-pay {
+            width: 100%;
+            padding: 1rem;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-confirm-pay:hover {
+            filter: brightness(1.1);
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 800px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .checkout-left {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding-right: 0;
+                padding-bottom: 2rem;
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/checkout-1Dt84Sug.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/auth-BNhlD6S9.js">
+  <link rel="stylesheet" crossorigin href="./assets/messages-B7KBawK7.css">
+</head>
+
+<body>
+    <!-- Persistent Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+            <span class="logo-text">Logo</span>
+        </div>
+
+        <div class="nav-group">
+            <a href="admin.html" class="nav-link">
+                <!-- Icon --> Dashboard
+            </a>
+            <a href="listings.html" class="nav-link active">
+                <!-- Icon --> Market Listings
+            </a>
+            <a href="my-listings.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                My Listings
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="listings.html" class="nav-link" style="color: var(--text-muted);">
+                Cancelled
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Viewport Area -->
+    <main class="main-viewport">
+        <!-- Top Header via admin.js -->
+        <header class="top-header">
+            <div class="search-wrapper"></div>
+            <div class="header-right">
+                <div class="user-info-trigger" id="profileToggle">
+                    <div class="user-meta">
+                        <span class="user-name" id="userName">User</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="welcome-row">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="#" onclick="window.history.back()" style="color: var(--text-muted);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                    <h1>Secure Checkout 🔒</h1>
+                </div>
+            </div>
+
+            <div id="checkoutLoading" class="p-8 text-center" style="display: none;">
+                Loading Order Details...
+            </div>
+
+            <div class="checkout-container" id="checkoutUI">
+                <!-- Review Order -->
+                <div class="checkout-left">
+                    <div class="checkout-section">
+                        <h3 class="section-title">
+                            1. Order Summary
+                        </h3>
+                        <div class="item-summary-card" id="itemSummaryCard">
+                            <!-- Populated via JS -->
+                            <div style="height: 80px; width: 80px; background: #eee; border-radius: 8px;"></div>
+                            <div>
+                                <div style="height: 20px; width: 150px; background: #eee; margin-bottom: 8px;"></div>
+                                <div style="height: 24px; width: 100px; background: #eee;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="checkout-section">
+                        <h3 class="section-title">2. Buyer Details</h3>
+                        <div style="background: #F8F9FA; padding: 1rem; border-radius: 8px;">
+                            <p id="buyerName" style="font-weight: 700;">Loading...</p>
+                            <p id="buyerId" style="color: var(--text-muted); font-size: 0.9rem;">ID: ...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment details -->
+                <div class="checkout-right">
+                    <div class="checkout-section">
+                        <h3 class="section-title">3. Payment Method</h3>
+
+                        <div class="payment-method-card selected" onclick="selectPayment('card')">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                            <div>
+                                <div style="font-weight: 600;">Credit / Debit Card</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Secure encryption</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-method-card" onclick="selectPayment('cash')">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                                <circle cx="12" cy="12" r="2"></circle>
+                                <path d="M6 12h.01M18 12h.01"></path>
+                            </svg>
+                            <div>
+                                <div style="font-weight: 600;">Cash on Meetup</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Pay when you collect</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="total-row">
+                        <span>Total to Pay</span>
+                        <span id="totalAmount">R 0.00</span>
+                    </div>
+
+                    <button id="confirmOrderBtn" class="btn-confirm-pay" onclick="processCheckout()">
+                        Confirm & Pay R 0.00
+                    </button>
+
+                    <div class="secure-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Payments secured by CampusMarket</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function selectPayment(method) {
+            document.querySelectorAll('.payment-method-card').forEach(el => el.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+    </script>
+</body>
+
+</html>

@@ -14,6 +14,8 @@ export default defineConfig({
                 'free-resources': resolve(__dirname, 'free-resources.html'),
                 account: resolve(__dirname, 'account.html'),
                 'post-item': resolve(__dirname, 'post-item.html'),
+                'my-listings': resolve(__dirname, 'my-listings.html'),
+                checkout: resolve(__dirname, 'checkout.html'),
             },
         },
     },

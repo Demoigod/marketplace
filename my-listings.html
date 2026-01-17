@@ -4,9 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Listings - Campus Market</title>
-    <link rel="stylesheet" href="admin.css?v=7">
+    <title>My Listings - Campus Market</title>
+    <link rel="stylesheet" href="admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .status-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-select {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,14 +58,14 @@
                 </svg>
                 Dashboard
             </a>
-            <a href="listings.html" class="nav-link active">
+            <a href="listings.html" class="nav-link">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                 </svg>
                 Market Listings
             </a>
-            <a href="my-listings.html" class="nav-link">
+            <a href="my-listings.html" class="nav-link active">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -104,26 +133,14 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="listingsSearch" placeholder="What are you looking for?">
+                <input type="text" id="myListingsSearch" placeholder="Search your listings...">
             </div>
 
             <div class="header-right">
-                <div class="icon-trigger" title="Notifications">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="badge-dot"></span>
-                </div>
-                <div class="icon-trigger" title="Support">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                </div>
                 <div class="user-info-trigger" id="profileToggle">
                     <div class="user-meta">
                         <span class="user-name" id="userName">User</span>
-                        <span class="user-id" id="userId">ID: DAC3E0</span>
+                        <span class="user-id" id="userId">ID: ...</span>
                     </div>
                     <img src="" alt="Avatar" class="avatar-sm" id="topNavAvatar">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -136,22 +153,22 @@
         <!-- Dynamic Content -->
         <div class="dashboard-content">
             <div class="welcome-row">
-                <h1>Market Listings 🛒</h1>
-                <p class="date-sub">Browse and manage available items on campus.</p>
+                <h1>My Listings 📦</h1>
+                <p class="date-sub">Manage items you are selling. Update status or remove listings.</p>
             </div>
 
-            <!-- Marketplace Grid -->
-            <div id="marketplaceGrid" class="marketplace-grid">
+            <!-- My Listings Grid -->
+            <div id="myListingsGrid" class="marketplace-grid">
                 <div class="loading-state"
                     style="padding: 100px; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
-                    Loading the finest items...
+                    Loading your inventory...
                 </div>
             </div>
         </div>
     </main>
 
-    <script type="module" src="admin.js?v=7"></script>
-    <script type="module" src="listings.js"></script>
+    <script type="module" src="admin.js"></script>
+    <script type="module" src="my-listings.js"></script>
 </body>
 
 </html>
