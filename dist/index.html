@@ -319,10 +319,10 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="./assets/main-DMHPxT9H.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/auth-BNhlD6S9.js">
-  <link rel="modulepreload" crossorigin href="./assets/save-item-CqwqWcBg.js">
-  <link rel="stylesheet" crossorigin href="./assets/styles-CpItMm-6.css">
+  <script type="module" crossorigin src="/assets/main-DMHPxT9H.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/auth-BNhlD6S9.js">
+  <link rel="modulepreload" crossorigin href="/assets/save-item-CqwqWcBg.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles-CpItMm-6.css">
 </head>
 
 <body>
@@ -588,7 +588,75 @@
         </div>
     </footer>
 
-    <!-- Auth Modal (rendered by navbar.js) -->
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="authModalTitle">Login</h3>
+                <button class="modal-close" id="closeAuthModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </button>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="upload-form" style="display: block;">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn-primary btn-full">Login</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="upload-form" style="display: none;">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="registerFirstName">First Name</label>
+                        <input type="text" id="registerFirstName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerLastName">Last Name</label>
+                        <input type="text" id="registerLastName" required placeholder="Doe">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="registerUsername">Username</label>
+                    <input type="text" id="registerUsername" required placeholder="johndoe123">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone Number</label>
+                    <input type="text" id="registerPhone" required placeholder="e.g., +27 12 345 6789">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="registerRole">I want to</label>
+                    <select id="registerRole" required>
+                        <option value="">Select your primary role</option>
+                        <option value="buyer">Buy items</option>
+                        <option value="seller">Sell items</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Register</button>
+            </form>
+        </div>
+    </div>
 
 </body>
 
