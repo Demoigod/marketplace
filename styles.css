@@ -6,46 +6,44 @@
 }
 
 :root {
-    /* ===== PROFESSIONAL COLOR PALETTE ===== */
+    /* ===== STUDENT-FRIENDLY COLOR PALETTE ===== */
+    /* Based on color psychology for trust, approachability, and low fatigue */
 
-    /* Primary Colors */
-    --primary-color: #1E40AF;
-    /* Deep Blue - Trust, security, professionalism */
+    /* Primary - Muted Blue (Trust & Academic) */
+    --primary-color: #2563EB;
+    --primary-hover: #1D4ED8;
+    --color-primary: #2563EB;
+
+    /* Secondary - Soft Teal (Growth & Learning) */
     --secondary-color: #14B8A6;
-    /* Teal - Fresh, modern, friendly */
-    --accent-color: #F59E0B;
-    /* Amber - Attention-grabbing CTAs */
+    --secondary-hover: #0F766E;
+    --color-accent: #14B8A6;
 
-    /* Neutrals (UI Foundation) */
-    --bg-primary: #F9FAFB;
-    /* Off-White background */
+    /* Accent - Warm Amber (Action, <10% usage) */
+    --accent-color: #F59E0B;
+    --accent-hover: #D97706;
+
+    /* Neutral Foundation (Content-First) */
+    --bg-primary: #F8FAFC;
     --bg-secondary: #FFFFFF;
-    /* White cards/panels */
+    --bg-app: #F8FAFC;
     --border-color: #E5E7EB;
-    /* Light Gray borders */
+
+    /* Text Colors */
     --text-main: #111827;
-    /* Charcoal primary text */
+    --text-primary: #111827;
     --text-muted: #6B7280;
-    /* Muted Gray secondary text */
-    --text-light: #ffffff;
-    /* White text on dark backgrounds */
+    --text-secondary: #6B7280;
+    --text-light: #FFFFFF;
 
     /* Status Colors */
     --color-success: #22C55E;
-    /* Green */
-    --color-warning: #FACC15;
-    /* Yellow */
+    --color-warning: #F59E0B;
     --color-error: #EF4444;
-    /* Red */
     --color-info: #3B82F6;
-    /* Blue */
 
-    /* Legacy Compatibility (mapped to new colors) */
-    --bg-secondary-old: #1E40AF;
-    --color-primary: #1E40AF;
-    --color-accent: #14B8A6;
-    --text-primary: #111827;
-    --text-secondary: #6B7280;
+    /* Legacy Compatibility */
+    --bg-secondary-old: #2563EB;
 
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -65,7 +63,7 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
-    --shadow-hover: 0 12px 40px rgba(30, 64, 175, 0.2);
+    --shadow-hover: 0 12px 40px rgba(37, 99, 235, 0.2);
 
     /* Transitions */
     --transition-fast: 0.2s ease;
