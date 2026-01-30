@@ -1,4 +1,4 @@
-import{g as l,s as r}from"./auth-BNhlD6S9.js";import"./admin-D-9K85UC.js";document.addEventListener("DOMContentLoaded",async()=>{const t=await l();if(!t){window.location.href="index.html";return}await c(t.id)});async function c(t){const a=document.getElementById("myListingsGrid");try{const{data:e,error:o}=await r.from("market_listings").select("*").eq("seller_id",t).order("created_at",{ascending:!1});if(o)throw o;if(!e||e.length===0){a.innerHTML=`
+import{g as l,s as r}from"./auth-B4SlU3WG.js";import"./admin-Chfn7G1P.js";document.addEventListener("DOMContentLoaded",async()=>{const t=await l();if(!t){window.location.href="index.html";return}await c(t.id)});async function c(t){const a=document.getElementById("myListingsGrid");try{const{data:e,error:o}=await r.from("market_listings").select("*").eq("seller_id",t).order("created_at",{ascending:!1});if(o)throw o;if(!e||e.length===0){a.innerHTML=`
                 <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
                     <h3>No listings found</h3>
                     <p>You haven't listed any items for sale yet.</p>

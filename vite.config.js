@@ -16,6 +16,7 @@ export default defineConfig({
                 'post-item': resolve(__dirname, 'post-item.html'),
                 'my-listings': resolve(__dirname, 'my-listings.html'),
                 checkout: resolve(__dirname, 'checkout.html'),
+                'skills-hub': resolve(__dirname, 'skills-hub.html'),
             },
         },
     },

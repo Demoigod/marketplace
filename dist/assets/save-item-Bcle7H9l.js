@@ -1,4 +1,4 @@
-import{i as d,s,g as v}from"./auth-BNhlD6S9.js";async function p(){try{if(await d()){console.log("Fetching items with profile data (authenticated)...");const{data:i,error:a}=await s.from("market_listings").select(`
+import{i as d,s,g as v}from"./auth-B4SlU3WG.js";async function p(){try{if(await d()){console.log("Fetching items with profile data (authenticated)...");const{data:i,error:a}=await s.from("market_listings").select(`
                     *,
                     profiles (
                         username,

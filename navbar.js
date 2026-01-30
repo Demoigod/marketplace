@@ -44,6 +44,9 @@ async function renderDesktopNav() {
                 <a href="index.html?type=free" class="menu-item" role="menuitem">
                     Free Resources
                 </a>
+                <a href="skills-hub.html" class="menu-item" role="menuitem">
+                    Skills Hub
+                </a>
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-header">Categories</div>
                 <a href="index.html?category=electronics" class="menu-item" role="menuitem">Electronics</a>
@@ -63,6 +66,7 @@ async function renderDesktopNav() {
             <div class="nav-links">
                  <a href="#" id="navPostItem" class="nav-link">Post Item</a>
                  <a href="admin.html" class="nav-link">Dashboard</a>
+                 <a href="skills-hub.html" class="nav-link">Skills Hub</a>
                  <a href="messages.html" class="nav-link">Messages</a>
             </div>
             <div class="dropdown-container" id="profileDropdown" style="margin-left: 8px;">

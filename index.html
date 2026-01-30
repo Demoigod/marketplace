@@ -48,6 +48,10 @@
             font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.2;
+            background: linear-gradient(135deg, white 0%, #bfdbfe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .hero-subtitle {
@@ -55,6 +59,10 @@
             margin-bottom: 2.5rem;
             opacity: 0.95;
             font-weight: 400;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
         }
 
         .hero-ctas {
@@ -350,15 +358,22 @@
     <!-- Hero Section -->
     <section class="landing-hero">
         <div class="hero-content">
-            <h1 class="hero-title">Buy, Sell & Share Resources Securely</h1>
-            <p class="hero-subtitle">A trusted marketplace for students and creators. Connect safely, trade confidently,
-                and access free resources.</p>
-
-            <div class="hero-ctas" id="heroAuthCtas">
-                <button class="btn-hero-primary" id="heroSignupBtn">Sign Up to Get Started</button>
-                <button class="btn-hero-secondary"
-                    onclick="document.getElementById('marketplace')?.scrollIntoView({behavior: 'smooth'})">Browse
-                    Listings</button>
+            <h1 class="hero-title">Buy, Sell, Learn & <br>Grow Together</h1>
+            <p class="hero-subtitle">
+                The all-in-one student platform. Buy and sell textbooks, access free study resources, and master new
+                skills to level up your career.
+            </p>
+            <div class="hero-ctas">
+                <button class="btn-hero-primary" onclick="window.location.href='index.html?type=market'">
+                    Browse Market
+                </button>
+                <button class="btn-hero-secondary" onclick="window.location.href='index.html?type=free'">
+                    Free Resources
+                </button>
+                <button class="btn-hero-secondary" onclick="window.location.href='skills-hub.html'"
+                    style="border-color: #FCD34D; color: #FCD34D;">
+                    Start Learning
+                </button>
             </div>
         </div>
     </section>
@@ -506,6 +521,79 @@
 
             <div id="resourcesGrid" class="marketplace-grid">
                 <!-- Resources injected by script.js -->
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="window.location.href='index.html?type=free'"
+                    style="background: transparent; border: 1px solid #2563EB; color: #2563EB; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600;">View
+                    All Resources</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Hub Preview (New Pillar) -->
+    <section id="skills" class="marketplace-section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Master New Skills</h2>
+                    <p class="section-subtitle">Level up your career with student-focused guides.</p>
+                </div>
+                <!-- View Toggle could go here -->
+            </div>
+
+            <div class="marketplace-grid">
+                <!-- Static Preview Cards for Skills -->
+                <div class="marketplace-item" onclick="window.location.href='skills-hub.html'">
+                    <div class="item-image"
+                        style="background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        🐍
+                    </div>
+                    <div class="item-content">
+                        <span class="item-category" style="color: #2563EB; background: #eff6ff;">Tech</span>
+                        <h3 class="item-title">Intro to Python</h3>
+                        <p class="item-description">Learn the basics of Python programming for data science.</p>
+                        <div class="item-footer" style="border-top: none; padding-top: 0;">
+                            <span style="font-size: 0.85rem; color: #059669; font-weight: 600;">● Beginner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="marketplace-item" onclick="window.location.href='skills-hub.html'">
+                    <div class="item-image"
+                        style="background: linear-gradient(135deg, #fce7f3 0%, #ffffff 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        🎨
+                    </div>
+                    <div class="item-content">
+                        <span class="item-category" style="color: #db2777; background: #fdf2f8;">Design</span>
+                        <h3 class="item-title">Graphic Design 101</h3>
+                        <p class="item-description">Master color theory and typography basics.</p>
+                        <div class="item-footer" style="border-top: none; padding-top: 0;">
+                            <span style="font-size: 0.85rem; color: #059669; font-weight: 600;">● Beginner</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="marketplace-item" onclick="window.location.href='skills-hub.html'">
+                    <div class="item-image"
+                        style="background: linear-gradient(135deg, #dcfce7 0%, #ffffff 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem;">
+                        💰
+                    </div>
+                    <div class="item-content">
+                        <span class="item-category" style="color: #059669; background: #ecfdf5;">Business</span>
+                        <h3 class="item-title">Student Finance</h3>
+                        <p class="item-description">Budgeting and saving tips for university life.</p>
+                        <div class="item-footer" style="border-top: none; padding-top: 0;">
+                            <span style="font-size: 0.85rem; color: #059669; font-weight: 600;">● Beginner</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <button onclick="window.location.href='skills-hub.html'"
+                    style="background: #2563EB; color: white; border: none; padding: 1rem 2rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);">Start
+                    Learning Now</button>
             </div>
         </div>
     </section>
