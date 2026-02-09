@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - Campus Market</title>
+    <meta name="description" content="Browse and buy from verified student sellers.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css"> <!-- Reusing admin styles for consistent dashboard feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script type="module" src="auth.js"></script>
+    <style>
+        /* Specific overrides for market.html */
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .marketplace-section {
+            padding-top: 2rem;
+            background: transparent;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="market.html" class="logo">
+                    <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+                        <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
+                        <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
+                        <defs>
+                            <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#2563EB" />
+                                <stop offset="100%" stop-color="#14B8A6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">Campus Market</span>
+                </a>
+
+                <!-- Navigation rendered by navbar.js -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Marketplace Section -->
+    <section id="marketplace" class="marketplace-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Browse Market</h2>
+                <!-- Optional Search / Filter Controls here -->
+            </div>
+
+            <!-- Category Filters -->
+            <div class="category-filters" style="margin-bottom: 2rem;">
+                <button class="category-chip active" data-category="all">All Items</button>
+                <button class="category-chip" data-category="electronics">Electronics</button>
+                <button class="category-chip" data-category="books">Books</button>
+                <button class="category-chip" data-category="furniture">Furniture</button>
+                <button class="category-chip" data-category="services">Services</button>
+                <button class="category-chip" data-category="clothing">Clothing</button>
+            </div>
+
+            <!-- Marketplace Grid -->
+            <div id="marketplaceGrid" class="marketplace-grid">
+                <div class="loading-state"
+                    style="padding: 100px; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+                    Loading items...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="script.js"></script>
+    <script type="module">
+        import { getCurrentUser } from './auth.js';
+
+        // Protect Market Page - Redirect to index if not logged in
+        (async () => {
+            const user = await getCurrentUser();
+            if (!user) {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+</body>
+
+</html>

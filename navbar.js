@@ -75,8 +75,9 @@ async function renderDesktopNav() {
         } else {
             // Buyer / Student View
             linksHtml = `
-                 <a href="index.html?type=market" class="nav-link">Marketplace</a>
-                 <a href="skills-hub.html" class="nav-link">Skills Hub</a>
+                 <a href="market.html" class="nav-link">Browse Market</a>
+                 <a href="become-seller.html" class="nav-link">Become a Seller</a>
+                 <a href="skills-hub.html" class="nav-link">Learn</a>
                  <a href="messages.html" class="nav-link">Messages</a>
             `;
         }

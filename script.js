@@ -51,16 +51,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateAuthUI();
 
     // Homepage Guard: Redirect authenticated users based on role
-    const session = await isLoggedIn();
-    if (session) {
-        const user = await getCurrentUser();
-        // If seller, go to dashboard
-        if (user?.role === 'seller') {
-            window.location.href = 'admin.html';
-            return;
+    const currentPath = window.location.pathname;
+    const isHomePage = currentPath.endsWith('index.html') || currentPath.endsWith('/') || currentPath === '/';
+
+    if (isHomePage) {
+        const session = await isLoggedIn();
+        if (session) {
+            const user = await getCurrentUser();
+            // If seller, go to dashboard
+            if (user?.role === 'seller') {
+                window.location.href = 'admin.html';
+                return;
+            } else {
+                // Buyers go to market
+                window.location.href = 'market.html';
+                return;
+            }
         }
-        // If buyer, stay here but maybe ensure market view? 
-        // For now, we let them stay on index.html as it is the marketplace.
     }
 
     // Initial content load
@@ -91,11 +98,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (user?.role === 'seller') {
                     window.location.href = 'admin.html';
                 } else {
-                    // Get current params to preserve them if needed, or default to market
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if (!urlParams.has('type') && !urlParams.has('category')) {
-                        window.location.href = 'index.html?type=market';
-                    }
+                    // Buyers go to the dedicated market page
+                    window.location.href = 'market.html';
                 }
             }
         }
@@ -104,12 +108,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function updateAuthUI() {
     const user = await getCurrentUser();
+
+    // Landing page sections to toggle
+    const heroSection = document.querySelector('.landing-hero');
+    const trustSection = document.querySelector('.trust-section');
+    const howItWorksSection = document.querySelector('.how-it-works');
     const heroAuthCtas = document.getElementById('heroAuthCtas');
 
     if (user) {
+        // Hide marketing fluff for logged-in users
+        if (heroSection) heroSection.style.display = 'none';
+        if (trustSection) trustSection.style.display = 'none';
+        if (howItWorksSection) howItWorksSection.style.display = 'none';
         if (heroAuthCtas) heroAuthCtas.style.display = 'none';
-        // Authentication state is handled by navbar.js renderDesktopNav
     } else {
+        // Show for guests
+        if (heroSection) heroSection.style.display = 'block';
+        if (trustSection) trustSection.style.display = 'block';
+        if (howItWorksSection) howItWorksSection.style.display = 'block';
         if (heroAuthCtas) heroAuthCtas.style.display = 'flex';
         setupHeroListeners();
     }
@@ -273,7 +289,7 @@ function setupEventListeners() {
                 if (user?.role === 'seller') {
                     window.location.href = 'admin.html';
                 } else {
-                    window.location.href = 'index.html?type=market';
+                    window.location.href = 'market.html';
                 }
             } else {
                 alert(result.message);
@@ -305,7 +321,7 @@ function setupEventListeners() {
                     window.location.href = 'admin.html';
                 } else {
                     // Default for new buyers
-                    window.location.href = 'index.html?type=market';
+                    window.location.href = 'market.html';
                 }
             } else {
                 alert(result.message);
