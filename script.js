@@ -50,11 +50,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check auth status to update UI
     await updateAuthUI();
 
-    // Homepage Guard: Redirect authenticated users to Dashboard
+    // Homepage Guard: Redirect authenticated users based on role
     const session = await isLoggedIn();
     if (session) {
-        window.location.href = 'admin.html';
-        return; // Stop initialization if redirecting
+        const user = await getCurrentUser();
+        // If seller, go to dashboard
+        if (user?.role === 'seller') {
+            window.location.href = 'admin.html';
+            return;
+        }
+        // If buyer, stay here but maybe ensure market view? 
+        // For now, we let them stay on index.html as it is the marketplace.
     }
 
     // Initial content load
@@ -73,11 +79,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
 
     // Global Auth Logic: Handle redirects on state change (Logout)
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_OUT') {
             window.location.href = 'index.html';
-        } else if (event === 'SIGNED_IN' && window.location.pathname.endsWith('index.html')) {
-            window.location.href = 'admin.html';
+        } else if (event === 'SIGNED_IN') {
+            const user = await getCurrentUser();
+            const currentPath = window.location.pathname;
+
+            // Redirect logic for Homepage / Index
+            if (currentPath.endsWith('index.html') || currentPath.endsWith('/') || currentPath === '/') {
+                if (user?.role === 'seller') {
+                    window.location.href = 'admin.html';
+                } else {
+                    // Get current params to preserve them if needed, or default to market
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (!urlParams.has('type') && !urlParams.has('category')) {
+                        window.location.href = 'index.html?type=market';
+                    }
+                }
+            }
         }
     });
 });
@@ -248,7 +268,13 @@ function setupEventListeners() {
             const password = document.getElementById('loginPassword').value;
             const result = await loginUser(email, password);
             if (result.success) {
-                window.location.href = 'admin.html';
+                // Fetch user to check role
+                const user = await getCurrentUser();
+                if (user?.role === 'seller') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html?type=market';
+                }
             } else {
                 alert(result.message);
             }
@@ -270,7 +296,17 @@ function setupEventListeners() {
 
             const result = await registerUser(email, password, userData);
             if (result.success) {
-                window.location.href = 'admin.html';
+                // Fetch user to check role, or rely on what we just sent
+                const user = await getCurrentUser(); // Better to fetch fresh state or rely on metadata if instant
+
+                // For new users, role comes from the form select or default
+                // But let's trust the profile/session
+                if (user?.role === 'seller') {
+                    window.location.href = 'admin.html';
+                } else {
+                    // Default for new buyers
+                    window.location.href = 'index.html?type=market';
+                }
             } else {
                 alert(result.message);
             }

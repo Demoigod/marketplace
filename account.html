@@ -308,6 +308,35 @@
 
     <script type="module" src="admin.js"></script>
     <script type="module" src="account.js"></script>
+    <script type="module">
+        import { getCurrentUser } from './auth.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await getCurrentUser();
+            if (user) {
+                const roleBadge = document.getElementById('detailsRoleBadge');
+                const sellerStatusCard = document.getElementById('sellerStatusCard');
+                const becomeSellerBtn = document.getElementById('becomeSellerBtn');
+                const sellerStatusText = document.getElementById('sellerStatusText');
+
+                if (roleBadge) {
+                    roleBadge.textContent = user.role === 'seller' ? 'Verified Seller' : 'Student / Buyer';
+                    roleBadge.className = user.role === 'seller' ? 'badge success' : 'badge';
+                }
+
+                if (sellerStatusCard) {
+                    if (user.role === 'seller') {
+                        sellerStatusText.textContent = "You are a verified seller. You have full access to the dashboard.";
+                        becomeSellerBtn.style.display = 'none';
+                        // Optional: Add a "Go to Dashboard" button here instead
+                    } else {
+                        sellerStatusText.textContent = "You are currently a buyer. Verify your student status to start selling items.";
+                        becomeSellerBtn.style.display = 'block';
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

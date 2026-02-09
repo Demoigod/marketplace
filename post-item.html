@@ -325,6 +325,17 @@
 
     <script type="module" src="admin.js?v=7"></script>
     <script type="module" src="post-item.js"></script>
+    <script type="module">
+        import { getCurrentUser } from './auth.js';
+
+        // Protect Post Item Page
+        (async () => {
+            const user = await getCurrentUser();
+            if (!user || user.role !== 'seller') {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
 </body>
 
 </html>

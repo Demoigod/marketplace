@@ -16,7 +16,9 @@ export async function registerUser(email, password, userData) {
                     last_name: lastName,
                     username: username,
                     phone: phone,
-                    role: role
+                    username: username,
+                    phone: phone,
+                    role: role || 'user'
                 }
             }
         });
@@ -88,6 +90,7 @@ export async function isLoggedIn() {
 export const checkAuthStatus = isLoggedIn;
 
 // Get current user profile data
+// Get current user profile data
 export async function getCurrentUser() {
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -96,34 +99,21 @@ export async function getCurrentUser() {
         // Fetch additional profile data from profiles table
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('*')
+            .select('*, role')
             .eq('id', user.id)
             .single();
 
+        let userProfile = { ...user };
+
         if (profileError) {
-            console.warn('Profile not found, using basic auth data:', profileError.message);
-            // Fallback to basic data from auth metadata + auth object
-            return {
-                id: user.id,
-                email: user.email,
-                username: user.user_metadata?.username || user.user_metadata?.name || 'User',
-                first_name: user.user_metadata?.first_name || '',
-                last_name: user.user_metadata?.last_name || '',
-                phone: user.user_metadata?.phone || '',
-                role: user.user_metadata?.role || 'buyer',
-                avatar_url: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_metadata?.username || 'User')}&background=368CBF&color=fff`,
-                immutable_user_code: null,
-                purchases: [],
-                listings: [],
-                sales: [],
-                downloads: [],
-                savedItems: [],
-                uploadedResources: []
-            };
+            console.warn('Error fetching profile:', profileError.message);
+            // Return auth user with default role if profile fetch fails
+            userProfile = { ...user, role: 'user' };
+        } else {
+            userProfile = { ...user, ...profile };
         }
 
         // Fetch activity data with relational joins
-        // Note: Relation names updated to match new schema logic
         // Initialize activity data with empty defaults
         let purchases = [], listings = [], sellerListingsForSales = [], downloads = [], savedItems = [], uploadedResources = [];
 
@@ -157,14 +147,15 @@ export async function getCurrentUser() {
         }
 
         return {
-            ...profile,
+            ...userProfile,
             id: user.id,
-            first_name: profile?.first_name || user.user_metadata?.first_name || '',
-            last_name: profile?.last_name || user.user_metadata?.last_name || '',
-            username: profile?.username || user.user_metadata?.username || user.user_metadata?.name || 'User',
-            email: profile?.email || user.email || '',
-            phone: profile?.phone_number || user.user_metadata?.phone || '',
-            immutable_user_code: profile?.immutable_user_code || null,
+            first_name: userProfile.first_name || user.user_metadata?.first_name || '',
+            last_name: userProfile.last_name || user.user_metadata?.last_name || '',
+            username: userProfile.username || user.user_metadata?.username || user.user_metadata?.name || 'User',
+            email: userProfile.email || user.email || '',
+            phone: userProfile.phone || user.user_metadata?.phone || '',
+            role: userProfile.role || 'user',
+            immutable_user_code: userProfile.immutable_user_code || null,
             purchases: purchases,
             listings: listings,
             sales: sales,

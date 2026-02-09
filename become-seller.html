@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Seller - Campus Market</title>
+    <link rel="stylesheet" href="styles.css?v=52">
+    <style>
+        .verification-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+
+        .step-icon {
+            width: 64px;
+            height: 64px;
+            background: #eff6ff;
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.75rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        .btn-verify {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+
+        .btn-verify:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-verify:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            color: var(--color-success);
+            background: #ecfdf5;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <!-- Reuse existing navbar logic -->
+            <a href="index.html" class="logo" style="flex-direction: row; gap: 10px; align-items: center;">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
+                    <path d="M16 8L22 14L16 20L10 14L16 20L16 8Z" fill="white" />
+                    <defs>
+                        <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#2563EB" />
+                            <stop offset="100%" stop-color="#14B8A6" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>Campus Market</span>
+            </a>
+
+            <!-- We'll let navbar.js populate rights side, but for now we might need a back link -->
+            <div class="nav-links">
+                <a href="account.html" class="nav-link">Back to Account</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="verification-container" id="step1">
+        <div class="step-icon">🛡️</div>
+        <h1>Become a Verified Seller</h1>
+        <p style="color: #64748b; margin-bottom: 2rem;">
+            To ensure safety in our community, we require all sellers to verify their student status.
+            Once verified, you'll gain access to the Seller Dashboard and be able to post listings.
+        </p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">🆔</div>
+            <h3>Upload Student ID</h3>
+            <p id="fileName" style="font-size: 0.9rem; color: #64748b;">Click to browse or drag & drop your student card
+            </p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+
+        <button class="btn-verify" id="submitBtn" disabled>Submit for Verification</button>
+        <div class="success-message" id="successMsg">
+            <strong>Success!</strong> You are now a verified seller. Redirecting...
+        </div>
+        <p id="errorMsg" style="display:none; color: red; margin-top: 1rem;"></p>
+    </div>
+
+    <!-- Success State -->
+    <div class="verification-container" id="step2" style="display: none;">
+        <div class="step-icon" style="background: #ecfdf5; color: #059669;">✅</div>
+        <h1>You're All Set!</h1>
+        <p style="color: #64748b; margin-bottom: 2rem;">
+            Your account has been upgraded to Seller status. You can now access the dashboard and start selling.
+        </p>
+        <button class="btn-verify" onclick="window.location.href='admin.html'">Go to Seller Dashboard</button>
+    </div>
+
+    <script type="module" src="become-seller.js"></script>
+</body>
+
+</html>

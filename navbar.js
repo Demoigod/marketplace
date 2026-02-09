@@ -61,22 +61,40 @@ async function renderDesktopNav() {
     let rightNavHtml = '';
     if (isAuth) {
         const isSeller = user.role === 'seller';
-        // Logged in: Show requested links
-        rightNavHtml = `
-            <div class="nav-links">
+
+        // Build Navigation based on Role
+        let linksHtml = '';
+
+        if (isSeller) {
+            linksHtml = `
                  <a href="#" id="navPostItem" class="nav-link">Post Item</a>
                  <a href="admin.html" class="nav-link">Dashboard</a>
                  <a href="skills-hub.html" class="nav-link">Skills Hub</a>
                  <a href="messages.html" class="nav-link">Messages</a>
+            `;
+        } else {
+            // Buyer / Student View
+            linksHtml = `
+                 <a href="index.html?type=market" class="nav-link">Marketplace</a>
+                 <a href="skills-hub.html" class="nav-link">Skills Hub</a>
+                 <a href="messages.html" class="nav-link">Messages</a>
+            `;
+        }
+
+        // Logged in: Show requested links
+        rightNavHtml = `
+            <div class="nav-links">
+                 ${linksHtml}
             </div>
             <div class="dropdown-container" id="profileDropdown" style="margin-left: 8px;">
                  <button class="icon-btn" aria-expanded="false" aria-haspopup="true" aria-label="User Menu">
                     ${userIcon}
                 </button>
                 <div class="dropdown-menu-modern" role="menu" style="display: none;">
-                    <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || 'User'}</span></div>
+                    <div class="dropdown-header">Signed in as <br><span style="color:var(--text-primary);">${user.name || user.username || 'User'}</span></div>
                     <div class="dropdown-divider"></div>
-                    <a href="admin.html" class="menu-item" role="menuitem">Control Center</a>
+                    ${isSeller ? '<a href="admin.html" class="menu-item" role="menuitem">Seller Dashboard</a>' : ''}
+                    <a href="account.html" class="menu-item" role="menuitem">Account Settings</a>
                     <button id="menuLogout" class="menu-item danger" role="menuitem">Log out</button>
                 </div>
             </div>

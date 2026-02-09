@@ -312,8 +312,20 @@
             </div>
         </div>
     </main>
+    <div id="toast" class="toast">Action successful</div>
 
-    <script type="module" src="admin.js?v=7"></script>
+    <script type="module" src="admin.js"></script>
+    <script type="module">
+        import { getCurrentUser, isLoggedIn } from './auth.js';
+
+        // Protect Seller Dashboard
+        (async () => {
+            const user = await getCurrentUser();
+            if (!user || user.role !== 'seller') {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
 </body>
 
 </html>
