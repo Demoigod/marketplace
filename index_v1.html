@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Market - Fresh Start</title>
+    <link rel="stylesheet" href="styles.css?v=fresh-1">
+    <link rel="stylesheet" href="minimal.css?v=fresh-1">
+
+    <script type="module">
+        console.log("FRESH INDEX LOADED");
+        import { getCurrentUser } from './auth.js?v=fresh-1';
+        async function checkAuth() {
+            try {
+                const user = await getCurrentUser();
+                if (user) window.location.replace('market.html');
+                else document.body.style.display = 'block';
+            } catch (e) {
+                document.body.style.display = 'block';
+            }
+        }
+        checkAuth();
+    </script>
+    <style>
+        body {
+            display: none;
+            margin: 0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <header style="padding: 2rem; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="margin:0; font-size:1.5rem;">Campus Market</h1>
+        <button onclick="document.getElementById('authModal').style.display='flex'" style="padding:0.5rem 1rem;">Log
+            In</button>
+    </header>
+
+    <div
+        style="height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f8fafc;">
+        <h1 style="font-size: 3rem; margin-bottom: 2rem;">Search Campus Market</h1>
+        <input type="text" placeholder="Search..."
+            style="padding: 1rem 2rem; width: 100%; max-width: 600px; border-radius: 50px; border: 1px solid #ccc;">
+    </div>
+
+    <!-- AUTH MODAL COPY -->
+    <div id="authModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); place-content:center;">
+        <div style="background:white; padding:2rem; width:100%; max-width:400px; position:relative;">
+            <button onclick="this.parentElement.parentElement.style.display='none'"
+                style="position:absolute; top:1rem; right:1rem;">X</button>
+            <h2>Log In</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email"
+                    style="width:100%; margin-bottom:1rem; padding:0.5rem;">
+                <input type="password" id="loginPassword" placeholder="Password"
+                    style="width:100%; margin-bottom:1rem; padding:0.5rem;">
+                <button type="submit" style="width:100%; padding:0.5rem; background:blue; color:white;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="main.js?v=fresh-1"></script>
+</body>
+
+</html>

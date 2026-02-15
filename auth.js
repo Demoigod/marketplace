@@ -93,21 +93,26 @@ export const checkAuthStatus = isLoggedIn;
 // Get current user profile data
 export async function getCurrentUser() {
     try {
+        console.log("APP_DEBUG: getCurrentUser called");
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return null;
 
         // Fetch additional profile data from profiles table
+        // Use maybeSingle() to avoid 406 error if profile doesn't exist yet
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('*, role')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
         let userProfile = { ...user };
 
         if (profileError) {
             console.warn('Error fetching profile:', profileError.message);
             // Return auth user with default role if profile fetch fails
+            userProfile = { ...user, role: 'user' };
+        } else if (!profile) {
+            console.warn('Profile missing for user, using default');
             userProfile = { ...user, role: 'user' };
         } else {
             userProfile = { ...user, ...profile };

@@ -1,0 +1,88 @@
+/* MINIMAL LANDING PAGE STYLES */
+.minimal-hero {
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    min-height: 80vh;
+    /* Takes up most of the screen */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+}
+
+.minimal-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.1;
+    margin-bottom: 3rem;
+    letter-spacing: -0.03em;
+}
+
+.search-xl-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-radius: 50px;
+    background: white;
+}
+
+.search-xl-input {
+    width: 100%;
+    padding: 1.5rem 4rem 1.5rem 2rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50px;
+    outline: none;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.search-xl-input:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.search-xl-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #2563EB;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.search-xl-btn:hover {
+    background: #1D4ED8;
+}
+
+/* Footer for minimal page */
+footer {
+    padding: 2rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    background: transparent;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .minimal-title {
+        font-size: 2.5rem;
+        padding: 0 1rem;
+    }
+}

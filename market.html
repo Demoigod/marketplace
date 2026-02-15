@@ -58,41 +58,73 @@
 
     <!-- Marketplace Section -->
     <section id="marketplace" class="marketplace-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Browse Market</h2>
-                <!-- Optional Search / Filter Controls here -->
-            </div>
-
-            <!-- Category Filters -->
-            <div class="category-filters" style="margin-bottom: 2rem;">
-                <button class="category-chip active" data-category="all">All Items</button>
-                <button class="category-chip" data-category="electronics">Electronics</button>
-                <button class="category-chip" data-category="books">Books</button>
-                <button class="category-chip" data-category="furniture">Furniture</button>
-                <button class="category-chip" data-category="services">Services</button>
-                <button class="category-chip" data-category="clothing">Clothing</button>
-            </div>
-
-            <!-- Marketplace Grid -->
-            <div id="marketplaceGrid" class="marketplace-grid">
-                <div class="loading-state"
-                    style="padding: 100px; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
-                    Loading items...
+        <div class="container market-layout">
+            <!-- Sidebar -->
+            <aside class="market-sidebar">
+                <!-- Search moved to sidebar -->
+                <div class="sidebar-section search-section">
+                    <div class="search-container small" style="width: 100%;">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search items..."
+                            style="width: 100%;">
+                    </div>
                 </div>
-            </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Marketplace</h3>
+                    <ul class="sidebar-menu">
+                        <li><button class="sidebar-link active" data-category="all">All Items</button></li>
+                        <li><button class="sidebar-link" data-category="electronics">Electronics</button></li>
+                        <li><button class="sidebar-link" data-category="books">Books</button></li>
+                        <li><button class="sidebar-link" data-category="furniture">Furniture</button></li>
+                        <li><button class="sidebar-link" data-category="clothing">Clothing</button></li>
+                        <li><button class="sidebar-link" data-category="services">Services</button></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">My Account</h3>
+                    <ul class="sidebar-menu">
+                        <li><a href="post-item.html" class="sidebar-link action-link">+ Sell Item</a></li>
+                        <li><a href="my-listings.html" class="sidebar-link">My Listings</a></li>
+                        <li><a href="messages.html" class="sidebar-link">Messages</a></li>
+                        <li><a href="account.html" class="sidebar-link">Settings</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="market-main">
+                <!-- Header removed for cleaner look -->
+
+                <!-- Marketplace Grid -->
+                <div id="marketplaceGrid" class="marketplace-grid">
+                    <div class="loading-state"
+                        style="padding: 100px; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+                        Loading items...
+                    </div>
+                </div>
+            </main>
         </div>
     </section>
 
-    <script type="module" src="script.js"></script>
+    <script type="module" src="main.js?v=cache-bust-1"></script>
     <script type="module">
         import { getCurrentUser } from './auth.js';
 
         // Protect Market Page - Redirect to index if not logged in
         (async () => {
-            const user = await getCurrentUser();
-            if (!user) {
-                window.location.href = 'index.html';
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    // Not logged in? Go back to landing.
+                    window.location.replace('index.html');
+                } else {
+                    // Logged in? safe to show content
+                    // (Optional: remove loading state here if we had one covering the screen)
+                }
+            } catch (e) {
+                console.error("Market auth check failed", e);
+                window.location.replace('index.html');
             }
         })();
     </script>

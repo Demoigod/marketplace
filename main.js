@@ -1,5 +1,6 @@
 // ===== SUPABASE INTEGRATION =====
-import { supabase } from './supabase-config.js';
+console.log("APP_DEBUG: main.js LOADED - NUCLEAR VERSION V1 [TIMESTAMP: " + new Date().toISOString() + "]");
+import { supabase } from './supabase-config.js?v=fixed';
 import {
     registerUser,
     loginUser,
@@ -10,11 +11,11 @@ import {
     addListing,
     addDownload,
     checkAuthStatus
-} from './auth.js';
-import { initNavigation } from './navbar.js';
+} from './auth.js?v=fixed';
+import { initNavigation } from './navbar.js?v=fixed';
 // Removed invalid import
-import { fetchAllItems, createItemCard } from './items.js';
-import { initSaveListeners } from './save-item.js';
+import { fetchAllItems, createItemCard } from './items.js?v=fixed';
+import { initSaveListeners } from './save-item.js?v=fixed';
 
 // ===== STATE MANAGEMENT =====
 let currentCategory = 'all';
@@ -49,30 +50,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check auth status to update UI
     await updateAuthUI();
+    console.log("APP_DEBUG: Script.js loaded.");
 
-    // Homepage Guard: Redirect authenticated users based on role
-    const currentPath = window.location.pathname;
-    const isHomePage = currentPath.endsWith('index.html') || currentPath.endsWith('/') || currentPath === '/';
+    // Homepage Guard REMOVED - Handled by inline script in index.html to prevent flash
 
-    if (isHomePage) {
-        const session = await isLoggedIn();
-        if (session) {
-            const user = await getCurrentUser();
-            // If seller, go to dashboard
-            if (user?.role === 'seller') {
-                window.location.href = 'admin.html';
-                return;
-            } else {
-                // Buyers go to market
-                window.location.href = 'market.html';
-                return;
-            }
-        }
-    }
 
     // Initial content load
-    refreshMarketplace();
-    fetchResources();
+    // Initial content load - ONLY if on a page with the grid
+    if (document.getElementById('marketplaceGrid')) {
+        refreshMarketplace();
+    }
+    if (document.getElementById('resourcesGrid')) {
+        fetchResources();
+    }
     initSaveListeners();
 
     // Check URL parameters for actions (e.g., immediate post triggering)
@@ -95,12 +85,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Redirect logic for Homepage / Index
             if (currentPath.endsWith('index.html') || currentPath.endsWith('/') || currentPath === '/') {
-                if (user?.role === 'seller') {
-                    window.location.href = 'admin.html';
-                } else {
-                    // Buyers go to the dedicated market page
-                    window.location.href = 'market.html';
-                }
+                // Unified Redirect: Everyone goes to market.html
+                window.location.href = 'market.html';
             }
         }
     });
@@ -240,34 +226,36 @@ function createResourceCard(resource) {
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
     // Search functionality (Dynamic check for Nav Search)
-    const activeSearchInput = document.getElementById('navSearchInput') || searchInput;
+    const activeSearchInput = document.getElementById('navSearchInput') || document.getElementById('searchInput');
+
+    // ===== SEARCH & FILTERS =====
     if (activeSearchInput) {
         activeSearchInput.addEventListener('input', debounce(handleSearch, 300));
     }
 
-    // Category filters
-    document.querySelectorAll('.category-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            // We would need to implement client-side filtering or re-fetch with query
-            // For now, simpler re-fetch approach:
-            // This assumes fetchAllItems handles strict filtering or we filter the local 'marketplaceItems' if we cached perfectly.
-            // But since fetchAllItems returns everything, let's just filter locally:
-            // This requires we keep marketplaceItems in state or refetch. 
-            // Simplified: Just log for now or implement if 'items.js' supports it.
-            // Actually, best to just filter the DOM or re-fetch with filter.
-            // Let's implement client-side filter of the fetched list.
-            const cat = chip.dataset.category;
-            filterMarketplace(cat);
+    // Category Filtering (Sidebar & Chips)
+    const categoryButtons = document.querySelectorAll('.category-chip, .sidebar-link[data-category]');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            // Update state and refresh
+            currentCategory = button.dataset.category;
+            refreshMarketplace();
         });
     });
 
-    // Resource filters
-    document.querySelectorAll('.resource-chip').forEach(chip => {
+    // Resource Filtering
+    const resourceChips = document.querySelectorAll('.resource-chip');
+    resourceChips.forEach(chip => {
         chip.addEventListener('click', () => {
-            document.querySelectorAll('.resource-chip').forEach(c => c.classList.remove('active'));
+            resourceChips.forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
+
             currentResourceType = chip.dataset.type;
             renderResources();
         });

@@ -30,6 +30,9 @@ async function renderDesktopNav() {
     const userIcon = `<svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
     const chevronDown = `<svg class="menu-icon" style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
 
+    // Determine base URL for categories
+    const basePage = isAuth ? 'market.html' : 'index.html';
+
     // Browse Dropdown HTML
     const browseHtml = `
         <div class="dropdown-container" id="browseDropdown">
@@ -38,10 +41,10 @@ async function renderDesktopNav() {
             </button>
             <div class="dropdown-menu-modern" role="menu" style="display: none;">
                 <div class="dropdown-header">Marketplace</div>
-                <a href="index.html?category=all" class="menu-item" role="menuitem">
+                <a href="${basePage}?category=all" class="menu-item" role="menuitem">
                     All Listings
                 </a>
-                <a href="index.html?type=free" class="menu-item" role="menuitem">
+                <a href="${basePage}?type=free" class="menu-item" role="menuitem">
                     Free Resources
                 </a>
                 <a href="skills-hub.html" class="menu-item" role="menuitem">
@@ -49,10 +52,10 @@ async function renderDesktopNav() {
                 </a>
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-header">Categories</div>
-                <a href="index.html?category=electronics" class="menu-item" role="menuitem">Electronics</a>
-                <a href="index.html?category=books" class="menu-item" role="menuitem">Books</a>
-                <a href="index.html?category=furniture" class="menu-item" role="menuitem">Furniture</a>
-                <a href="index.html?category=services" class="menu-item" role="menuitem">Services</a>
+                <a href="${basePage}?category=electronics" class="menu-item" role="menuitem">Electronics</a>
+                <a href="${basePage}?category=books" class="menu-item" role="menuitem">Books</a>
+                <a href="${basePage}?category=furniture" class="menu-item" role="menuitem">Furniture</a>
+                <a href="${basePage}?category=services" class="menu-item" role="menuitem">Services</a>
             </div>
         </div>
     `;
@@ -75,7 +78,7 @@ async function renderDesktopNav() {
         } else {
             // Buyer / Student View
             linksHtml = `
-                 <a href="market.html" class="nav-link">Browse Market</a>
+                 <a href="market.html" class="nav-link">Browse Marketplace</a>
                  <a href="become-seller.html" class="nav-link">Become a Seller</a>
                  <a href="skills-hub.html" class="nav-link">Learn</a>
                  <a href="messages.html" class="nav-link">Messages</a>

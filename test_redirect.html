@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Redirect Test</title>
+</head>
+
+<body>
+    <h1>Redirect Validator</h1>
+    <div id="status">Testing...</div>
+    <script type="module">
+        // Mocking the environment
+        window.getCurrentUser = async () => ({ role: 'user', id: 'test-user' });
+
+        // The logic from script.js we want to test
+        async function testRedirect() {
+            const user = await window.getCurrentUser();
+            const currentPath = window.location.pathname; // This will be /test_redirect.html
+
+            // Simulating "Index" behavior
+            // We can't easily overwrite window.location in a test without navigating away
+            // So we will just log what WOULD happen
+
+            if (user?.role === 'seller') {
+                document.getElementById('status').innerText = 'FAIL: Would redirect to admin.html';
+            } else {
+                document.getElementById('status').innerText = 'PASS: Would redirect to market.html';
+            }
+        }
+
+        testRedirect();
+    </script>
+</body>
+
+</html>

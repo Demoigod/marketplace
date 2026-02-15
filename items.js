@@ -1,5 +1,5 @@
-import { supabase } from './supabase-config.js';
-import { isLoggedIn } from './auth.js';
+import { supabase } from './supabase-config.js?v=fixed';
+import { isLoggedIn } from './auth.js?v=fixed';
 
 /**
  * Fetches all active items from the marketplace.
@@ -71,7 +71,7 @@ export function createItemCard(item, isAuth = false) {
         mainImage = item.images[0];
     }
     if (!mainImage) {
-        mainImage = 'https://via.placeholder.com/300x200?text=No+Image';
+        mainImage = 'https://placehold.co/300x200?text=No+Image';
     }
 
     // SECURITY: Conditional seller information display

@@ -1,4 +1,4 @@
-import{s as v}from"./auth-B4SlU3WG.js";/* empty css              */import"./admin-8vNtIyrQ.js";document.addEventListener("DOMContentLoaded",async()=>{const t=new URLSearchParams(window.location.search).get("id");if(!t){window.location.href="listings.html";return}f(t)});async function f(a){var r,n,o,l;const t=document.getElementById("itemDetailContainer");try{const{data:e,error:p}=await v.from("market_listings").select(`
+import{s as v}from"./auth-JaHXRiaM.js";/* empty css              */import"./admin-Dyf5zH3X.js";document.addEventListener("DOMContentLoaded",async()=>{const t=new URLSearchParams(window.location.search).get("id");if(!t){window.location.href="listings.html";return}f(t)});async function f(a){var r,n,o,l;const t=document.getElementById("itemDetailContainer");try{const{data:e,error:p}=await v.from("market_listings").select(`
                         *,
                         profiles (
                             username,
@@ -65,3 +65,4 @@ import{s as v}from"./auth-B4SlU3WG.js";/* empty css              */import"./admi
                         <a href="listings.html" class="btn-primary" style="display: inline-block; margin-top: 2rem; padding: 0.75rem 2rem; text-decoration: none; border-radius: 10px;">Back to Marketplace</a>
                     </div>
                 `}}window.changeMainImage=(a,t)=>{const r=document.getElementById("mainImageDisplay");r&&(r.src=a,document.querySelectorAll(".thumbnail-img").forEach(n=>n.classList.remove("active")),t&&t.classList.add("active"))};window.handleBuyAction=a=>{window.location.href=`checkout.html?id=${a}`};window.handleContactAction=(a,t)=>{window.location.href=`messages.html?seller_id=${a}&listing_id=${t}`};
+//# sourceMappingURL=item-tjMknBZ4.js.map
