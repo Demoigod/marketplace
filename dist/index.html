@@ -4,113 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Market - Minimal Search</title>
-    <meta name="description" content="The student marketplace for learning, selling, and growing.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- STRICT AUTH CHECK: Redirect IMMEDIATELY if logged in -->
+    <title>Campus Market - Fresh Start</title>
+
     <style>
         body {
             display: none;
             margin: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: sans-serif;
         }
     </style>
-  <script type="module" crossorigin src="/assets/main-B9gpcn8Z.js"></script>
+  <script type="module" crossorigin src="/assets/main-Hnoq-NHx.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/auth-JaHXRiaM.js">
   <link rel="stylesheet" crossorigin href="/assets/main-DBfZF7EU.css">
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header style="padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
-        <div class="logo"
-            style="font-weight: 800; font-size: 1.5rem; color: #111827; display: flex; align-items: center; gap: 8px;">
-            <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
-                <path d="M16 8L22 14L16 20L10 14L16 8Z" fill="white" />
-                <defs>
-                    <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
-                        <stop offset="0%" stop-color="#2563EB" />
-                        <stop offset="100%" stop-color="#14B8A6" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            Campus Market
-        </div>
-        <div style="display: flex; gap: 1rem;">
-            <button onclick="document.getElementById('authModal').style.display='flex'"
-                style="background: none; border: none; font-weight: 600; color: #374151; cursor: pointer;">Log
-                in</button>
-            <button onclick="document.getElementById('authModal').style.display='flex'"
-                style="background: #111827; color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 20px; font-weight: 600; cursor: pointer;">Sign
-                up</button>
-        </div>
+    <header style="padding: 2rem; display:flex; justify-content:space-between; align-items:center;">
+        <h1 style="margin:0; font-size:1.5rem;">Campus Market</h1>
+        <button id="landingLoginBtn" style="padding:0.5rem 1rem; cursor:pointer;">Log In</button>
     </header>
 
-    <!-- HERO -->
-    <section class="minimal-hero">
-        <h1 class="minimal-title">Discover Unique Items<br>on Campus</h1>
-        <div class="search-xl-container">
-            <input type="text" class="search-xl-input" placeholder="Search for textbooks, furniture, electronics...">
-            <button class="search-xl-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </button>
-        </div>
-    </section>
+    <div
+        style="height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f8fafc;">
+        <h1 style="font-size: 3rem; margin-bottom: 2rem; text-align: center;">Search Campus Market</h1>
+        <input type="text" placeholder="Search..."
+            style="padding: 1rem 2rem; width: 100%; max-width: 600px; border-radius: 50px; border: 1px solid #ccc;">
+    </div>
 
-    <!-- FOOTER -->
-    <footer
-        style="padding: 2rem; position: fixed; bottom: 0; width: 100%; text-align: center; color: #9ca3af; font-size: 0.85rem;">
-        &copy; 2026 Campus Market
-    </footer>
-
-    <!-- AUTH MODAL -->
-    <div id="authModal" class="modal"
-        style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <!-- AUTH MODAL COPY -->
+    <div id="authModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); place-content:center; z-index: 9999;">
         <div
-            style="background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 400px; position: relative;">
-            <button onclick="document.getElementById('authModal').style.display='none'"
-                style="position: absolute; right: 1rem; top: 1rem; border: none; background: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-            <h2 style="margin-bottom: 1.5rem;">Welcome Back</h2>
-            <form id="loginForm" class="upload-form">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
-                    <input type="email" id="loginEmail" required
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px;">
-                </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Password</label>
-                    <input type="password" id="loginPassword" required
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 8px;">
-                </div>
+            style="background:white; padding:2rem; width:100%; max-width:400px; position:relative; border-radius: 8px;">
+            <button id="authModalClose"
+                style="position:absolute; top:1rem; right:1rem; border:none; background:none; cursor:pointer; font-size:1.2rem;">&times;</button>
+            <h2 style="margin-top:0;">Log In</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required
+                    style="width:100%; margin-bottom:1rem; padding:0.5rem;">
+                <input type="password" id="loginPassword" placeholder="Password" required
+                    style="width:100%; margin-bottom:1rem; padding:0.5rem;">
                 <button type="submit"
-                    style="width: 100%; background: #2563EB; color: white; padding: 0.75rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Log
-                    In</button>
+                    style="width:100%; padding:0.5rem; background:#2563EB; color:white; border:none; border-radius:4px; cursor:pointer;">Login</button>
             </form>
+            <p style="margin-top:1rem; font-size:0.9rem; color:#666;">
+                <a href="#" onclick="alert('Please contact admin')">Forgot password?</a>
+            </p>
         </div>
     </div>
 
     <script>
-        // Modal & Search Interaction
-        const modal = document.getElementById('authModal');
-        document.querySelectorAll('[onclick*="authModal"]').forEach(btn => {
-            btn.onclick = (e) => { e.preventDefault(); modal.style.display = 'flex'; }
-        });
+        // Inline safeguard for buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('authModal');
+            const btn = document.getElementById('landingLoginBtn');
+            const close = document.getElementById('authModalClose');
 
-        const searchInput = document.querySelector('.search-xl-input');
-        const searchBtn = document.querySelector('.search-xl-btn');
-        function triggerAuth(e) {
-            e.preventDefault();
-            modal.style.display = 'flex';
-            setTimeout(() => document.getElementById('loginEmail')?.focus(), 100);
-        }
-        if (searchBtn) searchBtn.addEventListener('click', triggerAuth);
-        if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') triggerAuth(e); });
+            if (btn && modal) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    modal.style.display = 'grid'; // grid for place-content center
+                };
+            }
+            if (close && modal) {
+                close.onclick = () => {
+                    modal.style.display = 'none';
+                }
+            }
+            // Close on click outside
+            window.onclick = (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 

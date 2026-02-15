@@ -34,35 +34,63 @@
 <body>
     <header style="padding: 2rem; display:flex; justify-content:space-between; align-items:center;">
         <h1 style="margin:0; font-size:1.5rem;">Campus Market</h1>
-        <button onclick="document.getElementById('authModal').style.display='flex'" style="padding:0.5rem 1rem;">Log
-            In</button>
+        <button id="landingLoginBtn" style="padding:0.5rem 1rem; cursor:pointer;">Log In</button>
     </header>
 
     <div
         style="height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f8fafc;">
-        <h1 style="font-size: 3rem; margin-bottom: 2rem;">Search Campus Market</h1>
+        <h1 style="font-size: 3rem; margin-bottom: 2rem; text-align: center;">Search Campus Market</h1>
         <input type="text" placeholder="Search..."
             style="padding: 1rem 2rem; width: 100%; max-width: 600px; border-radius: 50px; border: 1px solid #ccc;">
     </div>
 
     <!-- AUTH MODAL COPY -->
     <div id="authModal"
-        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); place-content:center;">
-        <div style="background:white; padding:2rem; width:100%; max-width:400px; position:relative;">
-            <button onclick="this.parentElement.parentElement.style.display='none'"
-                style="position:absolute; top:1rem; right:1rem;">X</button>
-            <h2>Log In</h2>
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); place-content:center; z-index: 9999;">
+        <div
+            style="background:white; padding:2rem; width:100%; max-width:400px; position:relative; border-radius: 8px;">
+            <button id="authModalClose"
+                style="position:absolute; top:1rem; right:1rem; border:none; background:none; cursor:pointer; font-size:1.2rem;">&times;</button>
+            <h2 style="margin-top:0;">Log In</h2>
             <form id="loginForm">
-                <input type="email" id="loginEmail" placeholder="Email"
+                <input type="email" id="loginEmail" placeholder="Email" required
                     style="width:100%; margin-bottom:1rem; padding:0.5rem;">
-                <input type="password" id="loginPassword" placeholder="Password"
+                <input type="password" id="loginPassword" placeholder="Password" required
                     style="width:100%; margin-bottom:1rem; padding:0.5rem;">
-                <button type="submit" style="width:100%; padding:0.5rem; background:blue; color:white;">Login</button>
+                <button type="submit"
+                    style="width:100%; padding:0.5rem; background:#2563EB; color:white; border:none; border-radius:4px; cursor:pointer;">Login</button>
             </form>
+            <p style="margin-top:1rem; font-size:0.9rem; color:#666;">
+                <a href="#" onclick="alert('Please contact admin')">Forgot password?</a>
+            </p>
         </div>
     </div>
 
     <script type="module" src="main.js?v=fresh-1"></script>
+    <script>
+        // Inline safeguard for buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('authModal');
+            const btn = document.getElementById('landingLoginBtn');
+            const close = document.getElementById('authModalClose');
+
+            if (btn && modal) {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    modal.style.display = 'grid'; // grid for place-content center
+                };
+            }
+            if (close && modal) {
+                close.onclick = () => {
+                    modal.style.display = 'none';
+                }
+            }
+            // Close on click outside
+            window.onclick = (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 
 </html>
