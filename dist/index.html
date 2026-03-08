@@ -13,7 +13,7 @@
             font-family: sans-serif;
         }
     </style>
-  <script type="module" crossorigin src="/assets/main-Hnoq-NHx.js"></script>
+  <script type="module" crossorigin src="/assets/main-Bt8HsJWu.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/auth-JaHXRiaM.js">
   <link rel="stylesheet" crossorigin href="/assets/main-DBfZF7EU.css">
 </head>
@@ -60,10 +60,11 @@
             const btn = document.getElementById('landingLoginBtn');
             const close = document.getElementById('authModalClose');
 
-            if (btn && modal) {
+            if (btn) {
                 btn.onclick = (e) => {
                     e.preventDefault();
-                    modal.style.display = 'grid'; // grid for place-content center
+                    // User requested redirect to market page instead of modal
+                    window.location.href = 'market.html';
                 };
             }
             if (close && modal) {

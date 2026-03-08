@@ -52,7 +52,11 @@ export async function loginUser(email, password) {
         return { success: true, message: 'Login successful', user: data.user };
     } catch (error) {
         console.error('Login error:', error.message);
-        return { success: false, message: error.message };
+        let message = error.message;
+        if (message === 'Failed to fetch') {
+            message = 'Failed to fetch. Please ensure your Supabase project is not paused and your network is connected.';
+        }
+        return { success: false, message: message };
     }
 }
 

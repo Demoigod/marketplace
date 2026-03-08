@@ -78,7 +78,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Global Auth Logic: Handle redirects on state change (Logout)
     supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_OUT') {
-            window.location.href = 'index.html';
+            const currentPath = window.location.pathname;
+            // List of pages that require login
+            const protectedPages = [
+                'account.html',
+                'post-item.html',
+                'my-listings.html',
+                'messages.html',
+                'admin.html',
+                'checkout.html',
+                'become-seller.html'
+            ];
+
+            // Check if we are on a protected page
+            const isProtected = protectedPages.some(page => currentPath.includes(page));
+
+            if (isProtected) {
+                window.location.href = 'index.html';
+            }
+            // If on market.html or index.html, Do Nothing (Allow Guest)
+
         } else if (event === 'SIGNED_IN') {
             const user = await getCurrentUser();
             const currentPath = window.location.pathname;

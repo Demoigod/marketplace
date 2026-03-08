@@ -74,10 +74,11 @@
             const btn = document.getElementById('landingLoginBtn');
             const close = document.getElementById('authModalClose');
 
-            if (btn && modal) {
+            if (btn) {
                 btn.onclick = (e) => {
                     e.preventDefault();
-                    modal.style.display = 'grid'; // grid for place-content center
+                    // User requested redirect to market page instead of modal
+                    window.location.href = 'market.html';
                 };
             }
             if (close && modal) {
