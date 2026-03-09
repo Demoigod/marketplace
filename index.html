@@ -8,30 +8,8 @@
     <link rel="stylesheet" href="styles.css?v=fresh-1">
     <link rel="stylesheet" href="minimal.css?v=fresh-1">
 
-    <script type="module">
-        console.log("FRESH INDEX LOADED");
-        import { getCurrentUser } from './auth.js?v=fresh-1';
-        async function checkAuth() {
-            try {
-                const user = await getCurrentUser();
-                if (user) window.location.replace('market.html');
-                else document.body.style.display = 'block';
-            } catch (e) {
-                document.body.style.display = 'block';
-            }
-        }
-        checkAuth();
-    </script>
-    <style>
-        body {
-            display: none;
-            margin: 0;
-            font-family: sans-serif;
-        }
-    </style>
 </head>
-
-<body>
+<body style="margin: 0; font-family: sans-serif;">
     <header style="padding: 2rem; display:flex; justify-content:space-between; align-items:center;">
         <h1 style="margin:0; font-size:1.5rem;">Campus Market</h1>
         <button id="landingLoginBtn" style="padding:0.5rem 1rem; cursor:pointer;">Log In</button>
